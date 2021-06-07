@@ -458,7 +458,29 @@ void TFT_DrawLine(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint32_t c
 	}
 }
 
-void TFT_DrawBitmap(uint32_t Xpos, uint32_t Ypos, const uint8_t *pbmp, uint8_t layer)
+void TFT_DrawBitmap_d(uint32_t Xpos, uint32_t Ypos, const uint8_t *bitmap, uint16_t width, uint16_t height,  uint8_t layer){
+	 uint32_t y,x,p=Xpos,c=0, len=strlen(bitmap);
+  /* Set the address */
+  uint32_t  address = hltdc.LayerCfg[layer].FBStartAdress +  Ypos*X_SIZE*4;
+  /* Bypass the bitmap header */
+  for(y=0;y<height;y++){
+    for(x=1;x<width+1;x++){
+		c=0;
+		c=0x00000000;
+		c |= (bitmap[((y*width)+x)*4+3]);
+		c |= (bitmap[((y*width)+x)*4+2]) << 8;
+		c |= (bitmap[((y*width)+x)*4+1]) << 16;
+		c |= (bitmap[((y*width)+x)*4+0]) << 24;
+
+      *(uint32_t*) (address + (y+x+p)*4) = c;//TTZ_COL_ORAN;
+      if((y+x)>=(X_SIZE*Y_SIZE)) return;
+    }
+	p=p+X_SIZE-1;
+  }
+  return;
+}
+
+void TFT_DrawBitmap(uint32_t Xpos, uint32_t Ypos, uint8_t *pbmp, uint8_t layer)
 {
 //	TFT_FillScreen(0xFFFF0000,0);
 //	char tststr[40] = "test string";

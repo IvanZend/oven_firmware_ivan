@@ -550,7 +550,7 @@ screenFunc_t MarlinUI:: get_screen() {
 }
 void MarlinUI::status_screen() {
   prevScreen = currentScreen;
-  // status_screen_refresh();
+  //status_screen_refresh();
   #if HAS_LCD_MENU
     ENCODER_RATE_MULTIPLY(false);
   #endif
@@ -648,10 +648,10 @@ void MarlinUI::status_screen() {
     }
 
   #endif // ULTIPANEL_FEEDMULTIPLY
-
+   // !!! заметка. тут отправляем картинку на дисплей
+   oven_test_draw();
    HAL_LTDC_SetAddress(&hltdc,LCD_FRAME_BUFFER(LAYER_HOME), 0);
-  // draw_status_screen();
-  oven_test_draw();
+   //draw_status_screen();
 }
 
 void MarlinUI::kill_screen(PGM_P lcd_error, PGM_P lcd_component) {
