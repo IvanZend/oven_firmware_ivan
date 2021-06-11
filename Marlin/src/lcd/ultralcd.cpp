@@ -22,7 +22,6 @@
 
 #include "../MarlinCore.h"
 #include "../inc/MarlinConfigPre.h"
-#include "../oven/oven_lcd_output.h"
 
 #ifdef LED_BACKLIGHT_TIMEOUT
   #include "../feature/leds/leds.h"
@@ -648,10 +647,14 @@ void MarlinUI::status_screen() {
     }
 
   #endif // ULTIPANEL_FEEDMULTIPLY
-   // !!! заметка. тут отправляем картинку на дисплей
-   oven_test_draw();
-   HAL_LTDC_SetAddress(&hltdc,LCD_FRAME_BUFFER(LAYER_HOME), 0);
    //draw_status_screen();
+  if (!oven_display.draw_all_completed)
+  {
+    HAL_LTDC_SetAddress(&hltdc,LCD_FRAME_BUFFER(LAYER_HOME), 0);
+    oven_display.draw_all_widgets(oven_display.widgets_vector);
+    //oven_display.test_draw();
+    oven_display.draw_all_completed = true;
+  }
 }
 
 void MarlinUI::kill_screen(PGM_P lcd_error, PGM_P lcd_component) {

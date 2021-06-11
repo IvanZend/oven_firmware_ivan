@@ -210,6 +210,18 @@ extern "C" {
 #define PIN_SPI_MOSI            PC12
 #define PIN_SPI_MISO            PC11
 #define PIN_SPI_SCK             PC10
+
+/**
+ *  SPI settings - number of devices
+ *  0         - for default device, initialized at start
+  * 1-6       - drivers
+  * 7-8       - ADS1118
+  * 9-10      - FLASH memory
+ */
+
+#ifndef NB_SPI_SETTINGS
+#define NB_SPI_SETTINGS 11
+#endif
 // #define PIN_SPI_SS              -1
 
 // I2C Definitions

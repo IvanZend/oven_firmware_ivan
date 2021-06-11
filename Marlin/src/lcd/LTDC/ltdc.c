@@ -430,13 +430,13 @@ void TFT_DrawLine(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint32_t c
 	int steep = abs(y2-y1)>abs(x2-x1);
 	if(steep)
 	{
-		swap(x1,y1);
-		swap(x2,y2);
+		ltdc_swap(x1,y1);
+		ltdc_swap(x2,y2);
 	}
 	if(x1>x2)
 	{
-		swap(x1,x2);
-		swap(y1,y2);
+		ltdc_swap(x1,x2);
+		ltdc_swap(y1,y2);
 	}
 	int dx,dy;
 	dx=x2-x1;

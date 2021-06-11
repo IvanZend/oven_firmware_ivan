@@ -78,7 +78,7 @@
 #define TTZ_COL_GREE ((uint32_t)0xFF00FF00)
 
 
-#define swap(a,b) {int16_t t=a;a=b;b=t;}
+#define ltdc_swap(a,b) {int16_t t=a;a=b;b=t;}
 #define convert24to32(x) (x|0xFF000000)
 
 

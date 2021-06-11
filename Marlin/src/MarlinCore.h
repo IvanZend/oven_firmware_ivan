@@ -31,6 +31,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "oven/oven_core.h"
+
 #if HAS_L64XX
   #include "libs/L64XX/L64XX_Marlin.h"
   extern uint8_t axis_known_position;
