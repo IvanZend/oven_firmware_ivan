@@ -17,6 +17,9 @@ using namespace std;
 #define RECTANGLE_FILL          1
 #define RECTANGLE_PUNCTIR       0
 #define DEFAULT_DISPLAY_MODE    STANDARD_USER_MODE
+#define DISPLAY_WIDTH           800
+#define DISPLAY_HEIGHT          600
+#define RIGHT_COLUMN_OFFSET     391
 
 typedef struct 
 {
@@ -74,19 +77,24 @@ class Widget
     //vector<TextObj>  constant_text_strings;
     //vector<TextObj>  pressed_button_text_stringsr;
     //vector<Widget*>  related_oblects;           // Нужно для обработки кнопок сложной формы, состоящих из нескольких виджетов.
-    void add_image_to_vector(tImage image_generated, uint16_t coord_x, uint16_t coord_y, vector<ImageObj>& images_vector);
+    void add_image_to_widget(tImage image_generated, uint16_t coord_x, uint16_t coord_y);
+    void tile_area(tImage image_to_tile, uint16_t area_width, uint16_t area_hight); // замостить область повторяющейся картинкой
+    void set_rectangle(void);
 };
 
 class OvenDisplay 
 {
     public:
-    OvenDisplay(void);          // конструктор
+
+    OvenDisplay(void);                  // конструктор
     Display_mode display_mode;
-    bool draw_all_completed;    // Флаг, что весь дисплей был отрисован. Переключаем при запуске и при смене режима (DEFAULT_DISPLAY_MODE)
+    uint16_t display_width, display_height;
+    bool draw_all_completed;            // Флаг, что весь дисплей был отрисован. Переключаем при запуске и при смене режима (DEFAULT_DISPLAY_MODE)
     vector<Widget> widgets_vector;
-    void test_draw(void);       // тестовая картинка, выводим изображение ракеты
-    void init_widgets(Display_mode current_mode, vector<Widget>& widgets_vector_to_init);
-    void draw_all_widgets(vector<Widget>& widgets_vector_to_draw);        // отрисовываем весь дисплей
+
+    void test_draw(void);                                                                      // тестовая картинка, выводим изображение ракеты
+    void init_widgets(void);
+    void draw_all_widgets(vector<Widget>& widgets_vector_to_draw);                             // отрисовываем весь дисплей
 };
 
 void system_menu_layout_draw(void);

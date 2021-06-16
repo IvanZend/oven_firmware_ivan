@@ -464,7 +464,8 @@ void TFT_DrawBitmap_d(uint32_t Xpos, uint32_t Ypos, const uint8_t *bitmap, uint1
   uint32_t  address = hltdc.LayerCfg[layer].FBStartAdress +  Ypos*X_SIZE*4;
   /* Bypass the bitmap header */
   for(y=0;y<height;y++){
-    for(x=1;x<width+1;x++){
+    //for(x=1;x<width+1;x++){
+		for(x=0;x<width;x++){
 		c=0;
 		c=0x00000000;
 		c |= (bitmap[((y*width)+x)*4+3]);
