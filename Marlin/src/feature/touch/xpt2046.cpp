@@ -95,9 +95,6 @@ uint16_t XPT2046::read_buttons(screenFunc_t currentScreen) {
     // sprintf(testPing,"echo:1");
     // HAL_UART_Transmit(&huart2, (uint8_t *)testPing, strlen(testPing), 10);
 
-
-
-
   int16_t tsoffsets[4] = { 0 };
   // uint8_t testVar = 0;
 
@@ -137,155 +134,18 @@ uint16_t XPT2046::read_buttons(screenFunc_t currentScreen) {
 		//  TFT_DrawFilledCircle(y,x,10,LCD_COLOR_RANDOM);
 		  // *(uint32_t*) (hltdc.LayerCfg[0].FBStartAdress + (4*(y*hltdc.LayerCfg[0].ImageWidth + x))) = (uint32_t)((rand() & 0xff) | (rand() & 0xff)<<8 | (rand() & 0xff)<<16 | ( 0xff)<<24);
   
-
-  
-  if(currentScreen == MarlinUI::status_screen){
-    // if(WITHIN(y,  82, 333)){    
-    //    if(WITHIN(x,  89, 383)){           return FL_RENDER;      }
-    // }
-    if(WITHIN(y,  504, 554)){    
-      if(WITHIN(x,  52, 126)){           return HOM_SD;      }
-      if(WITHIN(x, 231, 303)){           return SD_GO_ON;      }
-      if(WITHIN(x, 412, 484)){           return SD_PAUSE;      }
-      if(WITHIN(x, 590, 662)){           return SD_STOP;      }
-    }
-    if(WITHIN(y,  25, 97)){   
-      if(WITHIN(x, 14, 86)){           return HOM_RESLOGS;      }
-    }
-  }
-  if(currentScreen == MarlinUI::menu_recovery){
-    if(WITHIN(y,  200, 400)){
-             if(WITHIN(x,  100, 350)){         return RECOVERY_RESUME;      }
-        else if(WITHIN(x,  450, 700)){         return RECOVERY_CANCEL;      }
-        else{        return 0;      }
-    }
-  }
-  if(currentScreen == MarlinUI::menu_sdmain){
-    if(WITHIN(y,  499, 555)){
-             if(WITHIN(x,  150, 251)){         return SD_PPAGE;      }
-        else if(WITHIN(x,  252, 353)){         return SD_NPAGE;      }
-        else if(WITHIN(x,  447, 549)){         return SD_PREVIEW;    }
-        else if(WITHIN(x,  549, 651)){         return SD_PRINT;      }
-        else{        return 0;      }
-    }else if(WITHIN(x,  150, 651)){
-      if(WITHIN(y,  126, 150)){                 return SD_FILE0;
-      }else if(WITHIN(y,  151, 174)){           return SD_FILE1;
-      }else if(WITHIN(y,  175, 198)){           return SD_FILE2;
-      }else if(WITHIN(y,  199, 222)){           return SD_FILE3;
-      }else if(WITHIN(y,  223, 246)){           return SD_FILE4;
-      }else if(WITHIN(y,  247, 270)){           return SD_FILE5;
-      }else if(WITHIN(y,  271, 294)){           return SD_FILE6;
-      }else if(WITHIN(y,  295, 318)){           return SD_FILE7;
-      }else if(WITHIN(y,  319, 342)){           return SD_FILE8;
-      }else if(WITHIN(y,  343, 366)){           return SD_FILE9;
-      }else if(WITHIN(y,  367, 390)){           return SD_FILE10;
-      }else if(WITHIN(y,  391, 414)){           return SD_FILE11;   
-      }else if(WITHIN(y,  415, 438)){           return SD_FILE12;   
-      }else if(WITHIN(y,  439, 462)){           return SD_FILE13;   
-      }else if(WITHIN(y,  463, 486)){           return SD_FILE14;   
+  for (vector<Widget>::size_type i = 0; i != oven_display.widgets_vector.size(); i++)
+  {
+    if (oven_display.widgets_vector[i].button_name != NO_BUTTON)
+    {
+      if ((WITHIN(x, oven_display.widgets_vector[i].wgt_coord_x, (oven_display.widgets_vector[i].wgt_coord_x + oven_display.widgets_vector[i].wgt_width))) && \
+          (WITHIN(y, oven_display.widgets_vector[i].wgt_coord_y, (oven_display.widgets_vector[i].wgt_coord_y + oven_display.widgets_vector[i].wgt_height))))
+      {
+        return oven_display.widgets_vector[i].button_name;
       }
     }
   }
-  if(currentScreen == MarlinUI::menu_axis){
-    if(WITHIN(x,  34, 125)){
-                  if(WITHIN(y,  36, 127)){           return AXIS_DZP01;      }
-              else if(WITHIN(y,  133, 225)){         return AXIS_DZP001;       }
-              else if(WITHIN(y,  231, 322)){         return AXIS_DZHOME;       }
-              else if(WITHIN(y,  328, 419)){         return AXIS_DZM001;      }
-              else if(WITHIN(y,  424, 515)){         return AXIS_DZM01;      }
-              else{        return 0;      }
-    }else  if(WITHIN(x,  155, 253)){
-                  if(WITHIN(y,  55, 94)){            return AXIS_MM10;      }
-              else if(WITHIN(y,  231, 322)){         return AXIS_HXL;      }
-              else{        return 0;      }
-    }else  if(WITHIN(x,  254, 345)){
-                  if(WITHIN(y,  55, 94)){            return AXIS_MM1;      }
-              else if(WITHIN(y,  133, 224)){         return AXIS_HYT;      }
-              else if(WITHIN(y,  231, 322)){         return AXIS_HXY;      }
-              else if(WITHIN(y,  328, 419)){         return AXIS_HYB;      }
-              else if(WITHIN(y,  434, 515)){         return AXIS_HXYZ;      }    
-              else{        return 0;      }     
-    }else  if(WITHIN(x,  346, 443)){
-                  if(WITHIN(y,  55, 94)){            return AXIS_MM01;      }
-              else if(WITHIN(y,  231, 322)){         return AXIS_HXR;      }  
-              else{        return 0;      }    
-    }else  if(WITHIN(x,  473, 564)){
-                  if(WITHIN(y,  36, 127)){           return AXIS_ZP10;      }
-              else if(WITHIN(y,  133, 225)){         return AXIS_ZP1;       }
-              else if(WITHIN(y,  231, 322)){         return AXIS_ZH;      }
-              else if(WITHIN(y,  328, 419)){         return AXIS_ZM1;      }
-              else if(WITHIN(y,  424, 515)){         return AXIS_ZM10;      }
-              else{        return 0;      }
-    }else  if(WITHIN(x,  595, 686)){
-                  if(WITHIN(y,  36, 127)){           return AXIS_EP10;      }
-              else if(WITHIN(y,  133, 225)){         return AXIS_EP1;       }
-              else if(WITHIN(y,  231, 276)){         return AXIS_ES1;      }
-              else if(WITHIN(y,  277, 322)){         return AXIS_ES2;      }
-              else if(WITHIN(y,  328, 419)){         return AXIS_EM1;      }
-              else if(WITHIN(y,  424, 515)){         return AXIS_EM10;      }
-              else{        return 0;      }
-    }
-  }
-  if(currentScreen == MarlinUI::menu_calib){
-    /*top 3*/
-    if(WITHIN(x,   36, 249) && WITHIN(y,   27, 127)){          return CAL_EXTR1;      }
-    #if EXTRUDERS > 1
-    if(WITHIN(x,  254, 468) && WITHIN(y,   27, 127)){          return CAL_EXTR2;      }
-    #endif
-    if(WITHIN(x,  473, 687) && WITHIN(y,   27, 127)){          return CAL_BED;      }
-    /*mid 3*/
-    if(WITHIN(x,   36, 249) && WITHIN(y,  129, 229)){          return CAL_FILAMENT_FLOW1;      }
-    #if EXTRUDERS > 1
-    if(WITHIN(x,  254, 468) && WITHIN(y,  129, 229)){          return CAL_FILAMENT_FLOW2;      }
-    #endif
-    if(WITHIN(x,  473, 687) && WITHIN(y,  129, 229)){          return CAL_CHAMBER;      }
-    /*bot 2*/
-    if(WITHIN(x,  473, 687) && WITHIN(y,  231, 331)){          return CAL_FEEDRATE;      }
-    if(WITHIN(x,  473, 687) && WITHIN(y,  333, 433)){          return CAL_COOLER;      }
 
-    /*MINUS - PLUS*/
-    if(WITHIN(x,  35, 142) && WITHIN(y,  306, 409)){           return CAL_NUMM;      }
-    if(WITHIN(x, 362, 468) && WITHIN(y,  306, 409)){           return CAL_NUMP;      }
-
-    /*NUMPAD*/
-    if(WITHIN(x, 43, 111) && WITHIN(y,  428, 473)){           return CAL_NUM1;      }
-    if(WITHIN(x,113, 181) && WITHIN(y,  428, 473)){           return CAL_NUM2;      }
-    if(WITHIN(x,183, 251) && WITHIN(y,  428, 473)){           return CAL_NUM3;      }
-    if(WITHIN(x,253, 321) && WITHIN(y,  428, 473)){           return CAL_NUM4;      }
-    if(WITHIN(x,323, 391) && WITHIN(y,  428, 473)){           return CAL_NUM5;      }
-
-    if(WITHIN(x, 43, 111) && WITHIN(y,  475, 520)){           return CAL_NUM6;      }
-    if(WITHIN(x,113, 181) && WITHIN(y,  475, 520)){           return CAL_NUM7;      }
-    if(WITHIN(x,183, 251) && WITHIN(y,  475, 520)){           return CAL_NUM8;      }
-    if(WITHIN(x,253, 321) && WITHIN(y,  475, 520)){           return CAL_NUM9;      }
-    if(WITHIN(x,323, 391) && WITHIN(y,  475, 520)){           return CAL_NUM0;      }
-
-    if(WITHIN(x,393, 462) && WITHIN(y,  428, 568)){           return CAL_NUMK;      }
-    if(WITHIN(x,323, 462) && WITHIN(y,  523, 568)){           return CAL_NUMK;      }
-    if(WITHIN(x, 43, 181) && WITHIN(y,  523, 568)){           return CAL_NUMB;      }
-    if(WITHIN(x,183, 322) && WITHIN(y,  523, 568)){           return CAL_NUMC;      }
-  }
-  if(currentScreen == MarlinUI::status_screen || \
-  currentScreen == MarlinUI::menu_calib || \
-  currentScreen == MarlinUI::menu_options || \
-  currentScreen == MarlinUI::menu_light || \
-  currentScreen == MarlinUI::menu_camera || \
-  currentScreen == MarlinUI::menu_filament || \
-  currentScreen == MarlinUI::menu_sdmain || \
-  currentScreen == MarlinUI::menu_axis
-  ){
-    return WITHIN(x,  710, 790) ? ( \
-    WITHIN(y,  0, 100) ? RBTN_HOME : \
-    WITHIN(y,  101, 160) ? RBTN_CALIB : \
-    WITHIN(y,  161, 245) ? RBTN_OPTIONS : \
-    WITHIN(y,  246, 340) ? RBTN_LIGHT : \
-    WITHIN(y,  341, 415) ? RBTN_CAMERA : \
-    WITHIN(y,  416, 495) ? RBTN_FILAMENT : \
-    WITHIN(y,  496, 599) ? RBTN_AXIS : 0) : ( \
-    0\
-    );
-
-  }
   return 0;
 }
 

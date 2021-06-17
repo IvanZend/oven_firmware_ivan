@@ -841,340 +841,11 @@ void MarlinUI::update() {
     static bool wait_for_unclick; // = false
 
     // #if ENABLED(TOUCH_BUTTONS)
-      if (touch_buttons) {
-        RESET_STATUS_TIMEOUT();
-        if (ELAPSED(ms, next_button_update_ms)) {
-          #if HAS_BUZZER
-            buzz(LCD_FEEDBACK_FREQUENCY_DURATION_MS, LCD_FEEDBACK_FREQUENCY_HZ);
-          #endif
-          next_button_update_ms = ms + repeat_delay;    // Assume the repeat delay
-          if (!wait_for_unclick) {
-            next_button_update_ms += 250;               // Longer delay on first press
-            wait_for_unclick = true;                    // Avoid Back/Select click while repeating
-          }
-          if (touch_buttons == RBTN_HOME) {
-            if(currentScreen != status_screen)goto_screen(status_screen);        
-          }else if(touch_buttons == RBTN_CALIB){
-            if(currentScreen != menu_calib)goto_screen(menu_calib);
-          }else if(touch_buttons == RBTN_OPTIONS){
-            #ifdef MENU_OPTS
-            if(currentScreen != menu_options)goto_screen(menu_options);
-            #endif     
-          }else if(touch_buttons == RBTN_LIGHT){
-            #ifdef MENU_LIGHT
-            if(currentScreen != menu_light)goto_screen(menu_light);     
-            #endif     
-          }else if(touch_buttons == RBTN_CAMERA){
-            #ifdef MENU_CAMERA
-            if(currentScreen != menu_camera)goto_screen(menu_camera);      
-            #endif    
-          }else if(touch_buttons == RBTN_FILAMENT){
-            if(currentScreen != menu_filament)goto_screen(menu_filament);          
-          }else if(touch_buttons == RBTN_AXIS){
-            if(currentScreen != menu_axis)goto_screen(menu_axis);        
-          }
+  if (touch_buttons) 
+  {
+    drawing_screen = true;
+  }
 
-          if(touch_buttons>10 && currentScreen == status_screen){
-            if(Appli_state==APPLICATION_READY && touch_buttons == HOM_SD && !card.flag.sdprinting){
-              sdFilesPosition = 0;
-              card.filescounter = 0;
-              goto_screen(menu_sdmain);        
-            }
-            if(touch_buttons == HOM_RESLOGS){             
-              uint8_t reset_logs[50];
-              FL_sel = 2;
-              W25qxx_ReadBytes(reset_logs,4096*256,50);
-              // GET_TEXT(_UxGT(reset_logs));
-              // sprintf(uintToHex,"Reset logs: %h \r\n",GET_TEXT(reset_logs));
-              HAL_UART_Transmit(&huart2, (uint8_t *)reset_logs, sizeof(reset_logs), 10);
-            }
-            if(touch_buttons == SD_GO_ON){
-              wait_for_user = false;
-            }
-            if(touch_buttons == SD_PAUSE){
-              if(!wait_for_user)queue.inject_P(PSTR("M0"));
-            }
-            if(touch_buttons == SD_STOP){     
-              card.stop_sd_print();              
-              #if DISABLED(SD_ABORT_NO_COOLDOWN)
-              thermalManager.disable_all_heaters();
-              #endif
-              thermalManager.zero_fan_speeds();           
-            }
-          }
-          if(touch_buttons>10 && currentScreen == menu_recovery){
-            if(touch_buttons == RECOVERY_RESUME){
-              ui.return_to_status();
-              queue.inject_P(PSTR("M1000"));
-            }
-            if(touch_buttons == RECOVERY_CANCEL){
-              babystep.bbstp_home((AxisEnum)2);              
-              recovery.cancel();
-              ui.return_to_status();
-            }
-          }
-          if(touch_buttons>10 && currentScreen == menu_sdmain){
-            if(touch_buttons == SD_PREVIEW){
-              goto_screen(status_screen);   
-              home_sd_rewrite();
-              TFT_DrawRectangle(/*x,y*/89,82, /*width, height*/294,251, /*round corner*/8,/*color*/0xFFFFFFFF,/*back_color*/TTZ_COL_BAGR,LAYER_HOME,/*thikness in px*/126,/*fill?*/1,/*punktir?*/0);
-              card.renderFile();
-            }
-            if(touch_buttons == SD_PRINT){
-              if(sdfile_selected!=255){
-
-
-                char printfile1[255];
-                TCHAR printfile2[255];
-                bool cyrrilic = false;
-                for(int p=0;p<255;p++){
-                  printfile1[p] = (char)sdfiles[sdfile_selected][p];
-                  printfile2[p] = sdfiles[sdfile_selected][p];
-                  if(sdfiles[sdfile_selected][p]>255)cyrrilic = true;
-                }
-                if(cyrrilic == true){
-                  card.openFileRead(NULL,printfile2);
-                }
-                else{
-                  card.openFileRead(printfile1);
-                }
-                
-
-                if (FileFromSD.obj.objsize) {
-                  card.startFileprint();            // SD card will now be read for commands
-                  startOrResumeJob();               // Start (or resume) the print job timer
-                  #if ENABLED(POWER_LOSS_RECOVERY)
-                    recovery.prepare();
-                  #endif
-                }
-
-                #if ENABLED(HOST_ACTION_COMMANDS)
-                  #ifdef ACTION_ON_RESUME
-                    host_action_resume();
-                  #endif
-                  #if ENABLED(HOST_PROMPT_SUPPORT)
-                    host_prompt_open(PROMPT_INFO, PSTR("Resuming SD"), DISMISS_STR);
-                  #endif
-                #endif
-
-
-                goto_screen(status_screen);
-                home_sd_rewrite();
-                ui.reset_status();
-
-
-
-              }
-            }
-            if(touch_buttons == SD_NPAGE){
-              sdfile_selected = 255;
-              card.increment_page();
-              card.ls(true,0);
-              // scan_files(&num, true, 0, buff, dbg, buff);
-            }
-            if(touch_buttons == SD_PPAGE){
-              sdfile_selected = 255;
-              card.decrement_page();
-              card.ls(true,0);
-              // scan_files(&num, true, 0, buff, dbg, buff);
-            }
-            if((touch_buttons >= SD_FILE0) && (touch_buttons <= SD_FILE14)){card.select_to_print(touch_buttons);}
-          }
-          if(touch_buttons>10 && currentScreen == menu_options){
-
-          }
-          if(touch_buttons>10 && currentScreen == menu_calib){
-            if(touch_buttons >= CAL_NUM0 && touch_buttons <= CAL_NUMC){   }
-
-            if(touch_buttons == CAL_NUMP){
-              pm_calib_val(1);
-            }else if(touch_buttons == CAL_NUMM){
-              pm_calib_val(-1);
-            }else if(touch_buttons == CAL_EXTR1){
-              calibstate = EXTR1; edited_timer_ms = 0; edited_settings = 0; menu_calib_set_active(CAL_EXTR1);
-             }else if(touch_buttons == CAL_EXTR2){
-              calibstate = EXTR2; edited_timer_ms = 0; edited_settings = 0; menu_calib_set_active(CAL_EXTR2);
-            }else if(touch_buttons == CAL_BED){
-              calibstate = BED; edited_timer_ms = 0; edited_settings = 0; menu_calib_set_active(CAL_BED);
-            }else if(touch_buttons == CAL_CHAMBER){
-              calibstate = CHAMBER; edited_timer_ms = 0; edited_settings = 0; menu_calib_set_active(CAL_CHAMBER);
-            }else if(touch_buttons == CAL_FEEDRATE){
-              calibstate = FEEDRATE; edited_timer_ms = 0; edited_settings = 0; menu_calib_set_active(CAL_FEEDRATE);
-            }else if(touch_buttons == CAL_COOLER){
-              calibstate = COOLER; edited_timer_ms = 0; edited_settings = 0; menu_calib_set_active(CAL_COOLER);
-            }else if(touch_buttons == CAL_FILAMENT_FLOW1){
-              calibstate = FILAMENT_FLOW1; edited_timer_ms = 0; edited_settings = 0; menu_calib_set_active(CAL_FILAMENT_FLOW1);
-            }else if(touch_buttons == CAL_FILAMENT_FLOW2){
-              calibstate = FILAMENT_FLOW2; edited_timer_ms = 0; edited_settings = 0; menu_calib_set_active(CAL_FILAMENT_FLOW2);
-            }else if(touch_buttons == CAL_NUM1){
-              edit_calib_val(1);
-            }else if(touch_buttons == CAL_NUM2){
-              edit_calib_val(2);
-            }else if(touch_buttons == CAL_NUM3){
-              edit_calib_val(3);
-            }else if(touch_buttons == CAL_NUM4){
-              edit_calib_val(4);
-            }else if(touch_buttons == CAL_NUM5){
-              edit_calib_val(5);
-            }else if(touch_buttons == CAL_NUM6){
-              edit_calib_val(6);
-            }else if(touch_buttons == CAL_NUM7){
-              edit_calib_val(7);
-            }else if(touch_buttons == CAL_NUM8){
-              edit_calib_val(8);
-            }else if(touch_buttons == CAL_NUM9){
-              edit_calib_val(9);
-            }else if(touch_buttons == CAL_NUM0){
-              edit_calib_val(0);
-            }else if(touch_buttons == CAL_NUMK){
-              edic_calib_ok();
-            }else if(touch_buttons == CAL_NUMB){
-              edic_calib_back();
-            }else if(touch_buttons == CAL_NUMC){
-              edic_calib_cancel();
-            }else{}
-            
-          }
-          if(touch_buttons>10 && currentScreen == menu_filament){
-
-          }
-          if(touch_buttons>10 && currentScreen == menu_axis){
-            if(touch_buttons == AXIS_MM10){
-              opt_disctance=1;
-              TFT_DrawRectangle(/*x,y*/163,67, /*width, height*/14,14, /*round corner*/7,/*color*/0xFFF58220,/*back_color*/0xFF231F20,MAIN_LAYER,/*thikness in px*/7,/*fill?*/1,/*punktir?*/0);
-              TFT_DrawRectangle(/*x,y*/262,67, /*width, height*/14,14, /*round corner*/7,/*color*/0xFFFFFFFF,/*back_color*/0xFF231F20,MAIN_LAYER,/*thikness in px*/7,/*fill?*/1,/*punktir?*/0);
-              TFT_DrawRectangle(/*x,y*/351,67, /*width, height*/14,14, /*round corner*/7,/*color*/0xFFFFFFFF,/*back_color*/0xFF231F20,MAIN_LAYER,/*thikness in px*/7,/*fill?*/1,/*punktir?*/0);
-            }else if(touch_buttons == AXIS_MM1){
-              opt_disctance=2;
-              TFT_DrawRectangle(/*x,y*/163,67, /*width, height*/14,14, /*round corner*/7,/*color*/0xFFFFFFFF,/*back_color*/0xFF231F20,MAIN_LAYER,/*thikness in px*/7,/*fill?*/1,/*punktir?*/0);
-              TFT_DrawRectangle(/*x,y*/262,67, /*width, height*/14,14, /*round corner*/7,/*color*/0xFFF58220,/*back_color*/0xFF231F20,MAIN_LAYER,/*thikness in px*/7,/*fill?*/1,/*punktir?*/0);
-              TFT_DrawRectangle(/*x,y*/351,67, /*width, height*/14,14, /*round corner*/7,/*color*/0xFFFFFFFF,/*back_color*/0xFF231F20,MAIN_LAYER,/*thikness in px*/7,/*fill?*/1,/*punktir?*/0);
-            }else if(touch_buttons == AXIS_MM01){
-              opt_disctance=3;
-              TFT_DrawRectangle(/*x,y*/163,67, /*width, height*/14,14, /*round corner*/7,/*color*/0xFFFFFFFF,/*back_color*/0xFF231F20,MAIN_LAYER,/*thikness in px*/7,/*fill?*/1,/*punktir?*/0);
-              TFT_DrawRectangle(/*x,y*/262,67, /*width, height*/14,14, /*round corner*/7,/*color*/0xFFFFFFFF,/*back_color*/0xFF231F20,MAIN_LAYER,/*thikness in px*/7,/*fill?*/1,/*punktir?*/0);
-              TFT_DrawRectangle(/*x,y*/351,67, /*width, height*/14,14, /*round corner*/7,/*color*/0xFFF58220,/*back_color*/0xFF231F20,MAIN_LAYER,/*thikness in px*/7,/*fill?*/1,/*punktir?*/0);
-            }else if(touch_buttons == AXIS_DZP01){
-              if (!(DISABLED(BABYSTEP_WITHOUT_HOMING) && !TEST(axis_known_position, Z_AXIS)) && babystep.bbst_homed)set_home_offset(Z_AXIS,home_offset[Z_AXIS]+0.1);
-              if(babystep.bbst_homed)babystep.add_mm(Z_AXIS, 0.1);
-              // for (int8_t e = 0; e < HOTENDS; e++)hotend_offset[e].z-=0.1;
-            }else if(touch_buttons == AXIS_DZP001){
-              if (!(DISABLED(BABYSTEP_WITHOUT_HOMING) && !TEST(axis_known_position, Z_AXIS)) && babystep.bbst_homed)set_home_offset(Z_AXIS,home_offset[Z_AXIS]+0.01);
-              if(babystep.bbst_homed)babystep.add_mm(Z_AXIS, 0.01);
-              // for (int8_t e = 0; e < HOTENDS; e++)hotend_offset[e].z-=0.01;
-            }else if(touch_buttons == AXIS_DZHOME){
-              if(!card.flag.sdprinting){babystep.bbstp_home(Z_AXIS);}
-            }else if(touch_buttons == AXIS_DZM001){
-              if (!(DISABLED(BABYSTEP_WITHOUT_HOMING) && !TEST(axis_known_position, Z_AXIS)) && babystep.bbst_homed)set_home_offset(Z_AXIS,home_offset[Z_AXIS]-0.01);
-              if(babystep.bbst_homed)babystep.add_mm(Z_AXIS, -0.01);
-              // for (int8_t e = 0; e < HOTENDS; e++)hotend_offset[e].z+=0.01;
-            }else if(touch_buttons == AXIS_DZM01){
-              if (!(DISABLED(BABYSTEP_WITHOUT_HOMING) && !TEST(axis_known_position, Z_AXIS)) && babystep.bbst_homed)set_home_offset(Z_AXIS,home_offset[Z_AXIS]-0.1);
-              if(babystep.bbst_homed)babystep.add_mm(Z_AXIS, -0.1);
-              // for (int8_t e = 0; e < HOTENDS; e++)hotend_offset[e].z+=0.1;
-            }else if(touch_buttons == AXIS_HXL){
-              if(!card.flag.sdprinting){
-                encoderPosition = -1;
-                move_menu_scale = (opt_disctance==1)?(10):(opt_disctance==2 ? 1 : 0.1f);
-                lcd_move_x();
-              }
-              // _lcd_move_xyz(GET_TEXT(MSG_MOVE_X), X_AXIS);
-            }else if(touch_buttons == AXIS_HXR){
-              if(!card.flag.sdprinting){
-                encoderPosition = 1;
-                move_menu_scale = (opt_disctance==1)?(10):(opt_disctance==2 ? 1 : 0.1f);
-                lcd_move_x();
-              }
-              // _lcd_move_xyz(GET_TEXT(MSG_MOVE_X), X_AXIS);
-            }else if(touch_buttons == AXIS_HYT){
-              if(!card.flag.sdprinting){
-                encoderPosition = 1;
-                move_menu_scale = (opt_disctance==1)?(10):(opt_disctance==2 ? 1 : 0.1f);
-                lcd_move_y();
-              }
-            }else if(touch_buttons == AXIS_HYB){              
-              if(!card.flag.sdprinting){
-                encoderPosition = -1;
-                move_menu_scale = (opt_disctance==1)?(10):(opt_disctance==2 ? 1 : 0.1f);
-                lcd_move_y();
-              }
-            }else if(touch_buttons == AXIS_HXY){          
-              queue.inject_P(PSTR("G28XY"));
-              // queue.inject_P(PSTR("G28Y"));
-              // queue.inject_P(PSTR("G28X"));
-            }else if(touch_buttons == AXIS_HXYZ){            
-              queue.inject_P(G28_STR);
-            }else if(touch_buttons == AXIS_ZP10){              
-              if(!card.flag.sdprinting){
-                encoderPosition = -1;
-                move_menu_scale = 10;
-                lcd_move_z();
-              }
-            }else if(touch_buttons == AXIS_ZP1){              
-              if(!card.flag.sdprinting){
-                encoderPosition = -1;
-                move_menu_scale = 1;
-                lcd_move_z();
-              }
-            }else if(touch_buttons == AXIS_ZH){
-              queue.inject_P(PSTR("G28Z"));
-            }else if(touch_buttons == AXIS_ZM1){              
-              if(!card.flag.sdprinting){
-                encoderPosition = 1;
-                move_menu_scale = 1;
-                lcd_move_z();
-              }
-            }else if(touch_buttons == AXIS_ZM10){              
-              if(!card.flag.sdprinting){
-                encoderPosition = 1;
-                move_menu_scale = 10;
-                lcd_move_z();
-              }
-            }else if(touch_buttons == AXIS_EP10){
-
-            }else if(touch_buttons == AXIS_EP1){
-
-            }else if(touch_buttons == AXIS_ES1){
-              queue.inject_P(PSTR("T0"));
-            }else if(touch_buttons == AXIS_ES2){
-              queue.inject_P(PSTR("T1")); 
-            }else if(touch_buttons == AXIS_EM1){
-
-            }else if(touch_buttons == AXIS_EM10){
-
-            }else{}
-          }
-          // else // keep wait_for_unclick value
-
-          // #endif // TOUCH_BUTTONS
-
-      
-          // Integrated LCD click handling via button_pressed
-          if (!external_control && button_pressed()) {
-            if (!wait_for_unclick) {                        // If not waiting for a debounce release:
-              wait_for_unclick = true;                      //  - Set debounce flag to ignore continous clicks
-              lcd_clicked = !wait_for_user && !no_reentry;  //  - Keep the click if not waiting for a user-click
-              wait_for_user = false;                        //  - Any click clears wait for user
-              quick_feedback();                             //  - Always make a click sound
-            }
-          }
-          else wait_for_unclick = false;
-      
-
-        }
-        if ((prevScreen == menu_sdmain || prevScreen == menu_recovery) && touch_buttons >= RBTN_HOME && touch_buttons <= RBTN_AXIS){          
-          // RewriteMemory(&hsdram1,LCD_FRAME_BUFFER(LAYER_HOME_2),LCD_FRAME_BUFFER(LAYER_HOME));
-          home_sd_rewrite();
-        }
-
-
-
-        drawing_screen = true;
-      }
-    // if (LCD_BACK_CLICKED()) {
-    //   quick_feedback();
-    //   goto_previous_screen();
-    // }
 
   #endif // HAS_LCD_MENU
 
@@ -1235,15 +906,19 @@ void MarlinUI::update() {
 
   #endif // INIT_SDCARD_ON_BOOT
 
+  if (touch_buttons != oven_display.previous_button)
+  {
+    oven_display.handle_button_press((Buttons_list)touch_buttons);
+    oven_display.previous_button = (Buttons_list)touch_buttons;
+  }
+  
   touch_buttons = touch.read_buttons(currentScreen);
   if (ELAPSED(ms, next_lcd_update_ms)
     #if HAS_GRAPHICAL_LCD
       || drawing_screen
     #endif
-  ) {
-
-
-    
+  ) 
+  {
     #ifdef ENDSTOPTEST
       // if (ELAPSED(ms, 7000) && PENDING(ms, 8500)){
       //   queue.inject_P(PSTR("G28XY"));
@@ -1256,7 +931,6 @@ void MarlinUI::update() {
       //   queue.advance();
       // }
     #endif
-
 
     drawing_screen = false;
     // if(drawing_screen == false){
