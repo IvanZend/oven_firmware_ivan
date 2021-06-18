@@ -1,6 +1,7 @@
 #include "ltdc.h"
 #include "oven_display.h"
 #include "../core/macros.h"
+#include "oven_device.h"
 
 #include "images/rocket.h"
 #include "images/backgr_tile.h"
@@ -248,40 +249,40 @@ void OvenDisplay::init_widgets(void)
     {
     case STANDARD_USER_MODE:
     {
-        widgets_vector.push_back(background_frame);
-        widgets_vector.push_back(thermometer_icon);
-        widgets_vector.push_back(heating_string);
-        widgets_vector.push_back(heating_timer_start_stop_btn);
-        widgets_vector.push_back(temperature_display);
-        widgets_vector.push_back(left_time_up_arrow_1);
-        widgets_vector.push_back(left_time_up_arrow_2);
-        widgets_vector.push_back(left_time_up_arrow_3);
-        widgets_vector.push_back(left_time_up_arrow_4);
-        widgets_vector.push_back(left_time_figure_1);
-        widgets_vector.push_back(left_time_figure_2);
-        widgets_vector.push_back(left_time_figure_3);
-        widgets_vector.push_back(left_time_figure_4);
-        widgets_vector.push_back(left_time_colon_char);
-        widgets_vector.push_back(left_time_down_arrow_1);
-        widgets_vector.push_back(left_time_down_arrow_2);
-        widgets_vector.push_back(left_time_down_arrow_3);
-        widgets_vector.push_back(left_time_down_arrow_4);
-        widgets_vector.push_back(left_temperature_entering_background);
-        widgets_vector.push_back(temperature_left_keyboard_1);
-        widgets_vector.push_back(temperature_left_keyboard_2);
-        widgets_vector.push_back(temperature_left_keyboard_3);
-        widgets_vector.push_back(temperature_left_keyboard_4);
-        widgets_vector.push_back(temperature_left_keyboard_5);
-        widgets_vector.push_back(temperature_left_keyboard_6);
-        widgets_vector.push_back(temperature_left_keyboard_7);
-        widgets_vector.push_back(temperature_left_keyboard_8);
-        widgets_vector.push_back(temperature_left_keyboard_9);
-        widgets_vector.push_back(temperature_left_keyboard_0);
-        widgets_vector.push_back(temperature_left_keyboard_backspace);
-        widgets_vector.push_back(temperature_left_keyboard_cancel);
-        widgets_vector.push_back(temperature_left_keyboard_enter_top);
-        widgets_vector.push_back(temperature_left_keyboard_enter_bottom);
-        widgets_vector.push_back(heating_on_off_button);
+        widgets_vector.push_back(background_frame);                             // 0
+        widgets_vector.push_back(thermometer_icon);                             // 1
+        widgets_vector.push_back(heating_string);                               // 2
+        widgets_vector.push_back(heating_timer_start_stop_btn);                 // 3
+        widgets_vector.push_back(temperature_display);                          // 4
+        widgets_vector.push_back(left_time_up_arrow_1);                         // 5
+        widgets_vector.push_back(left_time_up_arrow_2);                         // 6
+        widgets_vector.push_back(left_time_up_arrow_3);                         // 7
+        widgets_vector.push_back(left_time_up_arrow_4);                         // 8
+        widgets_vector.push_back(left_time_figure_1);                           // 9
+        widgets_vector.push_back(left_time_figure_2);                           // 10
+        widgets_vector.push_back(left_time_figure_3);                           // 11
+        widgets_vector.push_back(left_time_figure_4);                           // 12
+        widgets_vector.push_back(left_time_colon_char);                         // 13
+        widgets_vector.push_back(left_time_down_arrow_1);                       // 14
+        widgets_vector.push_back(left_time_down_arrow_2);                       // 15
+        widgets_vector.push_back(left_time_down_arrow_3);                       // 16
+        widgets_vector.push_back(left_time_down_arrow_4);                       // 17
+        widgets_vector.push_back(left_temperature_entering_background);         // 18
+        widgets_vector.push_back(temperature_left_keyboard_1);                  // 19
+        widgets_vector.push_back(temperature_left_keyboard_2);                  // 20
+        widgets_vector.push_back(temperature_left_keyboard_3);                  // 21
+        widgets_vector.push_back(temperature_left_keyboard_4);                  // 22
+        widgets_vector.push_back(temperature_left_keyboard_5);                  // 23
+        widgets_vector.push_back(temperature_left_keyboard_6);                  // 24
+        widgets_vector.push_back(temperature_left_keyboard_7);                  // 25
+        widgets_vector.push_back(temperature_left_keyboard_8);                  // 26
+        widgets_vector.push_back(temperature_left_keyboard_9);                  // 27
+        widgets_vector.push_back(temperature_left_keyboard_0);                  // 28
+        widgets_vector.push_back(temperature_left_keyboard_backspace);          // 29
+        widgets_vector.push_back(temperature_left_keyboard_cancel);             // 30
+        widgets_vector.push_back(temperature_left_keyboard_enter_top);          // 31
+        widgets_vector.push_back(temperature_left_keyboard_enter_bottom);       // 32
+        widgets_vector.push_back(heating_on_off_button);                        // 33
         /*
         widgets_vector.push_back(pressure_sensor_icon);
         widgets_vector.push_back(vacuum_pump_string);
@@ -395,37 +396,6 @@ void OvenDisplay::init_buttons_state(void)
 
 void OvenDisplay::handle_button_press(Buttons_list pressed_button)
 {
-    for (vector<Widget>::size_type i = 0; i != widgets_vector.size(); i++)      // проходимся по всем виджетам
-    {
-        if (widgets_vector[i].button_name != NO_BUTTON)                         // если виджет является кнопкой
-        {
-            if (pressed_button != NO_BUTTON)                                    // если нажата какая-либо кнопка
-            {
-                if (pressed_button == widgets_vector[i].button_name)            // если нажата данная кнопка
-                {
-                    widgets_vector[i].button_is_pressed = true;
-                    widgets_vector[i].draw_img_vector(widgets_vector[i].pressed_btn_images, widgets_vector[i].wgt_coord_x, widgets_vector[i].wgt_coord_y);
-                }
-                else        // если не нажата данная кнопка
-                {
-                    if (widgets_vector[i].button_is_pressed)        // если данная кнопка была нажата ранее
-                    {
-                        widgets_vector[i].button_is_pressed = false;
-                        widgets_vector[i].draw_img_vector(widgets_vector[i].released_btn_images, widgets_vector[i].wgt_coord_x, widgets_vector[i].wgt_coord_y);
-                    }
-                }
-            }
-            else            // если не нажата никакая кнопка
-            {
-                if (widgets_vector[i].button_is_pressed)            // если данная кнопка была нажата ранее
-                {
-                    widgets_vector[i].button_is_pressed = false;
-                    widgets_vector[i].draw_img_vector(widgets_vector[i].released_btn_images, widgets_vector[i].wgt_coord_x, widgets_vector[i].wgt_coord_y);
-                }
-            }
-        }
-    }
-
     switch (pressed_button)         // вызываем функции, не связанные с отрисовкой кнопки
     {
     case NO_BUTTON:
@@ -550,7 +520,20 @@ void OvenDisplay::handle_button_press(Buttons_list pressed_button)
     }
     case HEATING_ON_OFF:
     {
-
+        uint8_t widget_number = 33;
+        if (heater_600.device_enabled)
+        {
+            heater_600.device_enabled = false;
+            widgets_vector[widget_number].change_image_in_widget(img_slide_button_off, 0, 0);
+        }
+        else
+        {
+            heater_600.device_enabled = true;
+            widgets_vector[widget_number].change_image_in_widget(img_slide_button_on, 0, 0);
+        }
+        widgets_vector[widget_number].draw_img_vector(widgets_vector[widget_number].changeable_images, \
+                                                    widgets_vector[widget_number].wgt_coord_x, widgets_vector[widget_number].wgt_coord_y);
+        return;
         break;
     }
 
@@ -685,6 +668,37 @@ void OvenDisplay::handle_button_press(Buttons_list pressed_button)
         break;
     }
     }
+
+    for (vector<Widget>::size_type i = 0; i != widgets_vector.size(); i++)      // проходимся по всем виджетам
+    {
+        if (widgets_vector[i].button_name != NO_BUTTON)                         // если виджет является кнопкой
+        {
+            if (pressed_button != NO_BUTTON)                                    // если нажата какая-либо кнопка
+            {
+                if (pressed_button == widgets_vector[i].button_name)            // если нажата данная кнопка
+                {
+                    widgets_vector[i].button_is_pressed = true;
+                    widgets_vector[i].draw_img_vector(widgets_vector[i].pressed_btn_images, widgets_vector[i].wgt_coord_x, widgets_vector[i].wgt_coord_y);
+                }
+                else        // если не нажата данная кнопка
+                {
+                    if (widgets_vector[i].button_is_pressed)        // если данная кнопка была нажата ранее
+                    {
+                        widgets_vector[i].button_is_pressed = false;
+                        widgets_vector[i].draw_img_vector(widgets_vector[i].released_btn_images, widgets_vector[i].wgt_coord_x, widgets_vector[i].wgt_coord_y);
+                    }
+                }
+            }
+            else            // если не нажата никакая кнопка
+            {
+                if (widgets_vector[i].button_is_pressed)            // если данная кнопка была нажата ранее
+                {
+                    widgets_vector[i].button_is_pressed = false;
+                    widgets_vector[i].draw_img_vector(widgets_vector[i].released_btn_images, widgets_vector[i].wgt_coord_x, widgets_vector[i].wgt_coord_y);
+                }
+            }
+        }
+    }
 }
 
 void OvenDisplay::enter_related_event(void)
@@ -813,13 +827,13 @@ void Widget::draw_img_vector(vector<ImageObj> img_vector_to_draw, uint16_t paren
             }
 }
 
-/*
-void Widget::change_image_in_widget(tImage image_to_change, uint16_t img_out_coord_x, uint16_t img_out_coord_y)
+
+void Widget::change_image_in_widget(tImage image_to_output, uint16_t img_out_coord_x, uint16_t img_out_coord_y)
 {
     changeable_images.clear();
-    add_img_to_wgt(changeable_images, image_to_change, img_out_coord_x, img_out_coord_y);
+    add_img_to_wgt(CHANGEABLE_IMG, image_to_output, img_out_coord_x, img_out_coord_y);
 }
-*/
+
 /*
 uint16_t Widget::img_center_x(tImage img_to_center)
 {

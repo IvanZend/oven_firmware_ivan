@@ -139,17 +139,17 @@ class Widget
     vector<ImageObj> pressed_btn_images;
     vector<ImageObj> released_btn_images;
     bool button_is_pressed;
-    bool wgt_img_changed;               // флаг, что выводимое значение изменилось, но еще не было физически отрисовано
+    bool wgt_img_changed;                           // флаг, что выводимое значение изменилось, но еще не было физически отрисовано
     //vector<ImageObj> constant_rectangles;
     //vector<ImageObj> pressed_button_rectangles;
     //vector<TextObj>  constant_text_strings;
     //vector<TextObj>  pressed_button_text_stringsr;
-    //vector<Widget*>  related_oblects;           // Нужно для обработки кнопок сложной формы, состоящих из нескольких виджетов.
+    //vector<Widget*>  related_oblects;             // Нужно для обработки кнопок сложной формы, состоящих из нескольких виджетов.
     void add_img_to_wgt(Img_vect_list vect_to_add_type, tImage add_image_generated, uint16_t add_img_coord_x, uint16_t add_img_coord_y);
     void tile_area(tImage image_to_tile, uint16_t area_width, uint16_t area_hight); // замостить область повторяющейся картинкой
-    void set_rectangle(void);                   // отрисовываем фоновые рамки
+    void set_rectangle(void);                       // отрисовываем фоновые рамки
     void draw_img_vector(vector<ImageObj> img_vector_to_draw, uint16_t parent_wgt_coord_x, uint16_t parent_wgt_coord_y);
-    //void change_image_in_widget(tImage image_to_output, uint16_t img_out_coord_x, uint16_t img_out_coord_y);
+    void change_image_in_widget(tImage image_to_output, uint16_t img_out_coord_x, uint16_t img_out_coord_y);
     //uint16_t img_center_x(tImage img_to_center);
 };
 
