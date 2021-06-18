@@ -134,6 +134,8 @@ uint16_t XPT2046::read_buttons(screenFunc_t currentScreen) {
 		//  TFT_DrawFilledCircle(y,x,10,LCD_COLOR_RANDOM);
 		  // *(uint32_t*) (hltdc.LayerCfg[0].FBStartAdress + (4*(y*hltdc.LayerCfg[0].ImageWidth + x))) = (uint32_t)((rand() & 0xff) | (rand() & 0xff)<<8 | (rand() & 0xff)<<16 | ( 0xff)<<24);
   
+  
+  /*
   for (vector<Widget>::size_type i = 0; i != oven_display.widgets_vector.size(); i++)
   {
     if (oven_display.widgets_vector[i].button_name != NO_BUTTON)
@@ -145,8 +147,9 @@ uint16_t XPT2046::read_buttons(screenFunc_t currentScreen) {
       }
     }
   }
+  */
 
-  return 0;
+  return oven_display.identify_pressed_btn(x, y);
 }
 
 bool XPT2046::isTouched() {

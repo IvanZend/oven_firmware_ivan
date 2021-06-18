@@ -140,7 +140,6 @@ class Widget
     vector<ImageObj> released_btn_images;
     bool button_is_pressed;
     bool wgt_img_changed;               // флаг, что выводимое значение изменилось, но еще не было физически отрисовано
-    void (*button_handler_pointer)();
     //vector<ImageObj> constant_rectangles;
     //vector<ImageObj> pressed_button_rectangles;
     //vector<TextObj>  constant_text_strings;
@@ -149,6 +148,7 @@ class Widget
     void add_img_to_wgt(Img_vect_list vect_to_add_type, tImage add_image_generated, uint16_t add_img_coord_x, uint16_t add_img_coord_y);
     void tile_area(tImage image_to_tile, uint16_t area_width, uint16_t area_hight); // замостить область повторяющейся картинкой
     void set_rectangle(void);                   // отрисовываем фоновые рамки
+    void draw_img_vector(vector<ImageObj> img_vector_to_draw, uint16_t parent_wgt_coord_x, uint16_t parent_wgt_coord_y);
     //void change_image_in_widget(tImage image_to_output, uint16_t img_out_coord_x, uint16_t img_out_coord_y);
     //uint16_t img_center_x(tImage img_to_center);
 };
@@ -166,13 +166,14 @@ class OvenDisplay
 
     void test_draw(void);                                                  // тестовая картинка, выводим изображение ракеты
     void init_widgets(void);                                               // задаём содержимое виджетов
-    void draw_all_widgets(vector<Widget>& widgets_vector_to_draw);         // отрисовываем весь дисплей
-    void update_all_widgets(vector<Widget>& widgets_vector_to_update);     // обновляем виджеты, значение которых изменилось, но не отрисовано (напр. цифры)
+    void draw_all_widgets(void);         // отрисовываем весь дисплей
+    void update_all_widgets(void);     // обновляем виджеты, значение которых изменилось, но не отрисовано (напр. цифры)
     void init_widgets_size(void);           // если размер виджета не был задан вручную, он автоматически равен размеру первой картинки - кнопки
     void init_img_changed_flag(void);       // инициализируем нулями флаги изменения виджета
     void init_buttons_state(void);          // инициализируем нулями состояние кнопок
     void handle_button_press(Buttons_list pressed_button);      // обрабатываем нажатие кнопки
     void enter_related_event(void);         // если нажали на одну половину enter, имитируем нажатие на вторую
+    uint16_t identify_pressed_btn(uint16_t pressing_coord_x, uint16_t pressing_coord_y);
 };
 
 void system_menu_layout_draw(void);
