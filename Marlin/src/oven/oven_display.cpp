@@ -1,7 +1,5 @@
 #include "ltdc.h"
 #include "oven_display.h"
-#include "oven_device.h"
-
 #include "images/rocket.h"
 #include "images/backgr_tile.h"
 #include "images/rect_down_left_round.h"
@@ -427,7 +425,60 @@ void OvenDisplay::init_buttons_state(void)
 
 void OvenDisplay::handle_button_press(Buttons_list pressed_button)
 {
-
+    for (vector<Widget>::size_type i = 0; i != widgets_vector.size(); i++)      // проходимся по всем виджетам
+    {
+        if (widgets_vector[i].button_name != NO_BUTTON)                         // если виджет является кнопкой
+        {
+            if (pressed_button != NO_BUTTON)                                    // если нажата какая-либо кнопка
+            {
+                if (pressed_button == widgets_vector[i].button_name)            // если нажата данная кнопка
+                {
+                    widgets_vector[i].button_is_pressed = true;
+                    for(vector<ImageObj>::size_type ii = 0; ii != widgets_vector[i].pressed_btn_images.size(); ii++)
+                    {
+                    TFT_DrawBitmap_d(widgets_vector[i].pressed_btn_images[ii].img_coord_x + widgets_vector[i].wgt_coord_x, \
+                                    widgets_vector[i].pressed_btn_images[ii].img_coord_y + widgets_vector[i].wgt_coord_y, \
+                                    widgets_vector[i].pressed_btn_images[ii].image_struct.data, \
+                                    widgets_vector[i].pressed_btn_images[ii].image_struct.width, \
+                                    widgets_vector[i].pressed_btn_images[ii].image_struct.height, \
+                                    MAIN_LAYER);
+                    }
+                }
+                else        // если не нажата данная кнопка
+                {
+                    if (widgets_vector[i].button_is_pressed)        // если данная кнопка была нажата ранее
+                    {
+                        widgets_vector[i].button_is_pressed = false;
+                        for(vector<ImageObj>::size_type ii = 0; ii != widgets_vector[i].released_btn_images.size(); ii++)
+                        {
+                        TFT_DrawBitmap_d(widgets_vector[i].released_btn_images[ii].img_coord_x + widgets_vector[i].wgt_coord_x, \
+                                        widgets_vector[i].released_btn_images[ii].img_coord_y + widgets_vector[i].wgt_coord_y, \
+                                        widgets_vector[i].released_btn_images[ii].image_struct.data, \
+                                        widgets_vector[i].released_btn_images[ii].image_struct.width, \
+                                        widgets_vector[i].released_btn_images[ii].image_struct.height, \
+                                        MAIN_LAYER);
+                        }
+                    }
+                }
+            }
+            else            // если не нажата никакая кнопка
+            {
+                if (widgets_vector[i].button_is_pressed)            // если данная кнопка была нажата ранее
+                {
+                    widgets_vector[i].button_is_pressed = false;
+                    for(vector<ImageObj>::size_type ii = 0; ii != widgets_vector[i].released_btn_images.size(); ii++)
+                    {
+                    TFT_DrawBitmap_d(widgets_vector[i].released_btn_images[ii].img_coord_x + widgets_vector[i].wgt_coord_x, \
+                                    widgets_vector[i].released_btn_images[ii].img_coord_y + widgets_vector[i].wgt_coord_y, \
+                                    widgets_vector[i].released_btn_images[ii].image_struct.data, \
+                                    widgets_vector[i].released_btn_images[ii].image_struct.width, \
+                                    widgets_vector[i].released_btn_images[ii].image_struct.height, \
+                                    MAIN_LAYER);
+                    }
+                }
+            }
+        }
+    }
 
     switch (pressed_button)         // вызываем функции, не связанные с отрисовкой кнопки
     {
@@ -553,16 +604,7 @@ void OvenDisplay::handle_button_press(Buttons_list pressed_button)
     }
     case HEATING_ON_OFF:
     {
-        if(heater_600.device_enabled)
-        {
-            heater_600.device_enabled = false;
-            heating_on_off_button.change_image_in_widget(img_slide_button_off, 0, 0);
-        }
-        else
-        {
-            heater_600.device_enabled = true;
-            heating_on_off_button.change_image_in_widget(img_slide_button_on, 0, 0);
-        }
+
         break;
     }
 
@@ -697,76 +739,6 @@ void OvenDisplay::handle_button_press(Buttons_list pressed_button)
         break;
     }
     }
-
-    for (vector<Widget>::size_type i = 0; i != widgets_vector.size(); i++)      // проходимся по всем виджетам
-    {
-        if (widgets_vector[i].button_name != NO_BUTTON)                         // если виджет является кнопкой
-        {
-            if (pressed_button != NO_BUTTON)                                    // если нажата какая-либо кнопка
-            {
-                if (pressed_button == widgets_vector[i].button_name)            // если нажата данная кнопка
-                {
-                    widgets_vector[i].button_is_pressed = true;
-                    if (widgets_vector[i].pressed_btn_images.size() != 0)
-                    {
-                        for(vector<ImageObj>::size_type ii = 0; ii != widgets_vector[i].pressed_btn_images.size(); ii++)
-                        {
-                        TFT_DrawBitmap_d(widgets_vector[i].pressed_btn_images[ii].img_coord_x + widgets_vector[i].wgt_coord_x, \
-                                        widgets_vector[i].pressed_btn_images[ii].img_coord_y + widgets_vector[i].wgt_coord_y, \
-                                        widgets_vector[i].pressed_btn_images[ii].image_struct.data, \
-                                        widgets_vector[i].pressed_btn_images[ii].image_struct.width, \
-                                        widgets_vector[i].pressed_btn_images[ii].image_struct.height, \
-                                        MAIN_LAYER);
-                        }
-                    }
-                    if (widgets_vector[i].changeable_images.size() != 0)
-                        {
-                        for(vector<ImageObj>::size_type ii = 0; ii != widgets_vector[i].changeable_images.size(); ii++)
-                        {
-                        TFT_DrawBitmap_d(widgets_vector[i].changeable_images[ii].img_coord_x + widgets_vector[i].wgt_coord_x, \
-                                        widgets_vector[i].changeable_images[ii].img_coord_y + widgets_vector[i].wgt_coord_y, \
-                                        widgets_vector[i].changeable_images[ii].image_struct.data, \
-                                        widgets_vector[i].changeable_images[ii].image_struct.width, \
-                                        widgets_vector[i].changeable_images[ii].image_struct.height, \
-                                        MAIN_LAYER);
-                        }
-                    }
-                }
-                else        // если не нажата данная кнопка
-                {
-                    if (widgets_vector[i].button_is_pressed)        // если данная кнопка была нажата ранее
-                    {
-                        widgets_vector[i].button_is_pressed = false;
-                        for(vector<ImageObj>::size_type ii = 0; ii != widgets_vector[i].released_btn_images.size(); ii++)
-                        {
-                        TFT_DrawBitmap_d(widgets_vector[i].released_btn_images[ii].img_coord_x + widgets_vector[i].wgt_coord_x, \
-                                        widgets_vector[i].released_btn_images[ii].img_coord_y + widgets_vector[i].wgt_coord_y, \
-                                        widgets_vector[i].released_btn_images[ii].image_struct.data, \
-                                        widgets_vector[i].released_btn_images[ii].image_struct.width, \
-                                        widgets_vector[i].released_btn_images[ii].image_struct.height, \
-                                        MAIN_LAYER);
-                        }
-                    }
-                }
-            }
-            else            // если не нажата никакая кнопка
-            {
-                if (widgets_vector[i].button_is_pressed)            // если данная кнопка была нажата ранее
-                {
-                    widgets_vector[i].button_is_pressed = false;
-                    for(vector<ImageObj>::size_type ii = 0; ii != widgets_vector[i].released_btn_images.size(); ii++)
-                    {
-                    TFT_DrawBitmap_d(widgets_vector[i].released_btn_images[ii].img_coord_x + widgets_vector[i].wgt_coord_x, \
-                                    widgets_vector[i].released_btn_images[ii].img_coord_y + widgets_vector[i].wgt_coord_y, \
-                                    widgets_vector[i].released_btn_images[ii].image_struct.data, \
-                                    widgets_vector[i].released_btn_images[ii].image_struct.width, \
-                                    widgets_vector[i].released_btn_images[ii].image_struct.height, \
-                                    MAIN_LAYER);
-                    }
-                }
-            }
-        }
-    }
 }
 
 void OvenDisplay::enter_related_event(void)
@@ -775,7 +747,7 @@ void OvenDisplay::enter_related_event(void)
      {
          if ((widgets_vector[i].button_name == LEFT_KEYBOARD_ENTER_TOP) || (widgets_vector[i].button_name == LEFT_KEYBOARD_ENTER_BOTTOM))
          {
-            widgets_vector[i].button_is_pressed = true;
+             widgets_vector[i].button_is_pressed = true;
             for(vector<ImageObj>::size_type ii = 0; ii != widgets_vector[i].pressed_btn_images.size(); ii++)
             {
             TFT_DrawBitmap_d(widgets_vector[i].pressed_btn_images[ii].img_coord_x + widgets_vector[i].wgt_coord_x, \
@@ -824,7 +796,7 @@ void Widget::set_rectangle(void)
     for (int i = 0; i < 44; i++)                                    // левая большая вертикальная линия (левая часть экрана)
     {
         add_img_to_wgt(CONSTANT_IMG, rect_vertic_line, 23, (i*10) + 126);
-    }
+    }    
     for (int i = 0; i < 8; i++)                                     // левая малая вертикальная линия (левая часть экрана)
     {
         add_img_to_wgt(CONSTANT_IMG, rect_vertic_line, 107, (i*10) + 38);
@@ -850,7 +822,7 @@ void Widget::set_rectangle(void)
     for (int i = 0; i < 44; i++)                                    // левая большая вертикальная линия (правая часть экрана)
     {
         add_img_to_wgt(CONSTANT_IMG, rect_vertic_line, 23 + RIGHT_COLUMN_OFFSET, (i*10) + 126);
-    }
+    }    
     for (int i = 0; i < 8; i++)                                     // левая малая вертикальная линия (правая часть экрана)
     {
         add_img_to_wgt(CONSTANT_IMG, rect_vertic_line, 107 + RIGHT_COLUMN_OFFSET, (i*10) + 38);
@@ -872,12 +844,13 @@ void Widget::set_rectangle(void)
 
 }
 
-void Widget::change_image_in_widget(tImage image_to_add, uint16_t img_out_coord_x, uint16_t img_out_coord_y)
+/*
+void Widget::change_image_in_widget(tImage image_to_change, uint16_t img_out_coord_x, uint16_t img_out_coord_y)
 {
     changeable_images.clear();
-    add_img_to_wgt(CHANGEABLE_IMG, image_to_add, img_out_coord_x, img_out_coord_y);
+    add_img_to_wgt(changeable_images, image_to_change, img_out_coord_x, img_out_coord_y);
 }
-
+*/
 /*
 uint16_t Widget::img_center_x(tImage img_to_center)
 {
