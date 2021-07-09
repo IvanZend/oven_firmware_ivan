@@ -2,6 +2,9 @@
 #define H_OVEN_DEVICE
 
 #include <cstdint>
+#include "oven_display.h"
+
+#define SECONDS_TIMER_MS      100
 
 class ExternDevice
 {
@@ -13,14 +16,19 @@ class ExternDevice
 class ProcessTimer
 {
     public:
-    uint16_t timer_miutes;
-    uint8_t minutes_low_digit;
-    uint8_t minutes_high_digit;
-    uint8_t hours_low_digit;
-    uint8_t hours_high_digit;
+    bool timer_enabled;
+    uint32_t minutes_low_digit;
+    uint32_t minutes_high_digit;
+    uint32_t hours_low_digit;
+    uint32_t hours_high_digit;
+    uint8_t seconds_counter;
+    uint16_t miutes_counter;
     ProcessTimer();
     void start_process_timer(void);
     void stop_process_timer(void);
+    void convert_digits_to_minutes(void);
+    void seconds_timer_handler(void);
+    void display_current_time(void);
 };
 
 class MainDevice

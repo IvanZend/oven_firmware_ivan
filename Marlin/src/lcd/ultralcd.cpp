@@ -815,6 +815,7 @@ void MarlinUI::update() {
 
   static uint16_t max_display_update_time = 0;
   static millis_t next_lcd_update_ms;
+  static millis_t next_sec_event_ms;
   millis_t ms = millis();
 
   #if HAS_LCD_MENU && LCD_TIMEOUT_TO_STATUS
@@ -913,6 +914,13 @@ void MarlinUI::update() {
     oven_display.previous_button = (Buttons_list)touch_buttons;
   }
   
+  
+  if (ELAPSED(ms, next_sec_event_ms))
+  {
+    main_device.process_timer_left.seconds_timer_handler();
+    next_sec_event_ms = ms + SECONDS_TIMER_MS;
+  }
+
   touch_buttons = touch.read_buttons(currentScreen);
   if (ELAPSED(ms, next_lcd_update_ms)
     #if HAS_GRAPHICAL_LCD
@@ -920,6 +928,8 @@ void MarlinUI::update() {
     #endif
   ) 
   {
+    //main_device.process_timer_left.seconds_timer_handler();
+
     #ifdef ENDSTOPTEST
       // if (ELAPSED(ms, 7000) && PENDING(ms, 8500)){
       //   queue.inject_P(PSTR("G28XY"));

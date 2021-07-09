@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+
+
 using namespace std;
 
 #define OFFSET_FROM_EDGE        30
@@ -21,6 +23,10 @@ using namespace std;
 #define DISPLAY_HEIGHT          600
 #define RIGHT_COLUMN_OFFSET     391
 #define TIME_FIGURE_Y_OFFSET    21
+#define CALIBRATION_OFFSET_X    -10
+#define CALIBRATION_OFFSET_Y    -8
+#define SIX_DIGIT_MAX_NUMBER    5
+#define DECIMAL_MAX_NUMBER      9
 
 enum Decr_Incr
 {
@@ -135,6 +141,99 @@ typedef struct
  * Виджет - визуальный объект, выводимый на экран. Может быть или не быть кнопкой.
  * Может содержать изображения, рамки, текст (символы или строки). 
 */
+
+#include "images/rocket.h"
+#include "images/backgr_tile.h"
+#include "images/rect_down_left_round.h"
+#include "images/rect_down_right_round.h"
+#include "images/rect_horiz_line.h"
+#include "images/rect_vertic_line.h"
+#include "images/rect_internal_round.h"
+#include "images/rect_top_right_round.h"
+#include "images/rect_top_left_corner.h"
+#include "images/img_atm_string.h"
+#include "images/img_heating_string.h"
+#include "images/img_heating_timer_start_button.h"
+#include "images/img_heating_timer_stop_button.h"
+#include "images/img_pressure_sensor_icon_crossed.h"
+#include "images/img_pressure_sensor_icon_enabled.h"
+#include "images/img_slide_button_off.h"
+#include "images/img_slide_button_on.h"
+#include "images/img_temperature_display.h"
+#include "images/img_temperature_entering_background.h"
+#include "images/img_thermometer_icon_crossed.h"
+#include "images/img_thermometer_icon_enabled.h"
+#include "images/img_time_colon_char.h"
+#include "images/img_time_colon_backgr.h"
+#include "images/img_time_down_arrow_pressed.h"
+#include "images/img_time_down_arrow_released.h"
+#include "images/img_time_figure_rect.h"
+#include "images/img_time_hour_char.h"
+#include "images/img_time_minute_char.h"
+#include "images/img_time_up_arrow_pressed.h"
+#include "images/img_time_up_arrow_released.h"
+#include "images/img_vacuum_pump_string.h"
+#include "images/img_keyboard_0_prsd.h"
+#include "images/img_keyboard_0_rlsd.h"
+#include "images/img_keyboard_1_prsd.h"
+#include "images/img_keyboard_1_rlsd.h"
+#include "images/img_keyboard_2_prsd.h"
+#include "images/img_keyboard_2_rlsd.h"
+#include "images/img_keyboard_3_prsd.h"
+#include "images/img_keyboard_3_rlsd.h"
+#include "images/img_keyboard_4_prsd.h"
+#include "images/img_keyboard_4_rlsd.h"
+#include "images/img_keyboard_5_prsd.h"
+#include "images/img_keyboard_5_rlsd.h"
+#include "images/img_keyboard_6_prsd.h"
+#include "images/img_keyboard_6_rlsd.h"
+#include "images/img_keyboard_7_prsd.h"
+#include "images/img_keyboard_7_rlsd.h"
+#include "images/img_keyboard_8_prsd.h"
+#include "images/img_keyboard_8_rlsd.h"
+#include "images/img_keyboard_9_prsd.h"
+#include "images/img_keyboard_9_rlsd.h"
+#include "images/img_keyboard_backspace_prsd.h"
+#include "images/img_keyboard_backspace_rlsd.h"
+#include "images/img_keyboard_cancel_prsd.h"
+#include "images/img_keyboard_cancel_rlsd.h"
+#include "images/img_keyboard_enter_bottom_prsd.h"
+#include "images/img_keyboard_enter_bottom_rlsd.h"
+#include "images/img_keyboard_enter_top_prsd.h"
+#include "images/img_keyboard_enter_top_rlsd.h"
+#include "images/numbers_45_0.h"
+#include "images/numbers_45_1.h"
+#include "images/numbers_45_2.h"
+#include "images/numbers_45_3.h"
+#include "images/numbers_45_4.h"
+#include "images/numbers_45_5.h"
+#include "images/numbers_45_6.h"
+#include "images/numbers_45_7.h"
+#include "images/numbers_45_8.h"
+#include "images/numbers_45_9.h"
+#include "images/numbers_45_background.h"
+#include "images/numbers_30_0.h"
+#include "images/numbers_30_1.h"
+#include "images/numbers_30_2.h"
+#include "images/numbers_30_3.h"
+#include "images/numbers_30_4.h"
+#include "images/numbers_30_5.h"
+#include "images/numbers_30_6.h"
+#include "images/numbers_30_7.h"
+#include "images/numbers_30_8.h"
+#include "images/numbers_30_9.h"
+#include "images/numbers_11_0.h"
+#include "images/numbers_11_1.h"
+#include "images/numbers_11_2.h"
+#include "images/numbers_11_3.h"
+#include "images/numbers_11_4.h"
+#include "images/numbers_11_5.h"
+#include "images/numbers_11_6.h"
+#include "images/numbers_11_7.h"
+#include "images/numbers_11_8.h"
+#include "images/numbers_11_9.h"
+
+
 class Widget
 {
     public:
@@ -168,6 +267,7 @@ class OvenDisplay
     Display_mode display_mode;
     uint16_t display_width, display_height;
     bool draw_all_completed;            // Флаг, что весь дисплей был отрисован. Переключаем при запуске и при смене режима (DEFAULT_DISPLAY_MODE)
+    bool colon_displayed;
     Buttons_list previous_button;
     vector<Widget> widgets_vector;
     vector<tImage> numbers_45_font_vector;
@@ -184,11 +284,15 @@ class OvenDisplay
     void handle_button_press(Buttons_list pressed_button);      // обрабатываем нажатие кнопки
     void enter_related_event(void);         // если нажали на одну половину enter, имитируем нажатие на вторую
     uint16_t identify_pressed_btn(uint16_t pressing_coord_x, uint16_t pressing_coord_y);
-    void change_time_figure(Decr_Incr chng_type, Widget& figure_widget, uint8_t* digit, vector<tImage>& nmbrs_img_vect);
+    void change_time_figure(Decr_Incr chng_type, Widget& figure_widget, uint32_t* digit, vector<tImage>& nmbrs_img_vect, uint8_t digit_max_value);
+    void replace_time_figure(Widget& figure_widget, tImage& nmbr_img);
     void init_numbrs_img_vect(void);
     void init_displayed_values(void);
+    void blink_clock_colon(void);
 };
 
 void system_menu_layout_draw(void);
+
+extern OvenDisplay oven_display;       // глобальный объект дисплея
 
 #endif
