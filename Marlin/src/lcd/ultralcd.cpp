@@ -652,6 +652,7 @@ void MarlinUI::status_screen() {
   {
     HAL_LTDC_SetAddress(&hltdc,LCD_FRAME_BUFFER(LAYER_HOME), 0);
     oven_display.draw_all_widgets();
+    oven_display.init_displayed_values();
     //oven_display.test_draw();
     oven_display.draw_all_completed = true;
   }

@@ -20,6 +20,13 @@ using namespace std;
 #define DISPLAY_WIDTH           800
 #define DISPLAY_HEIGHT          600
 #define RIGHT_COLUMN_OFFSET     391
+#define TIME_FIGURE_Y_OFFSET    21
+
+enum Decr_Incr
+{
+    DECREMENT,
+    INCREMENT
+};
 
 enum Img_vect_list
 {
@@ -150,7 +157,7 @@ class Widget
     void set_rectangle(void);                       // отрисовываем фоновые рамки
     void draw_img_vector(vector<ImageObj> img_vector_to_draw, uint16_t parent_wgt_coord_x, uint16_t parent_wgt_coord_y);
     void change_image_in_widget(tImage image_to_output, uint16_t img_out_coord_x, uint16_t img_out_coord_y);
-    //uint16_t img_center_x(tImage img_to_center);
+    uint16_t img_center_x(tImage img_to_center);
 };
 
 class OvenDisplay 
@@ -163,6 +170,9 @@ class OvenDisplay
     bool draw_all_completed;            // Флаг, что весь дисплей был отрисован. Переключаем при запуске и при смене режима (DEFAULT_DISPLAY_MODE)
     Buttons_list previous_button;
     vector<Widget> widgets_vector;
+    vector<tImage> numbers_45_font_vector;
+    vector<tImage> numbers_30_font_vector;
+    vector<tImage> numbers_11_font_vector;
 
     void test_draw(void);                                                  // тестовая картинка, выводим изображение ракеты
     void init_widgets(void);                                               // задаём содержимое виджетов
@@ -174,6 +184,9 @@ class OvenDisplay
     void handle_button_press(Buttons_list pressed_button);      // обрабатываем нажатие кнопки
     void enter_related_event(void);         // если нажали на одну половину enter, имитируем нажатие на вторую
     uint16_t identify_pressed_btn(uint16_t pressing_coord_x, uint16_t pressing_coord_y);
+    void change_time_figure(Decr_Incr chng_type, Widget& figure_widget, uint8_t* digit, vector<tImage>& nmbrs_img_vect);
+    void init_numbrs_img_vect(void);
+    void init_displayed_values(void);
 };
 
 void system_menu_layout_draw(void);
