@@ -27,6 +27,8 @@ using namespace std;
 #define CALIBRATION_OFFSET_Y    -8
 #define SIX_DIGIT_MAX_NUMBER    5
 #define DECIMAL_MAX_NUMBER      9
+#define SEC_IN_MIN_COUNT        59
+#define BOUNCE_MAX_SAMPLES      4
 
 enum Decr_Incr
 {
@@ -39,7 +41,8 @@ enum Img_vect_list
     CONSTANT_IMG,
     CHANGEABLE_IMG,
     BTN_PRESSED_IMG,
-    BTN_RELEASED_IMG
+    BTN_RELEASED_IMG,
+    BTN_BLOCKED_IMG
 };
 
 enum Buttons_list
@@ -167,11 +170,13 @@ typedef struct
 #include "images/img_time_colon_backgr.h"
 #include "images/img_time_down_arrow_pressed.h"
 #include "images/img_time_down_arrow_released.h"
+#include "images/img_time_down_arrow_blocked.h"
 #include "images/img_time_figure_rect.h"
 #include "images/img_time_hour_char.h"
 #include "images/img_time_minute_char.h"
 #include "images/img_time_up_arrow_pressed.h"
 #include "images/img_time_up_arrow_released.h"
+#include "images/img_time_up_arrow_blocked.h"
 #include "images/img_vacuum_pump_string.h"
 #include "images/img_keyboard_0_prsd.h"
 #include "images/img_keyboard_0_rlsd.h"
@@ -244,19 +249,21 @@ class Widget
     vector<ImageObj> changeable_images;
     vector<ImageObj> pressed_btn_images;
     vector<ImageObj> released_btn_images;
+    vector<ImageObj> blocked_btn_images;
     bool button_is_pressed;
     bool wgt_img_changed;                           // флаг, что выводимое значение изменилось, но еще не было физически отрисовано
-    //vector<ImageObj> constant_rectangles;
-    //vector<ImageObj> pressed_button_rectangles;
-    //vector<TextObj>  constant_text_strings;
-    //vector<TextObj>  pressed_button_text_stringsr;
-    //vector<Widget*>  related_oblects;             // Нужно для обработки кнопок сложной формы, состоящих из нескольких виджетов.
+    bool btn_locked;
+
+    Widget(Buttons_list btn_name, uint16_t wgt_x, uint16_t wgt_y);
+    Widget(Buttons_list btn_name, uint16_t wgt_x, uint16_t wgt_y, uint16_t wgt_wdth, uint16_t wgt_hght);
     void add_img_to_wgt(Img_vect_list vect_to_add_type, tImage add_image_generated, uint16_t add_img_coord_x, uint16_t add_img_coord_y);
     void tile_area(tImage image_to_tile, uint16_t area_width, uint16_t area_hight); // замостить область повторяющейся картинкой
     void set_rectangle(void);                       // отрисовываем фоновые рамки
     void draw_img_vector(vector<ImageObj> img_vector_to_draw, uint16_t parent_wgt_coord_x, uint16_t parent_wgt_coord_y);
     void change_image_in_widget(tImage image_to_output, uint16_t img_out_coord_x, uint16_t img_out_coord_y);
     uint16_t img_center_x(tImage img_to_center);
+    void lock_button(void);
+    void unlock_button(void);
 };
 
 class OvenDisplay 
@@ -273,14 +280,14 @@ class OvenDisplay
     vector<tImage> numbers_45_font_vector;
     vector<tImage> numbers_30_font_vector;
     vector<tImage> numbers_11_font_vector;
+    uint32_t bounce_sample_counter;
+    Buttons_list bounce_btn_buff;
 
     void test_draw(void);                                                  // тестовая картинка, выводим изображение ракеты
     void init_widgets(void);                                               // задаём содержимое виджетов
     void draw_all_widgets(void);         // отрисовываем весь дисплей
     void update_all_widgets(void);     // обновляем виджеты, значение которых изменилось, но не отрисовано (напр. цифры)
     void init_widgets_size(void);           // если размер виджета не был задан вручную, он автоматически равен размеру первой картинки - кнопки
-    void init_img_changed_flag(void);       // инициализируем нулями флаги изменения виджета
-    void init_buttons_state(void);          // инициализируем нулями состояние кнопок
     void handle_button_press(Buttons_list pressed_button);      // обрабатываем нажатие кнопки
     void enter_related_event(void);         // если нажали на одну половину enter, имитируем нажатие на вторую
     uint16_t identify_pressed_btn(uint16_t pressing_coord_x, uint16_t pressing_coord_y);
@@ -289,6 +296,10 @@ class OvenDisplay
     void init_numbrs_img_vect(void);
     void init_displayed_values(void);
     void blink_clock_colon(void);
+    void lock_arrows_left(void);
+    void unlock_arrows_left(void);
+    bool bounce_filter_passed(Buttons_list pressed_button);
+
 };
 
 void system_menu_layout_draw(void);

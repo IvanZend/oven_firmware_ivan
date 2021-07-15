@@ -41,10 +41,31 @@ Widget temperature_right_keyboard_enter_bottom = {false, 0, 0, 0, 0};
 Widget vacuum_on_off_button = {false, 0, 0, 0, 0};
 */
 
-Widget simplified_mode_dummy_text = {NO_BUTTON, 0, 0, 0, 0};
-Widget service_mode_dummy_text = {NO_BUTTON, 0, 0, 0, 0};
-
 OvenDisplay oven_display;
+
+Widget::Widget(Buttons_list btn_name, uint16_t wgt_x, uint16_t wgt_y)
+{
+    button_name = btn_name;
+    wgt_coord_x = wgt_x;
+    wgt_coord_y = wgt_y;
+    wgt_width = 0;
+    wgt_height = 0;
+    button_is_pressed = false;
+    wgt_img_changed = false;
+    btn_locked = false;
+}
+
+Widget::Widget(Buttons_list btn_name, uint16_t wgt_x, uint16_t wgt_y, uint16_t wgt_wdth, uint16_t wgt_hght)
+{
+    button_name = btn_name;
+    wgt_coord_x = wgt_x;
+    wgt_coord_y = wgt_y;
+    wgt_width = wgt_wdth;
+    wgt_height = wgt_hght;
+    button_is_pressed = false;
+    wgt_img_changed = false;
+    btn_locked = false;
+}
 
 void Widget::add_img_to_wgt(Img_vect_list vect_to_add_type, tImage add_image_generated, uint16_t add_img_coord_x, uint16_t add_img_coord_y)
 {
@@ -75,6 +96,9 @@ void Widget::add_img_to_wgt(Img_vect_list vect_to_add_type, tImage add_image_gen
         released_btn_images.push_back(tmp_img_obj_1);
         break;
     }
+    case BTN_BLOCKED_IMG:
+        blocked_btn_images.push_back(tmp_img_obj_1);
+        break;
     }
 }
 
@@ -86,6 +110,8 @@ OvenDisplay::OvenDisplay(void)
     draw_all_completed = false;
     colon_displayed = true;
     previous_button = NO_BUTTON;
+    bounce_sample_counter = 0;
+    bounce_btn_buff = NO_BUTTON;
     init_numbrs_img_vect();
     init_widgets();
 }
@@ -141,12 +167,16 @@ void OvenDisplay::init_widgets(void)
     temperature_display.add_img_to_wgt(CONSTANT_IMG, img_temperature_display, 0, 0);
     left_time_up_arrow_1.add_img_to_wgt(BTN_RELEASED_IMG, img_time_up_arrow_released, 0, 0);
     left_time_up_arrow_1.add_img_to_wgt(BTN_PRESSED_IMG, img_time_up_arrow_pressed, 0, 0);
+    left_time_up_arrow_1.add_img_to_wgt(BTN_BLOCKED_IMG, img_time_up_arrow_blocked, 0, 0);
     left_time_up_arrow_2.add_img_to_wgt(BTN_RELEASED_IMG, img_time_up_arrow_released, 0, 0);
     left_time_up_arrow_2.add_img_to_wgt(BTN_PRESSED_IMG, img_time_up_arrow_pressed, 0, 0);
+    left_time_up_arrow_2.add_img_to_wgt(BTN_BLOCKED_IMG, img_time_up_arrow_blocked, 0, 0);
     left_time_up_arrow_3.add_img_to_wgt(BTN_RELEASED_IMG, img_time_up_arrow_released, 0, 0);
     left_time_up_arrow_3.add_img_to_wgt(BTN_PRESSED_IMG, img_time_up_arrow_pressed, 0, 0);
+    left_time_up_arrow_3.add_img_to_wgt(BTN_BLOCKED_IMG, img_time_up_arrow_blocked, 0, 0);
     left_time_up_arrow_4.add_img_to_wgt(BTN_RELEASED_IMG, img_time_up_arrow_released, 0, 0);
     left_time_up_arrow_4.add_img_to_wgt(BTN_PRESSED_IMG, img_time_up_arrow_pressed, 0, 0);
+    left_time_up_arrow_4.add_img_to_wgt(BTN_BLOCKED_IMG, img_time_up_arrow_blocked, 0, 0);
     left_time_figure_1.add_img_to_wgt(CONSTANT_IMG, img_time_figure_rect, 0, 0);
     left_time_figure_2.add_img_to_wgt(CONSTANT_IMG, img_time_figure_rect, 0, 0);
     left_time_figure_3.add_img_to_wgt(CONSTANT_IMG, img_time_figure_rect, 0, 0);
@@ -154,12 +184,16 @@ void OvenDisplay::init_widgets(void)
     left_time_colon_char.add_img_to_wgt(CONSTANT_IMG, img_time_colon_char, 0, 0);
     left_time_down_arrow_1.add_img_to_wgt(BTN_RELEASED_IMG, img_time_down_arrow_released, 0, 0);
     left_time_down_arrow_1.add_img_to_wgt(BTN_PRESSED_IMG, img_time_down_arrow_pressed, 0, 0);
+    left_time_down_arrow_1.add_img_to_wgt(BTN_BLOCKED_IMG, img_time_down_arrow_blocked, 0, 0);
     left_time_down_arrow_2.add_img_to_wgt(BTN_RELEASED_IMG, img_time_down_arrow_released, 0, 0);
     left_time_down_arrow_2.add_img_to_wgt(BTN_PRESSED_IMG, img_time_down_arrow_pressed, 0, 0);
+    left_time_down_arrow_2.add_img_to_wgt(BTN_BLOCKED_IMG, img_time_down_arrow_blocked, 0, 0);
     left_time_down_arrow_3.add_img_to_wgt(BTN_RELEASED_IMG, img_time_down_arrow_released, 0, 0);
     left_time_down_arrow_3.add_img_to_wgt(BTN_PRESSED_IMG, img_time_down_arrow_pressed, 0, 0);
-    left_time_down_arrow_4.add_img_to_wgt(BTN_RELEASED_IMG, img_time_down_arrow_released, 0, 0);
+    left_time_down_arrow_3.add_img_to_wgt(BTN_BLOCKED_IMG, img_time_down_arrow_blocked, 0, 0);
     left_time_down_arrow_4.add_img_to_wgt(BTN_PRESSED_IMG, img_time_down_arrow_pressed, 0, 0);
+    left_time_down_arrow_4.add_img_to_wgt(BTN_RELEASED_IMG, img_time_down_arrow_released, 0, 0);
+    left_time_down_arrow_4.add_img_to_wgt(BTN_BLOCKED_IMG, img_time_down_arrow_blocked, 0, 0);
     left_temperature_entering_background.add_img_to_wgt(CONSTANT_IMG, img_temperature_entering_background, 0, 0);
     temperature_left_keyboard_0.add_img_to_wgt(BTN_PRESSED_IMG, img_keyboard_0_prsd, 0, 0);
     temperature_left_keyboard_0.add_img_to_wgt(BTN_RELEASED_IMG, img_keyboard_0_rlsd, 0, 0);
@@ -271,19 +305,16 @@ void OvenDisplay::init_widgets(void)
     }
     case SIMPLIFIED_USER_MODE:
     {
-        widgets_vector.push_back(simplified_mode_dummy_text);
+
         break;
     }
     case SERVICE_MODE:
     {
-        widgets_vector.push_back(service_mode_dummy_text);
+
         break;
     }
     }
-
     init_widgets_size();
-    init_img_changed_flag();
-    init_buttons_state();
 }
 
 void OvenDisplay::draw_all_widgets(void)
@@ -331,22 +362,6 @@ void OvenDisplay::init_widgets_size(void)
     }
 }
 
-void OvenDisplay::init_img_changed_flag(void)
-{
-    for (vector<Widget>::size_type i = 0; i != widgets_vector.size(); i++)
-    {
-        widgets_vector[i].wgt_img_changed = false;
-    }
-}
-
-void OvenDisplay::init_buttons_state(void)
-{
-    for (vector<Widget>::size_type i = 0; i != widgets_vector.size(); i++)
-    {
-        widgets_vector[i].button_is_pressed = false;
-    }
-}
-
 void OvenDisplay::handle_button_press(Buttons_list pressed_button)
 {
     switch (pressed_button)         // вызываем функции, не связанные с отрисовкой кнопки
@@ -360,12 +375,11 @@ void OvenDisplay::handle_button_press(Buttons_list pressed_button)
     {
         if (main_device.heating_timer_started)
         {
-            main_device.heating_timer_started = false;
             main_device.process_timer_left.stop_process_timer();
+            
         }
         else
         {
-            main_device.heating_timer_started = true;
             main_device.process_timer_left.start_process_timer();
         }
         return;
@@ -373,50 +387,74 @@ void OvenDisplay::handle_button_press(Buttons_list pressed_button)
     }
     case LEFT_UP_ARROW_1:
     {
-        change_time_figure(INCREMENT, widgets_vector[9], &main_device.process_timer_left.hours_high_digit, \
-                            numbers_45_font_vector, DECIMAL_MAX_NUMBER);
+        if (!(main_device.heating_timer_started))
+        {
+            change_time_figure(INCREMENT, widgets_vector[9], &main_device.process_timer_left.hours_high_digit, \
+                                numbers_45_font_vector, DECIMAL_MAX_NUMBER);
+        }
         break;
     }
     case LEFT_UP_ARROW_2:
     {
-        change_time_figure(INCREMENT, widgets_vector[10], &main_device.process_timer_left.hours_low_digit,
-                            numbers_45_font_vector, DECIMAL_MAX_NUMBER);
+        if (!(main_device.heating_timer_started))
+        {
+            change_time_figure(INCREMENT, widgets_vector[10], &main_device.process_timer_left.hours_low_digit,
+                                numbers_45_font_vector, DECIMAL_MAX_NUMBER);
+        }
         break;
     }
     case LEFT_UP_ARROW_3:
     {
-        change_time_figure(INCREMENT, widgets_vector[11], &main_device.process_timer_left.minutes_high_digit, \
-                            numbers_45_font_vector, SIX_DIGIT_MAX_NUMBER);
+        if (!(main_device.heating_timer_started))
+        {
+            change_time_figure(INCREMENT, widgets_vector[11], &main_device.process_timer_left.minutes_high_digit, \
+                                numbers_45_font_vector, SIX_DIGIT_MAX_NUMBER);
+        }
         break;
     }
     case LEFT_UP_ARROW_4:
     {
-        change_time_figure(INCREMENT, widgets_vector[12], &main_device.process_timer_left.minutes_low_digit, \
-                            numbers_45_font_vector, DECIMAL_MAX_NUMBER);
+        if (!(main_device.heating_timer_started))
+        {
+            change_time_figure(INCREMENT, widgets_vector[12], &main_device.process_timer_left.minutes_low_digit, \
+                                numbers_45_font_vector, DECIMAL_MAX_NUMBER);
+        }
         break;
     }
     case LEFT_DOWN_ARROW_1:
     {
-        change_time_figure(DECREMENT, widgets_vector[9], &main_device.process_timer_left.hours_high_digit, \
-                            numbers_45_font_vector, DECIMAL_MAX_NUMBER);
+        if (!(main_device.heating_timer_started))
+        {
+            change_time_figure(DECREMENT, widgets_vector[9], &main_device.process_timer_left.hours_high_digit, \
+                                numbers_45_font_vector, DECIMAL_MAX_NUMBER);
+        }
         break;
     }
     case LEFT_DOWN_ARROW_2:
     {
-        change_time_figure(DECREMENT, widgets_vector[10], &main_device.process_timer_left.hours_low_digit, \
-                            numbers_45_font_vector, DECIMAL_MAX_NUMBER);
+        if (!(main_device.heating_timer_started))
+        {
+            change_time_figure(DECREMENT, widgets_vector[10], &main_device.process_timer_left.hours_low_digit, \
+                                numbers_45_font_vector, DECIMAL_MAX_NUMBER);
+        }
         break;
     }
     case LEFT_DOWN_ARROW_3:
     {
-        change_time_figure(DECREMENT, widgets_vector[11], &main_device.process_timer_left.minutes_high_digit, \
-                            numbers_45_font_vector, SIX_DIGIT_MAX_NUMBER);
+        if (!(main_device.heating_timer_started))
+        {
+            change_time_figure(DECREMENT, widgets_vector[11], &main_device.process_timer_left.minutes_high_digit, \
+                                numbers_45_font_vector, SIX_DIGIT_MAX_NUMBER);
+        }
         break;
     }
     case LEFT_DOWN_ARROW_4:
     {
-        change_time_figure(DECREMENT, widgets_vector[12], &main_device.process_timer_left.minutes_low_digit, \
-                            numbers_45_font_vector, DECIMAL_MAX_NUMBER);
+        if (!(main_device.heating_timer_started))
+        {
+            change_time_figure(DECREMENT, widgets_vector[12], &main_device.process_timer_left.minutes_low_digit, \
+                                numbers_45_font_vector, DECIMAL_MAX_NUMBER);
+        }
         break;
     }
     case LEFT_KEYBOARD_1:
@@ -644,28 +682,35 @@ void OvenDisplay::handle_button_press(Buttons_list pressed_button)
     {
         if (widgets_vector[i].button_name != NO_BUTTON)                         // если виджет является кнопкой
         {
-            if (pressed_button != NO_BUTTON)                                    // если нажата какая-либо кнопка
+            if (!(widgets_vector[i].btn_locked))                                // если данная кнопка не заблокирована
             {
-                if (pressed_button == widgets_vector[i].button_name)            // если нажата данная кнопка
+                if (pressed_button != NO_BUTTON)                                // если нажата какая-либо кнопка
                 {
-                    widgets_vector[i].button_is_pressed = true;
-                    widgets_vector[i].draw_img_vector(widgets_vector[i].pressed_btn_images, widgets_vector[i].wgt_coord_x, widgets_vector[i].wgt_coord_y);
-                }
-                else        // если не нажата данная кнопка
-                {
-                    if (widgets_vector[i].button_is_pressed)        // если данная кнопка была нажата ранее
+                    if (pressed_button == widgets_vector[i].button_name)        // если нажата данная кнопка
                     {
-                        widgets_vector[i].button_is_pressed = false;
-                        widgets_vector[i].draw_img_vector(widgets_vector[i].released_btn_images, widgets_vector[i].wgt_coord_x, widgets_vector[i].wgt_coord_y);
+                        
+                        widgets_vector[i].button_is_pressed = true;
+                        widgets_vector[i].draw_img_vector(widgets_vector[i].pressed_btn_images, \
+                                                            widgets_vector[i].wgt_coord_x, widgets_vector[i].wgt_coord_y);
+                    }
+                    else        // если не нажата данная кнопка
+                    {
+                        if (widgets_vector[i].button_is_pressed)        // если данная кнопка была нажата ранее
+                        {
+                            widgets_vector[i].button_is_pressed = false;
+                            widgets_vector[i].draw_img_vector(widgets_vector[i].released_btn_images, \
+                                                                widgets_vector[i].wgt_coord_x, widgets_vector[i].wgt_coord_y);
+                        }
                     }
                 }
-            }
-            else            // если не нажата никакая кнопка
-            {
-                if (widgets_vector[i].button_is_pressed)            // если данная кнопка была нажата ранее
+                else            // если не нажата никакая кнопка
                 {
-                    widgets_vector[i].button_is_pressed = false;
-                    widgets_vector[i].draw_img_vector(widgets_vector[i].released_btn_images, widgets_vector[i].wgt_coord_x, widgets_vector[i].wgt_coord_y);
+                    if (widgets_vector[i].button_is_pressed)            // если данная кнопка была нажата ранее
+                    {
+                        widgets_vector[i].button_is_pressed = false;
+                        widgets_vector[i].draw_img_vector(widgets_vector[i].released_btn_images, \
+                                                            widgets_vector[i].wgt_coord_x, widgets_vector[i].wgt_coord_y);
+                    }
                 }
             }
         }
@@ -814,6 +859,20 @@ uint16_t Widget::img_center_x(tImage img_to_center)
     return centered_coord_x;
 }
 
+void Widget::lock_button(void)
+{
+    button_is_pressed = false;
+    draw_img_vector(blocked_btn_images, wgt_coord_x, wgt_coord_y);
+    btn_locked = true;
+}
+
+void Widget::unlock_button(void)
+{
+    button_is_pressed = false;
+    draw_img_vector(released_btn_images, wgt_coord_x, wgt_coord_y);
+    btn_locked = false;
+}
+
 void OvenDisplay::change_time_figure(Decr_Incr chng_type, Widget& figure_widget, uint32_t* digit, vector<tImage>& nmbrs_img_vect, uint8_t digit_max_value)
 {
     switch (chng_type)
@@ -892,7 +951,7 @@ void OvenDisplay::init_numbrs_img_vect(void)
 
 void OvenDisplay::init_displayed_values(void)
 {
-    for (vector<ImageObj>::size_type i = 0; i != widgets_vector.size(); i++)
+    for (vector<Widget>::size_type i = 0; i != widgets_vector.size(); i++)
     {
         if (
             (i == 9) || \
@@ -917,6 +976,64 @@ void OvenDisplay::blink_clock_colon(void)
     {
        widgets_vector[13].change_image_in_widget(img_time_colon_char, 0, 0);
        colon_displayed = true;
+    }
+}
+
+void OvenDisplay::lock_arrows_left(void)
+{
+    for (vector<Widget>::size_type i = 0; i != widgets_vector.size(); i++)
+    {
+        if (
+            (i == 5) || \
+            (i == 6) || \
+            (i == 7) || \
+            (i == 8) || \
+            (i == 14) || \
+            (i == 15) || \
+            (i == 16) || \
+            (i == 17)
+            )
+        {
+            widgets_vector[i].lock_button();
+        }
+    }
+}
+
+void OvenDisplay::unlock_arrows_left(void)
+{
+    for (vector<Widget>::size_type i = 0; i != widgets_vector.size(); i++)
+    {
+        if (
+            (i == 5) || \
+            (i == 6) || \
+            (i == 7) || \
+            (i == 8) || \
+            (i == 14) || \
+            (i == 15) || \
+            (i == 16) || \
+            (i == 17)
+            )
+        {
+            widgets_vector[i].unlock_button();
+        }
+    }
+}
+
+bool OvenDisplay::bounce_filter_passed(Buttons_list pressed_button)
+{
+    if (pressed_button != bounce_btn_buff)
+    {
+        bounce_btn_buff = pressed_button;
+        bounce_sample_counter = 0;
+    }
+    if (bounce_sample_counter >= BOUNCE_MAX_SAMPLES)
+    {
+        bounce_sample_counter = BOUNCE_MAX_SAMPLES;
+        return true;
+    }
+    else
+    {
+        return false;
     }
 }
 

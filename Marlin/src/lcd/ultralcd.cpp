@@ -816,6 +816,7 @@ void MarlinUI::update() {
   static uint16_t max_display_update_time = 0;
   static millis_t next_lcd_update_ms;
   static millis_t next_sec_event_ms;
+  static millis_t next_bounce_filter_ms;
   millis_t ms = millis();
 
   #if HAS_LCD_MENU && LCD_TIMEOUT_TO_STATUS
@@ -908,12 +909,20 @@ void MarlinUI::update() {
 
   #endif // INIT_SDCARD_ON_BOOT
 
-  if (touch_buttons != oven_display.previous_button)
+  if (oven_display.bounce_filter_passed((Buttons_list)touch_buttons))
   {
-    oven_display.handle_button_press((Buttons_list)touch_buttons);
-    oven_display.previous_button = (Buttons_list)touch_buttons;
+    if (touch_buttons != oven_display.previous_button)
+    {
+      oven_display.handle_button_press((Buttons_list)touch_buttons);
+      oven_display.previous_button = (Buttons_list)touch_buttons;
+    }
   }
   
+  if (ELAPSED(ms, next_bounce_filter_ms))
+  {
+    oven_display.bounce_sample_counter++;
+    next_bounce_filter_ms = ms + TOUCH_BOUNCE_TIMER_MS;
+  }
   
   if (ELAPSED(ms, next_sec_event_ms))
   {
