@@ -126,7 +126,7 @@ void OvenDisplay::init_widgets(void)
     Widget background_frame = {NO_BUTTON, 0, 0};
     Widget thermometer_icon = {NO_BUTTON, 29, 32};
     Widget heating_string = {NO_BUTTON, 120, 42};
-    Widget heating_timer_start_stop_btn = {HEATING_TIMER_START_STOP, 125, 86, 0, 0};
+    Widget heating_timer_start_stop_btn = {HEATING_TIMER_START_STOP, 88, 127, 0, 0};
     Widget temperature_display = {NO_BUTTON, 200, 50};
     Widget left_time_up_arrow_1 = {LEFT_UP_ARROW_1, 49, 200, 0, 0};
     Widget left_time_up_arrow_2 = {LEFT_UP_ARROW_2, 123, 200, 0, 0};
@@ -531,16 +531,18 @@ void OvenDisplay::handle_button_press(Buttons_list pressed_button)
     }
     case HEATING_ON_OFF:
     {
-        uint8_t widget_number = 33;
         if (main_device.heating_is_enabled)
         {
             main_device.heating_is_enabled = false;
-            widgets_vector[widget_number].change_image_in_widget(img_slide_button_off, 0, 0);
+            widgets_vector[33].change_image_in_widget(img_slide_button_off, 0, 0);
+            widgets_vector[1].change_image_in_widget(img_thermometer_icon_crossed, 0, 0);
+
         }
         else
         {
             main_device.heating_is_enabled = true;
-            widgets_vector[widget_number].change_image_in_widget(img_slide_button_on, 0, 0);
+            widgets_vector[33].change_image_in_widget(img_slide_button_on, 0, 0);
+            widgets_vector[1].change_image_in_widget(img_thermometer_icon_enabled, 0, 0);
         }
         return;
         break;
