@@ -1,6 +1,6 @@
 #include "oven_device.h"
 
-extern MainDevice main_device;
+MainDevice main_device;
 
 ExternDevice::ExternDevice(void)
 {
@@ -100,4 +100,5 @@ MainDevice::MainDevice(void)
     heating_is_enabled = 0;
     preset_temperature = 0;
     current_temperature = 0;
+    input_temperature = 0;
 }

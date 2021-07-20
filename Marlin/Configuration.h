@@ -424,16 +424,22 @@
 #define TEMP_SENSOR_BED 1//997
 // #define TEMP_SENSOR_BED 1000
 #define TEMP_SENSOR_PROBE 0
-#define TEMP_SENSOR_CHAMBER 999
+#define TEMP_SENSOR_CHAMBER 0
 
 // Dummy thermistor constant temperature readings, for use with 998 and 999
 #define DUMMY_THERMISTOR_998_VALUE 300
 #define DUMMY_THERMISTOR_999_VALUE 150
 
+#define OVEN_HEATER_600_PIN     PA15
+#define OVEN_HEATER_800_PIN     PB3
+
+#define OVEN_HEATER_600 temp_hotend[0];
+#define OVEN_HEATER_800 temp_hotend[1];
+
 // Use temp sensor 1 as a redundant sensor with sensor 0. If the readings
 // from the two sensors differ too much the print will be aborted.
 //#define TEMP_SENSOR_1_AS_REDUNDANT
-#define MAX_REDUNDANT_TEMP_SENSOR_DIFF 10
+#define MAX_REDUNDANT_TEMP_SENSOR_DIFF 1000// было 10
 
 #define TEMP_RESIDENCY_TIME     10  // (seconds) Time to wait for hotend to "settle" in M109
 #define TEMP_WINDOW              1  // (°C) Temperature proximity for the "temperature reached" timer

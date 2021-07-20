@@ -5,7 +5,6 @@
 
 extern ExternDevice heater_600;
 extern ExternDevice heater_800;
-
-extern MainDevice main_device;         // глобальный объект печи
+extern MainDevice main_device;
 
 #endif

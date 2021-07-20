@@ -5,7 +5,9 @@
 #include <string>
 #include <vector>
 
-
+#include "../../inc/MarlinConfigPre.h"
+#include "../temperature.h"
+//#include "../../Configuration.h"
 
 using namespace std;
 
@@ -29,6 +31,15 @@ using namespace std;
 #define DECIMAL_MAX_NUMBER      9
 #define SEC_IN_MIN_COUNT        59
 #define BOUNCE_MAX_SAMPLES      4
+#define HOUR_CHAR_COORD_X       28
+#define HOUR_CHAR_COORD_Y       72
+#define TEMPER_DISPL_SIZE_X     95
+#define TEMPER_DISPL_SIZE_Y     30
+#define TEMPER_INPUT_SIZE_X     30
+#define TEMPER_INPUT_SIZE_Y     11
+#define FONT_30_GAP_PIX         4
+#define FONT_11_GAP_PIX         3
+#define IMG_BACKGR_IN_VECT      10
 
 enum Decr_Incr
 {
@@ -105,6 +116,12 @@ enum Display_mode
     STANDARD_USER_MODE,
     SIMPLIFIED_USER_MODE,
     SERVICE_MODE
+};
+
+enum Alignment
+{
+    ALIGN_LEFT,
+    ALIGN_RIGHT
 };
 
 typedef struct 
@@ -227,6 +244,7 @@ typedef struct
 #include "images/numbers_30_7.h"
 #include "images/numbers_30_8.h"
 #include "images/numbers_30_9.h"
+#include "images/numbers_30_background.h"
 #include "images/numbers_11_0.h"
 #include "images/numbers_11_1.h"
 #include "images/numbers_11_2.h"
@@ -237,6 +255,7 @@ typedef struct
 #include "images/numbers_11_7.h"
 #include "images/numbers_11_8.h"
 #include "images/numbers_11_9.h"
+#include "images/numbers_11_background.h"
 
 
 class Widget
@@ -264,6 +283,13 @@ class Widget
     uint16_t img_center_x(tImage img_to_center);
     void lock_button(void);
     void unlock_button(void);
+    uint16_t string_align_right_x(vector<tImage>& img_nmbrs_vect, uint8_t fnt_space, vector<uint8_t>& value_to_align);
+    void convert_value_to_int_arr(vector<uint8_t>& value_int_vect,  uint32_t value_to_conv);
+    void change_value_in_wgt(Alignment numbers_align, uint8_t font_space, vector<tImage>& img_font, uint32_t value_to_displ);
+    void temper_input_add_number(uint8_t num_to_enter);
+    void temper_input_backspace(void);
+    void temper_input_reset(void);
+    void temper_input_enter(void);
 };
 
 class OvenDisplay 
