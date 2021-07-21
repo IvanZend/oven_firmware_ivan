@@ -3,42 +3,6 @@
 #include "../core/macros.h"
 #include "oven_core.h"
 
-/*
-Widget pressure_sensor_icon = {false, 0, 0, 0, 0};
-Widget vacuum_pump_string = {false, 0, 0, 0, 0};
-Widget vacuum_timer_start_button = {false, 0, 0, 0, 0};
-Widget vacuum_timer_stop_button = {false, 0, 0, 0, 0};
-Widget pressure_display = {false, 0, 0, 0, 0};
-Widget left_time_up_arrow_5 = {false, 0, 0, 0, 0};
-Widget left_time_up_arrow_6 = {false, 0, 0, 0, 0};
-Widget left_time_up_arrow_7 = {false, 0, 0, 0, 0};
-Widget left_time_up_arrow_8 = {false, 0, 0, 0, 0};
-Widget left_time_figure_5 = {false, 0, 0, 0, 0};
-Widget left_time_figure_6 = {false, 0, 0, 0, 0};
-Widget left_time_figure_7 = {false, 0, 0, 0, 0};
-Widget left_time_figure_8 = {false, 0, 0, 0, 0};
-Widget left_time_down_arrow_5 = {false, 0, 0, 0, 0};
-Widget left_time_down_arrow_6 = {false, 0, 0, 0, 0};
-Widget left_time_down_arrow_7 = {false, 0, 0, 0, 0};
-Widget left_time_down_arrow_8 = {false, 0, 0, 0, 0};
-Widget temperature_right_entering_background = {false, 0, 0, 0, 0};
-Widget temperature_right_keyboard_1 = {false, 0, 0, 0, 0};
-Widget temperature_right_keyboard_2 = {false, 0, 0, 0, 0};
-Widget temperature_right_keyboard_3 = {false, 0, 0, 0, 0};
-Widget temperature_right_keyboard_4 = {false, 0, 0, 0, 0};
-Widget temperature_right_keyboard_5 = {false, 0, 0, 0, 0};
-Widget temperature_right_keyboard_6 = {false, 0, 0, 0, 0};
-Widget temperature_right_keyboard_7 = {false, 0, 0, 0, 0};
-Widget temperature_right_keyboard_8 = {false, 0, 0, 0, 0};
-Widget temperature_right_keyboard_9 = {false, 0, 0, 0, 0};
-Widget temperature_right_keyboard_0 = {false, 0, 0, 0, 0};
-Widget temperature_right_keyboard_backspace = {false, 0, 0, 0, 0};
-Widget temperature_right_keyboard_recet = {false, 0, 0, 0, 0};
-Widget temperature_right_keyboard_enter_top = {false, 0, 0, 0, 0};
-Widget temperature_right_keyboard_enter_bottom = {false, 0, 0, 0, 0};
-Widget vacuum_on_off_button = {false, 0, 0, 0, 0};
-*/
-
 OvenDisplay oven_display;
 
 Widget::Widget(Buttons_list btn_name, uint16_t wgt_x, uint16_t wgt_y)
@@ -106,11 +70,12 @@ OvenDisplay::OvenDisplay(void)
     display_width = DISPLAY_WIDTH;
     display_height = DISPLAY_HEIGHT;
     draw_all_completed = false;
-    colon_displayed = true;
+    left_colon_displayed = true;
+    right_colon_displayed = true;
     previous_button = NO_BUTTON;
     bounce_sample_counter = 0;
     bounce_btn_buff = NO_BUTTON;
-    init_numbrs_img_vect();
+    init_fonts_img_vect();
     init_widgets();
 }
 
@@ -127,7 +92,7 @@ void OvenDisplay::init_widgets(void)
     Widget heating_timer_start_stop_btn = {HEATING_TIMER_START_STOP, 88, 127, 0, 0};
     Widget temperature_display = {NO_BUTTON, 200, 50};
     Widget left_time_up_arrow_1 = {LEFT_UP_ARROW_1, 49, 200, 0, 0};
-    Widget left_time_up_arrow_2 = {LEFT_UP_ARROW_2, 123, 200, 0, 0};
+    Widget left_time_up_arrow_2 = {LEFT_UP_ARROW_2, 124, 200, 0, 0};
     Widget left_time_up_arrow_3 = {LEFT_UP_ARROW_3, 218, 200, 0, 0};
     Widget left_time_up_arrow_4 = {LEFT_UP_ARROW_4, 292, 200, 0, 0};
     Widget left_time_figure_1 = {NO_BUTTON, 49, 230};
@@ -136,7 +101,7 @@ void OvenDisplay::init_widgets(void)
     Widget left_time_figure_4 = {NO_BUTTON, 292, 230};
     Widget left_time_colon_char = {NO_BUTTON, 201, 269};
     Widget left_time_down_arrow_1 = {LEFT_DOWN_ARROW_1, 49, 320, 0, 0};
-    Widget left_time_down_arrow_2 = {LEFT_DOWN_ARROW_2, 123, 320, 0, 0};
+    Widget left_time_down_arrow_2 = {LEFT_DOWN_ARROW_2, 124, 320, 0, 0};
     Widget left_time_down_arrow_3 = {LEFT_DOWN_ARROW_3, 218, 320, 0, 0};
     Widget left_time_down_arrow_4 = {LEFT_DOWN_ARROW_4, 292, 320, 0, 0};
     Widget left_temperature_entering_background = {NO_BUTTON, 50, 357};
@@ -158,6 +123,45 @@ void OvenDisplay::init_widgets(void)
     Widget temperature_displ_preset = {NO_BUTTON, 238, 81, TEMPER_DISPL_SIZE_X, TEMPER_DISPL_SIZE_Y};
     Widget temperature_displ_current = {NO_BUTTON, 238, 129, TEMPER_DISPL_SIZE_X, TEMPER_DISPL_SIZE_Y};
     Widget temperature_displ_input = {NO_BUTTON, 320, 362, TEMPER_INPUT_SIZE_X, TEMPER_INPUT_SIZE_Y};
+
+    Widget pressure_sensor_icon = {NO_BUTTON, 422, 32};
+    Widget vacuum_pump_string_1 = {NO_BUTTON, 512, 39};
+    Widget vacuum_pump_string_2 = {NO_BUTTON, 512, 65};
+    Widget atm_string = {NO_BUTTON, 415, 100};
+    Widget vacuum_timer_start_stop_btn = {VACUUM_TIMER_START_STOP, 481, 127, 0, 0};
+    Widget pressure_display = {NO_BUTTON, 592, 50};
+    Widget right_time_up_arrow_1 = {RIGHT_UP_ARROW_1, 442, 200, 0, 0};
+    Widget right_time_up_arrow_2 = {RIGHT_UP_ARROW_2, 517, 200, 0, 0};
+    Widget right_time_up_arrow_3 = {RIGHT_UP_ARROW_3, 611, 200, 0, 0};
+    Widget right_time_up_arrow_4 = {RIGHT_UP_ARROW_4, 686, 200, 0, 0};
+    Widget right_time_figure_1 = {NO_BUTTON, 442, 230, 0, 0};
+    Widget right_time_figure_2 = {NO_BUTTON, 517, 230, 0, 0};
+    Widget right_time_figure_3 = {NO_BUTTON, 611, 230, 0, 0};
+    Widget right_time_figure_4 = {NO_BUTTON, 686, 230, 0, 0};
+    Widget right_time_down_arrow_1 = {RIGHT_DOWN_ARROW_1, 442, 320, 0, 0};
+    Widget right_time_down_arrow_2 = {RIGHT_DOWN_ARROW_2, 517, 320, 0, 0};
+    Widget right_time_down_arrow_3 = {RIGHT_DOWN_ARROW_3, 611, 320, 0, 0};
+    Widget right_time_down_arrow_4 = {RIGHT_DOWN_ARROW_4, 686, 320, 0, 0};
+    Widget temperature_right_entering_background = {NO_BUTTON, 443, 357};
+    Widget temperature_right_keyboard_1 = {RIGHT_KEYBOARD_1, 448, 382, 0, 0};
+    Widget temperature_right_keyboard_2 = {RIGHT_KEYBOARD_2, 498, 382, 0, 0};
+    Widget temperature_right_keyboard_3 = {RIGHT_KEYBOARD_3, 549, 382, 0, 0};
+    Widget temperature_right_keyboard_4 = {RIGHT_KEYBOARD_4, 599, 382, 0, 0};
+    Widget temperature_right_keyboard_5 = {RIGHT_KEYBOARD_5, 650, 382, 0, 0};
+    Widget temperature_right_keyboard_6 = {RIGHT_KEYBOARD_6, 448, 416, 0, 0};
+    Widget temperature_right_keyboard_7 = {RIGHT_KEYBOARD_7, 498, 416, 0, 0};
+    Widget temperature_right_keyboard_8 = {RIGHT_KEYBOARD_8, 549, 416, 0, 0};
+    Widget temperature_right_keyboard_9 = {RIGHT_KEYBOARD_9, 599, 416, 0, 0};
+    Widget temperature_right_keyboard_0 = {RIGHT_KEYBOARD_0, 650, 416, 0, 0};
+    Widget temperature_right_keyboard_backspace = {RIGHT_KEYBOARD_BACKSPACE, 448, 450, 0, 0};
+    Widget temperature_right_keyboard_recet = {RIGHT_KEYBOARD_RECET, 549, 450, 0, 0};
+    Widget temperature_right_keyboard_enter_top = {RIGHT_KEYBOARD_ENTER_TOP, 700, 382, 0, 0};
+    Widget temperature_right_keyboard_enter_bottom = {RIGHT_KEYBOARD_ENTER_BOTTOM, 650, 450, 0, 0};
+    Widget vacuum_on_off_button = {VACUUM_ON_OFF, 527, 495, 0, 0};
+    Widget pressure_displ_preset = {NO_BUTTON, 630, 81, TEMPER_DISPL_SIZE_X, TEMPER_DISPL_SIZE_Y};
+    Widget pressure_displ_current = {NO_BUTTON, 630, 129, TEMPER_DISPL_SIZE_X, TEMPER_DISPL_SIZE_Y};
+    Widget pressure_displ_input = {NO_BUTTON, 714, 362, TEMPER_INPUT_SIZE_X, TEMPER_INPUT_SIZE_Y};
+    Widget right_time_colon_char = {NO_BUTTON, 594, 269};
 
     background_frame.tile_area(backgr_tile, display_width, display_height);
     background_frame.set_rectangle();
@@ -228,6 +232,76 @@ void OvenDisplay::init_widgets(void)
     temperature_left_keyboard_enter_bottom.add_img_to_wgt(BTN_PRESSED_IMG, img_keyboard_enter_bottom_prsd, 0, 0);
     temperature_left_keyboard_enter_bottom.add_img_to_wgt(BTN_RELEASED_IMG, img_keyboard_enter_bottom_rlsd, 0, 0);
     heating_on_off_button.add_img_to_wgt(BTN_RELEASED_IMG, img_slide_button_off, 0, 0);
+    
+    pressure_sensor_icon.add_img_to_wgt(CONSTANT_IMG, img_pressure_sensor_icon_crossed, 0, 0);
+    vacuum_pump_string_1.add_img_to_wgt(CONSTANT_IMG, img_vacuum_pump_string_1, 0, 0);
+    vacuum_pump_string_2.add_img_to_wgt(CONSTANT_IMG, img_vacuum_pump_string_2, 0, 0);
+    atm_string.add_img_to_wgt(CONSTANT_IMG, img_atm_string, 0, 0);
+    vacuum_timer_start_stop_btn.add_img_to_wgt(BTN_RELEASED_IMG, img_heating_timer_start_button, 0, 0);
+    pressure_display.add_img_to_wgt(CONSTANT_IMG, img_pressure_display, 0, 0);
+    right_time_up_arrow_1.add_img_to_wgt(BTN_RELEASED_IMG, img_time_up_arrow_released, 0, 0);
+    right_time_up_arrow_1.add_img_to_wgt(BTN_PRESSED_IMG, img_time_up_arrow_pressed, 0, 0);
+    right_time_up_arrow_1.add_img_to_wgt(BTN_BLOCKED_IMG, img_time_up_arrow_blocked, 0, 0);
+    right_time_up_arrow_2.add_img_to_wgt(BTN_RELEASED_IMG, img_time_up_arrow_released, 0, 0);
+    right_time_up_arrow_2.add_img_to_wgt(BTN_PRESSED_IMG, img_time_up_arrow_pressed, 0, 0);
+    right_time_up_arrow_2.add_img_to_wgt(BTN_BLOCKED_IMG, img_time_up_arrow_blocked, 0, 0);
+    right_time_up_arrow_3.add_img_to_wgt(BTN_RELEASED_IMG, img_time_up_arrow_released, 0, 0);
+    right_time_up_arrow_3.add_img_to_wgt(BTN_PRESSED_IMG, img_time_up_arrow_pressed, 0, 0);
+    right_time_up_arrow_3.add_img_to_wgt(BTN_BLOCKED_IMG, img_time_up_arrow_blocked, 0, 0);
+    right_time_up_arrow_4.add_img_to_wgt(BTN_RELEASED_IMG, img_time_up_arrow_released, 0, 0);
+    right_time_up_arrow_4.add_img_to_wgt(BTN_PRESSED_IMG, img_time_up_arrow_pressed, 0, 0);
+    right_time_up_arrow_4.add_img_to_wgt(BTN_BLOCKED_IMG, img_time_up_arrow_blocked, 0, 0);
+    right_time_figure_1.add_img_to_wgt(CONSTANT_IMG, img_time_figure_rect, 0, 0);
+    right_time_figure_1.add_img_to_wgt(CONSTANT_IMG, img_time_hour_char, HOUR_CHAR_COORD_X, HOUR_CHAR_COORD_Y);
+    right_time_figure_2.add_img_to_wgt(CONSTANT_IMG, img_time_figure_rect, 0, 0);
+    right_time_figure_2.add_img_to_wgt(CONSTANT_IMG, img_time_hour_char, HOUR_CHAR_COORD_X, HOUR_CHAR_COORD_Y);
+    right_time_figure_3.add_img_to_wgt(CONSTANT_IMG, img_time_figure_rect, 0, 0);
+    right_time_figure_3.add_img_to_wgt(CONSTANT_IMG, img_time_minute_char, HOUR_CHAR_COORD_X, HOUR_CHAR_COORD_Y);
+    right_time_figure_4.add_img_to_wgt(CONSTANT_IMG, img_time_figure_rect, 0, 0);
+    right_time_figure_4.add_img_to_wgt(CONSTANT_IMG, img_time_minute_char, HOUR_CHAR_COORD_X, HOUR_CHAR_COORD_Y);
+    right_time_down_arrow_1.add_img_to_wgt(BTN_RELEASED_IMG, img_time_down_arrow_released, 0, 0);
+    right_time_down_arrow_1.add_img_to_wgt(BTN_PRESSED_IMG, img_time_down_arrow_pressed, 0, 0);
+    right_time_down_arrow_1.add_img_to_wgt(BTN_BLOCKED_IMG, img_time_down_arrow_blocked, 0, 0);
+    right_time_down_arrow_2.add_img_to_wgt(BTN_RELEASED_IMG, img_time_down_arrow_released, 0, 0);
+    right_time_down_arrow_2.add_img_to_wgt(BTN_PRESSED_IMG, img_time_down_arrow_pressed, 0, 0);
+    right_time_down_arrow_2.add_img_to_wgt(BTN_BLOCKED_IMG, img_time_down_arrow_blocked, 0, 0);
+    right_time_down_arrow_3.add_img_to_wgt(BTN_RELEASED_IMG, img_time_down_arrow_released, 0, 0);
+    right_time_down_arrow_3.add_img_to_wgt(BTN_PRESSED_IMG, img_time_down_arrow_pressed, 0, 0);
+    right_time_down_arrow_3.add_img_to_wgt(BTN_BLOCKED_IMG, img_time_down_arrow_blocked, 0, 0);
+    right_time_down_arrow_4.add_img_to_wgt(BTN_RELEASED_IMG, img_time_down_arrow_released, 0, 0);
+    right_time_down_arrow_4.add_img_to_wgt(BTN_PRESSED_IMG, img_time_down_arrow_pressed, 0, 0);
+    right_time_down_arrow_4.add_img_to_wgt(BTN_BLOCKED_IMG, img_time_down_arrow_blocked, 0, 0);
+    temperature_right_entering_background.add_img_to_wgt(CONSTANT_IMG, img_temperature_entering_background, 0, 0);
+    temperature_right_keyboard_0.add_img_to_wgt(BTN_PRESSED_IMG, img_keyboard_0_prsd, 0, 0);
+    temperature_right_keyboard_0.add_img_to_wgt(BTN_RELEASED_IMG, img_keyboard_0_rlsd, 0, 0);
+    temperature_right_keyboard_1.add_img_to_wgt(BTN_PRESSED_IMG, img_keyboard_1_prsd, 0, 0);
+    temperature_right_keyboard_1.add_img_to_wgt(BTN_RELEASED_IMG, img_keyboard_1_rlsd, 0, 0);
+    temperature_right_keyboard_2.add_img_to_wgt(BTN_PRESSED_IMG, img_keyboard_2_prsd, 0, 0);
+    temperature_right_keyboard_2.add_img_to_wgt(BTN_RELEASED_IMG, img_keyboard_2_rlsd, 0, 0);
+    temperature_right_keyboard_3.add_img_to_wgt(BTN_PRESSED_IMG, img_keyboard_3_prsd, 0, 0);
+    temperature_right_keyboard_3.add_img_to_wgt(BTN_RELEASED_IMG, img_keyboard_3_rlsd, 0, 0);
+    temperature_right_keyboard_4.add_img_to_wgt(BTN_PRESSED_IMG, img_keyboard_4_prsd, 0, 0);
+    temperature_right_keyboard_4.add_img_to_wgt(BTN_RELEASED_IMG, img_keyboard_4_rlsd, 0, 0);
+    temperature_right_keyboard_5.add_img_to_wgt(BTN_PRESSED_IMG, img_keyboard_5_prsd, 0, 0);
+    temperature_right_keyboard_5.add_img_to_wgt(BTN_RELEASED_IMG, img_keyboard_5_rlsd, 0, 0);
+    temperature_right_keyboard_6.add_img_to_wgt(BTN_PRESSED_IMG, img_keyboard_6_prsd, 0, 0);
+    temperature_right_keyboard_6.add_img_to_wgt(BTN_RELEASED_IMG, img_keyboard_6_rlsd, 0, 0);
+    temperature_right_keyboard_7.add_img_to_wgt(BTN_PRESSED_IMG, img_keyboard_7_prsd, 0, 0);
+    temperature_right_keyboard_7.add_img_to_wgt(BTN_RELEASED_IMG, img_keyboard_7_rlsd, 0, 0);
+    temperature_right_keyboard_8.add_img_to_wgt(BTN_PRESSED_IMG, img_keyboard_8_prsd, 0, 0);
+    temperature_right_keyboard_8.add_img_to_wgt(BTN_RELEASED_IMG, img_keyboard_8_rlsd, 0, 0);
+    temperature_right_keyboard_9.add_img_to_wgt(BTN_PRESSED_IMG, img_keyboard_9_prsd, 0, 0);
+    temperature_right_keyboard_9.add_img_to_wgt(BTN_RELEASED_IMG, img_keyboard_9_rlsd, 0, 0);
+    temperature_right_keyboard_backspace.add_img_to_wgt(BTN_PRESSED_IMG, img_keyboard_backspace_prsd, 0, 0);
+    temperature_right_keyboard_backspace.add_img_to_wgt(BTN_RELEASED_IMG, img_keyboard_backspace_rlsd, 0, 0);
+    temperature_right_keyboard_recet.add_img_to_wgt(BTN_PRESSED_IMG, img_keyboard_cancel_prsd, 0, 0);
+    temperature_right_keyboard_recet.add_img_to_wgt(BTN_RELEASED_IMG, img_keyboard_cancel_rlsd, 0, 0);
+    temperature_right_keyboard_enter_top.add_img_to_wgt(BTN_PRESSED_IMG, img_keyboard_enter_top_prsd, 0, 0);
+    temperature_right_keyboard_enter_top.add_img_to_wgt(BTN_RELEASED_IMG, img_keyboard_enter_top_rlsd, 0, 0);
+    temperature_right_keyboard_enter_bottom.add_img_to_wgt(BTN_PRESSED_IMG, img_keyboard_enter_bottom_prsd, 0, 0);
+    temperature_right_keyboard_enter_bottom.add_img_to_wgt(BTN_RELEASED_IMG, img_keyboard_enter_bottom_rlsd, 0, 0);
+    vacuum_on_off_button.add_img_to_wgt(BTN_RELEASED_IMG, img_slide_button_off, 0, 0);
+    right_time_colon_char.add_img_to_wgt(CONSTANT_IMG, img_time_colon_char, 0, 0);
 
     widgets_vector.clear();
     switch (display_mode)
@@ -271,41 +345,45 @@ void OvenDisplay::init_widgets(void)
         widgets_vector.push_back(temperature_displ_preset);                     // 34
         widgets_vector.push_back(temperature_displ_current);                    // 35
         widgets_vector.push_back(temperature_displ_input);                      // 36
-        /*
-        widgets_vector.push_back(pressure_sensor_icon);
-        widgets_vector.push_back(vacuum_pump_string);
-        widgets_vector.push_back(vacuum_timer_start_button);
-        widgets_vector.push_back(vacuum_timer_stop_button);
-        widgets_vector.push_back(pressure_display);
-        widgets_vector.push_back(left_time_up_arrow_5);
-        widgets_vector.push_back(left_time_up_arrow_6);
-        widgets_vector.push_back(left_time_up_arrow_7);
-        widgets_vector.push_back(left_time_up_arrow_8);
-        widgets_vector.push_back(left_time_figure_5);
-        widgets_vector.push_back(left_time_figure_6);
-        widgets_vector.push_back(left_time_figure_7);
-        widgets_vector.push_back(left_time_figure_8);
-        widgets_vector.push_back(left_time_down_arrow_5);
-        widgets_vector.push_back(left_time_down_arrow_6);
-        widgets_vector.push_back(left_time_down_arrow_7);
-        widgets_vector.push_back(left_time_down_arrow_8);
-        widgets_vector.push_back(temperature_right_entering_background);
-        widgets_vector.push_back(temperature_right_keyboard_1);
-        widgets_vector.push_back(temperature_right_keyboard_2);
-        widgets_vector.push_back(temperature_right_keyboard_3);
-        widgets_vector.push_back(temperature_right_keyboard_4);
-        widgets_vector.push_back(temperature_right_keyboard_5);
-        widgets_vector.push_back(temperature_right_keyboard_6);
-        widgets_vector.push_back(temperature_right_keyboard_7);
-        widgets_vector.push_back(temperature_right_keyboard_8);
-        widgets_vector.push_back(temperature_right_keyboard_9);
-        widgets_vector.push_back(temperature_right_keyboard_0);
-        widgets_vector.push_back(temperature_right_keyboard_backspace);
-        widgets_vector.push_back(temperature_right_keyboard_recet);
-        widgets_vector.push_back(temperature_right_keyboard_enter_top);
-        widgets_vector.push_back(temperature_right_keyboard_enter_bottom);
-        widgets_vector.push_back(vacuum_on_off_button);
-        */
+        
+        widgets_vector.push_back(pressure_sensor_icon);                         // 37
+        widgets_vector.push_back(vacuum_timer_start_stop_btn);                  // 38
+        widgets_vector.push_back(pressure_display);                             // 39
+        widgets_vector.push_back(vacuum_pump_string_1);                         // 40
+        widgets_vector.push_back(vacuum_pump_string_2);                         // 41
+        widgets_vector.push_back(right_time_up_arrow_1);                        // 42
+        widgets_vector.push_back(right_time_up_arrow_2);                        // 43
+        widgets_vector.push_back(right_time_up_arrow_3);                        // 44
+        widgets_vector.push_back(right_time_up_arrow_4);                        // 45
+        widgets_vector.push_back(right_time_figure_1);                          // 46
+        widgets_vector.push_back(right_time_figure_2);                          // 47
+        widgets_vector.push_back(right_time_figure_3);                          // 48
+        widgets_vector.push_back(right_time_figure_4);                          // 49
+        widgets_vector.push_back(right_time_down_arrow_1);                      // 50
+        widgets_vector.push_back(right_time_down_arrow_2);                      // 51
+        widgets_vector.push_back(right_time_down_arrow_3);                      // 52
+        widgets_vector.push_back(right_time_down_arrow_4);                      // 53
+        widgets_vector.push_back(temperature_right_entering_background);        // 54
+        widgets_vector.push_back(temperature_right_keyboard_1);                 // 55
+        widgets_vector.push_back(temperature_right_keyboard_2);                 // 56
+        widgets_vector.push_back(temperature_right_keyboard_3);                 // 57
+        widgets_vector.push_back(temperature_right_keyboard_4);                 // 58
+        widgets_vector.push_back(temperature_right_keyboard_5);                 // 59
+        widgets_vector.push_back(temperature_right_keyboard_6);                 // 60
+        widgets_vector.push_back(temperature_right_keyboard_7);                 // 61
+        widgets_vector.push_back(temperature_right_keyboard_8);                 // 62
+        widgets_vector.push_back(temperature_right_keyboard_9);                 // 63
+        widgets_vector.push_back(temperature_right_keyboard_0);                 // 64
+        widgets_vector.push_back(temperature_right_keyboard_backspace);         // 65
+        widgets_vector.push_back(temperature_right_keyboard_recet);             // 66
+        widgets_vector.push_back(temperature_right_keyboard_enter_top);         // 67
+        widgets_vector.push_back(temperature_right_keyboard_enter_bottom);      // 68
+        widgets_vector.push_back(vacuum_on_off_button);                         // 69
+        widgets_vector.push_back(pressure_displ_preset);                        // 70
+        widgets_vector.push_back(pressure_displ_current);                       // 71
+        widgets_vector.push_back(pressure_displ_input);                         // 72
+        widgets_vector.push_back(right_time_colon_char);                        // 73
+
 
         break;
     }
@@ -387,21 +465,20 @@ void OvenDisplay::handle_button_press(Buttons_list pressed_button)
     }
     case HEATING_TIMER_START_STOP:
     {
-        if (main_device.heating_timer_started)
+        if (main_device.process_timer_left.timer_enabled)
         {
-            main_device.process_timer_left.stop_process_timer();
-            
+            main_device.process_timer_left.stop_process_timer(LEFT_SIDE);
         }
         else
         {
-            main_device.process_timer_left.start_process_timer();
+            main_device.process_timer_left.start_process_timer(LEFT_SIDE);
         }
         return;
         break;
     }
     case LEFT_UP_ARROW_1:
     {
-        if (!(main_device.heating_timer_started))
+        if (!(main_device.process_timer_left.timer_enabled))
         {
             change_time_figure(INCREMENT, widgets_vector[9], &main_device.process_timer_left.hours_high_digit, \
                                 numbers_45_font_vector, DECIMAL_MAX_NUMBER);
@@ -410,7 +487,7 @@ void OvenDisplay::handle_button_press(Buttons_list pressed_button)
     }
     case LEFT_UP_ARROW_2:
     {
-        if (!(main_device.heating_timer_started))
+        if (!(main_device.process_timer_left.timer_enabled))
         {
             change_time_figure(INCREMENT, widgets_vector[10], &main_device.process_timer_left.hours_low_digit,
                                 numbers_45_font_vector, DECIMAL_MAX_NUMBER);
@@ -419,7 +496,7 @@ void OvenDisplay::handle_button_press(Buttons_list pressed_button)
     }
     case LEFT_UP_ARROW_3:
     {
-        if (!(main_device.heating_timer_started))
+        if (!(main_device.process_timer_left.timer_enabled))
         {
             change_time_figure(INCREMENT, widgets_vector[11], &main_device.process_timer_left.minutes_high_digit, \
                                 numbers_45_font_vector, SIX_DIGIT_MAX_NUMBER);
@@ -428,7 +505,7 @@ void OvenDisplay::handle_button_press(Buttons_list pressed_button)
     }
     case LEFT_UP_ARROW_4:
     {
-        if (!(main_device.heating_timer_started))
+        if (!(main_device.process_timer_left.timer_enabled))
         {
             change_time_figure(INCREMENT, widgets_vector[12], &main_device.process_timer_left.minutes_low_digit, \
                                 numbers_45_font_vector, DECIMAL_MAX_NUMBER);
@@ -437,7 +514,7 @@ void OvenDisplay::handle_button_press(Buttons_list pressed_button)
     }
     case LEFT_DOWN_ARROW_1:
     {
-        if (!(main_device.heating_timer_started))
+        if (!(main_device.process_timer_left.timer_enabled))
         {
             change_time_figure(DECREMENT, widgets_vector[9], &main_device.process_timer_left.hours_high_digit, \
                                 numbers_45_font_vector, DECIMAL_MAX_NUMBER);
@@ -446,7 +523,7 @@ void OvenDisplay::handle_button_press(Buttons_list pressed_button)
     }
     case LEFT_DOWN_ARROW_2:
     {
-        if (!(main_device.heating_timer_started))
+        if (!(main_device.process_timer_left.timer_enabled))
         {
             change_time_figure(DECREMENT, widgets_vector[10], &main_device.process_timer_left.hours_low_digit, \
                                 numbers_45_font_vector, DECIMAL_MAX_NUMBER);
@@ -455,7 +532,7 @@ void OvenDisplay::handle_button_press(Buttons_list pressed_button)
     }
     case LEFT_DOWN_ARROW_3:
     {
-        if (!(main_device.heating_timer_started))
+        if (!(main_device.process_timer_left.timer_enabled))
         {
             change_time_figure(DECREMENT, widgets_vector[11], &main_device.process_timer_left.minutes_high_digit, \
                                 numbers_45_font_vector, SIX_DIGIT_MAX_NUMBER);
@@ -464,7 +541,7 @@ void OvenDisplay::handle_button_press(Buttons_list pressed_button)
     }
     case LEFT_DOWN_ARROW_4:
     {
-        if (!(main_device.heating_timer_started))
+        if (!(main_device.process_timer_left.timer_enabled))
         {
             change_time_figure(DECREMENT, widgets_vector[12], &main_device.process_timer_left.minutes_low_digit, \
                                 numbers_45_font_vector, DECIMAL_MAX_NUMBER);
@@ -473,73 +550,73 @@ void OvenDisplay::handle_button_press(Buttons_list pressed_button)
     }
     case LEFT_KEYBOARD_1:
     {
-        widgets_vector[36].temper_input_add_number(1);
+        widgets_vector[36].temper_input_add_number(1, main_device.input_temperature);
         break;
     }
     case LEFT_KEYBOARD_2:
     {
-        widgets_vector[36].temper_input_add_number(2);
+        widgets_vector[36].temper_input_add_number(2, main_device.input_temperature);
         break;
     }
     case LEFT_KEYBOARD_3:
     {
-        widgets_vector[36].temper_input_add_number(3);
+        widgets_vector[36].temper_input_add_number(3, main_device.input_temperature);
         break;
     }
     case LEFT_KEYBOARD_4:
     {
-        widgets_vector[36].temper_input_add_number(4);
+        widgets_vector[36].temper_input_add_number(4, main_device.input_temperature);
         break;
     }
     case LEFT_KEYBOARD_5:
     {
-        widgets_vector[36].temper_input_add_number(5);
+        widgets_vector[36].temper_input_add_number(5, main_device.input_temperature);
         break;
     }
     case LEFT_KEYBOARD_6:
     {
-        widgets_vector[36].temper_input_add_number(6);
+        widgets_vector[36].temper_input_add_number(6, main_device.input_temperature);
         break;
     }
     case LEFT_KEYBOARD_7:
     {
-        widgets_vector[36].temper_input_add_number(7);
+        widgets_vector[36].temper_input_add_number(7, main_device.input_temperature);
         break;
     }
     case LEFT_KEYBOARD_8:
     {
-        widgets_vector[36].temper_input_add_number(8);
+        widgets_vector[36].temper_input_add_number(8, main_device.input_temperature);
         break;
     }
     case LEFT_KEYBOARD_9:
     {
-        widgets_vector[36].temper_input_add_number(9);
+        widgets_vector[36].temper_input_add_number(9, main_device.input_temperature);
         break;
     }
     case LEFT_KEYBOARD_0:
     {
-        widgets_vector[36].temper_input_add_number(0);
+        widgets_vector[36].temper_input_add_number(0, main_device.input_temperature);
         break;
     }
     case LEFT_KEYBOARD_BACKSPACE:
     {
-        widgets_vector[36].temper_input_backspace();
+        widgets_vector[36].temper_input_backspace(main_device.input_temperature);
         break;
     }
     case LEFT_KEYBOARD_RECET:
     {
-        widgets_vector[36].temper_input_reset();
+        widgets_vector[36].temper_input_reset(main_device.input_temperature);
         break;
     }
     case LEFT_KEYBOARD_ENTER_TOP:
     {
-        enter_related_event();
+        enter_related_event_left();
         return;
         break;
     }
     case LEFT_KEYBOARD_ENTER_BOTTOM:
     {
-        enter_related_event();
+        enter_related_event_left();
         return;
         break;
     }
@@ -564,131 +641,181 @@ void OvenDisplay::handle_button_press(Buttons_list pressed_button)
         break;
     }
 
-    case VACUUM_TIMER_START:
+    case VACUUM_TIMER_START_STOP:
     {
-
-        break;
-    }
-    case VACUUM_TIMER_STOP:
-    {
-
+        if (main_device.process_timer_right.timer_enabled)
+        {
+            main_device.process_timer_right.stop_process_timer(RIGHT_SIDE);
+        }
+        else
+        {
+            main_device.process_timer_right.start_process_timer(RIGHT_SIDE);
+        }
+        return;
         break;
     }
     case RIGHT_UP_ARROW_1:
     {
-
+        if (!(main_device.process_timer_right.timer_enabled))
+        {
+            change_time_figure(INCREMENT, widgets_vector[46], &main_device.process_timer_right.hours_high_digit, \
+                                numbers_45_font_vector, DECIMAL_MAX_NUMBER);
+        }
         break;
     }
     case RIGHT_UP_ARROW_2:
     {
-
+        if (!(main_device.process_timer_right.timer_enabled))
+        {
+            change_time_figure(INCREMENT, widgets_vector[47], &main_device.process_timer_right.hours_low_digit, \
+                                numbers_45_font_vector, DECIMAL_MAX_NUMBER);
+        }
         break;
     }
     case RIGHT_UP_ARROW_3:
     {
-
+        if (!(main_device.process_timer_right.timer_enabled))
+        {
+            change_time_figure(INCREMENT, widgets_vector[48], &main_device.process_timer_right.minutes_high_digit, \
+                                numbers_45_font_vector, SIX_DIGIT_MAX_NUMBER);
+        }
         break;
     }
     case RIGHT_UP_ARROW_4:
     {
-
+        if (!(main_device.process_timer_right.timer_enabled))
+        {
+            change_time_figure(INCREMENT, widgets_vector[49], &main_device.process_timer_right.minutes_low_digit, \
+                                numbers_45_font_vector, DECIMAL_MAX_NUMBER);
+        }
         break;
     }
     case RIGHT_DOWN_ARROW_1:
     {
-
+        if (!(main_device.process_timer_right.timer_enabled))
+        {
+            change_time_figure(DECREMENT, widgets_vector[46], &main_device.process_timer_left.hours_high_digit, \
+                                numbers_45_font_vector, DECIMAL_MAX_NUMBER);
+        }
         break;
     }
     case RIGHT_DOWN_ARROW_2:
     {
-
+        if (!(main_device.process_timer_right.timer_enabled))
+        {
+            change_time_figure(DECREMENT, widgets_vector[47], &main_device.process_timer_left.hours_low_digit, \
+                                numbers_45_font_vector, DECIMAL_MAX_NUMBER);
+        }
         break;
     }
     case RIGHT_DOWN_ARROW_3:
     {
-
+        if (!(main_device.process_timer_right.timer_enabled))
+        {
+            change_time_figure(DECREMENT, widgets_vector[48], &main_device.process_timer_left.minutes_high_digit, \
+                                numbers_45_font_vector, SIX_DIGIT_MAX_NUMBER);
+        }
         break;
     }
     case RIGHT_DOWN_ARROW_4:
     {
-
+        if (!(main_device.process_timer_right.timer_enabled))
+        {
+            change_time_figure(DECREMENT, widgets_vector[49], &main_device.process_timer_left.minutes_low_digit, \
+                                numbers_45_font_vector, DECIMAL_MAX_NUMBER);
+        }
         break;
     }
     case RIGHT_KEYBOARD_1:
     {
-        
+        widgets_vector[72].temper_input_add_number(1, main_device.input_pressure);
         break;
     }
     case RIGHT_KEYBOARD_2:
     {
-        
+        widgets_vector[72].temper_input_add_number(2, main_device.input_pressure);
         break;
     }
     case RIGHT_KEYBOARD_3:
     {
-        
+        widgets_vector[72].temper_input_add_number(3, main_device.input_pressure);
         break;
     }
     case RIGHT_KEYBOARD_4:
     {
-        
+        widgets_vector[72].temper_input_add_number(4, main_device.input_pressure);
         break;
     }
     case RIGHT_KEYBOARD_5:
     {
-        
+        widgets_vector[72].temper_input_add_number(5, main_device.input_pressure);
         break;
     }
     case RIGHT_KEYBOARD_6:
     {
-        
+        widgets_vector[72].temper_input_add_number(6, main_device.input_pressure);
         break;
     }
     case RIGHT_KEYBOARD_7:
     {
-        
+        widgets_vector[72].temper_input_add_number(7, main_device.input_pressure);
         break;
     }
     case RIGHT_KEYBOARD_8:
     {
-        
+        widgets_vector[72].temper_input_add_number(8, main_device.input_pressure);
         break;
     }
     case RIGHT_KEYBOARD_9:
     {
-        
+        widgets_vector[72].temper_input_add_number(9, main_device.input_pressure);
         break;
     }
     case RIGHT_KEYBOARD_0:
     {
-        
+        widgets_vector[72].temper_input_add_number(0, main_device.input_pressure);
         break;
     }
     case RIGHT_KEYBOARD_BACKSPACE:
     {
-
+        widgets_vector[72].temper_input_backspace(main_device.input_pressure);
         break;
     }
     case RIGHT_KEYBOARD_RECET:
     {
-
+        widgets_vector[72].temper_input_reset(main_device.input_pressure);
         break;
     }
     case RIGHT_KEYBOARD_ENTER_TOP:
     {
-
+        enter_related_event_right();
+        return;
         break;
     }
     case RIGHT_KEYBOARD_ENTER_BOTTOM:
     {
-
+        enter_related_event_right();
+        return;
         break;
     }
     case VACUUM_ON_OFF:
     {
-
+        if (main_device.vacuum_is_enabled)
+        {
+            main_device.vacuum_is_enabled = false;
+            widgets_vector[69].change_image_in_widget(img_slide_button_off, 0, 0);
+            widgets_vector[37].change_image_in_widget(img_pressure_sensor_icon_crossed, 0, 0);
+        }
+        else
+        {
+            main_device.vacuum_is_enabled = true;
+            widgets_vector[69].change_image_in_widget(img_slide_button_on, 0, 0);
+            widgets_vector[37].change_image_in_widget(img_pressure_sensor_icon_enabled, 0, 0);
+        }
+        return;
         break;
     }
+    
     default:
     {
         
@@ -732,12 +859,25 @@ void OvenDisplay::handle_button_press(Buttons_list pressed_button)
     }
 }
 
-void OvenDisplay::enter_related_event(void)
+void OvenDisplay::enter_related_event_left(void)
 {
-    widgets_vector[36].temper_input_enter();
+    widgets_vector[36].temper_input_enter(main_device.input_temperature, main_device.preset_temperature, 34);
      for (vector<Widget>::size_type i = 0; i != widgets_vector.size(); i++)
      {
          if ((widgets_vector[i].button_name == LEFT_KEYBOARD_ENTER_TOP) || (widgets_vector[i].button_name == LEFT_KEYBOARD_ENTER_BOTTOM))
+         {
+            widgets_vector[i].button_is_pressed = true;
+            widgets_vector[i].draw_img_vector(widgets_vector[i].pressed_btn_images, widgets_vector[i].wgt_coord_x, widgets_vector[i].wgt_coord_y);
+         }
+     }
+}
+
+void OvenDisplay::enter_related_event_right(void)
+{
+    widgets_vector[72].temper_input_enter(main_device.input_pressure, main_device.preset_pressure, 70);
+     for (vector<Widget>::size_type i = 0; i != widgets_vector.size(); i++)
+     {
+         if ((widgets_vector[i].button_name == RIGHT_KEYBOARD_ENTER_TOP) || (widgets_vector[i].button_name == RIGHT_KEYBOARD_ENTER_BOTTOM))
          {
             widgets_vector[i].button_is_pressed = true;
             widgets_vector[i].draw_img_vector(widgets_vector[i].pressed_btn_images, widgets_vector[i].wgt_coord_x, widgets_vector[i].wgt_coord_y);
@@ -972,38 +1112,50 @@ void Widget::change_value_in_wgt(Alignment numbers_align, uint8_t font_space, ve
     value_digits_array.clear();
 }
 
-void Widget::temper_input_add_number(uint8_t num_to_enter)
+void Widget::temper_input_add_number(uint8_t num_to_enter, uint16_t &variable_to_change)
 {
+    if (variable_to_change <= 99)
+    {
+        variable_to_change *= 10;
+        variable_to_change += num_to_enter;
+        change_value_in_wgt(ALIGN_RIGHT, FONT_11_GAP_PIX, oven_display.numbers_11_font_vector, variable_to_change);
+    }
+    /*
     if (main_device.input_temperature <= 99)
     {
         main_device.input_temperature *= 10;
         main_device.input_temperature += num_to_enter;
         change_value_in_wgt(ALIGN_RIGHT, FONT_11_GAP_PIX, oven_display.numbers_11_font_vector, main_device.input_temperature);
     }
+    */
 }
 
-void Widget::temper_input_backspace(void)
+void Widget::temper_input_backspace(uint16_t &variable_to_change)
 {
-    if (main_device.input_temperature > 0)
+    if (variable_to_change > 0)
     {
-        main_device.input_temperature /= 10;
-        change_value_in_wgt(ALIGN_RIGHT, FONT_11_GAP_PIX, oven_display.numbers_11_font_vector, main_device.input_temperature);
+        variable_to_change /= 10;
+        change_value_in_wgt(ALIGN_RIGHT, FONT_11_GAP_PIX, oven_display.numbers_11_font_vector, variable_to_change);
     }
 }
 
-void Widget::temper_input_reset(void)
+void Widget::temper_input_reset(uint16_t &variable_to_change)
 {
-    if (main_device.input_temperature != 0)
+    if (variable_to_change != 0)
     {
-        main_device.input_temperature = 0;
-        change_value_in_wgt(ALIGN_RIGHT, FONT_11_GAP_PIX, oven_display.numbers_11_font_vector, main_device.input_temperature);
+        variable_to_change = 0;
+        change_value_in_wgt(ALIGN_RIGHT, FONT_11_GAP_PIX, oven_display.numbers_11_font_vector, variable_to_change);
     }
 }
 
-void Widget::temper_input_enter(void)
+void Widget::temper_input_enter(uint16_t &changed_variable, uint16_t &variable_to_write, uint16_t wgt_to_output_numbr)
 {
-    main_device.preset_temperature = main_device.input_temperature;
+    variable_to_write = changed_variable;
+    oven_display.widgets_vector[wgt_to_output_numbr].change_value_in_wgt(ALIGN_RIGHT, FONT_30_GAP_PIX, oven_display.numbers_30_font_vector, variable_to_write);
+    /*
+    main_device.preset_temperature = variable_to_change;
     oven_display.widgets_vector[34].change_value_in_wgt(ALIGN_RIGHT, FONT_30_GAP_PIX, oven_display.numbers_30_font_vector, main_device.preset_temperature);
+    */
 }
 
 void OvenDisplay::change_time_figure(Decr_Incr chng_type, Widget& figure_widget, uint32_t* digit, vector<tImage>& nmbrs_img_vect, uint8_t digit_max_value)
@@ -1046,7 +1198,7 @@ void OvenDisplay::replace_time_figure(Widget& figure_widget, tImage& nmbr_img)
     figure_widget.change_image_in_widget(nmbr_img, figure_widget.img_center_x(nmbr_img), TIME_FIGURE_Y_OFFSET);
 }
 
-void OvenDisplay::init_numbrs_img_vect(void)
+void OvenDisplay::init_fonts_img_vect(void)
 {
     numbers_45_font_vector.push_back(numbers_45_0);
     numbers_45_font_vector.push_back(numbers_45_1);
@@ -1090,10 +1242,14 @@ void OvenDisplay::init_displayed_values(void)
     for (vector<Widget>::size_type i = 0; i != widgets_vector.size(); i++)
     {
         if (
-            (i == 9) || \
+            (i == 9)  || \
             (i == 10) || \
             (i == 11) || \
-            (i == 12)
+            (i == 12) || \
+            (i == 46) || \
+            (i == 47) || \
+            (i == 48) || \
+            (i == 49)
             )
         {
             widgets_vector[i].change_image_in_widget(numbers_45_0, widgets_vector[i].img_center_x(numbers_45_0), TIME_FIGURE_Y_OFFSET);
@@ -1102,44 +1258,100 @@ void OvenDisplay::init_displayed_values(void)
     widgets_vector[34].change_value_in_wgt(ALIGN_RIGHT, FONT_30_GAP_PIX, numbers_30_font_vector, main_device.preset_temperature);
     widgets_vector[35].change_value_in_wgt(ALIGN_RIGHT, FONT_30_GAP_PIX, numbers_30_font_vector, main_device.current_temperature);
     widgets_vector[36].change_value_in_wgt(ALIGN_RIGHT, FONT_11_GAP_PIX, numbers_11_font_vector, main_device.input_temperature);
+
+    widgets_vector[70].change_value_in_wgt(ALIGN_RIGHT, FONT_30_GAP_PIX, numbers_30_font_vector, main_device.preset_pressure);
+    widgets_vector[71].change_value_in_wgt(ALIGN_RIGHT, FONT_30_GAP_PIX, numbers_30_font_vector, main_device.current_pressure);
+    widgets_vector[72].change_value_in_wgt(ALIGN_RIGHT, FONT_11_GAP_PIX, numbers_11_font_vector, main_device.input_pressure);
 }
 
-void OvenDisplay::blink_clock_colon(void)
+void OvenDisplay::blink_clock_colon(Side_of_screen screen_side)
 {
-    if (colon_displayed)
+    switch (screen_side)
     {
-       widgets_vector[13].change_image_in_widget(img_time_colon_backgr, 0, 0);
-       colon_displayed = false;
-    }
-    else
+    case (LEFT_SIDE):
     {
-       widgets_vector[13].change_image_in_widget(img_time_colon_char, 0, 0);
-       colon_displayed = true;
-    }
-}
-
-void OvenDisplay::lock_arrows_left(void)
-{
-    for (vector<Widget>::size_type i = 0; i != widgets_vector.size(); i++)
-    {
-        if (
-            (i == 5) || \
-            (i == 6) || \
-            (i == 7) || \
-            (i == 8) || \
-            (i == 14) || \
-            (i == 15) || \
-            (i == 16) || \
-            (i == 17)
-            )
+        if (left_colon_displayed)
         {
-            widgets_vector[i].lock_button();
+            widgets_vector[13].change_image_in_widget(img_time_colon_backgr, 0, 0);
+            left_colon_displayed = false;
+        }
+        else
+        {
+            widgets_vector[13].change_image_in_widget(img_time_colon_char, 0, 0);
+            left_colon_displayed = true;
+        }
+        break;
+    }
+    case RIGHT_SIDE:
+    {
+        if (right_colon_displayed)
+        {
+            widgets_vector[73].change_image_in_widget(img_time_colon_backgr, 0, 0);
+            right_colon_displayed = false;
+        }
+        else
+        {
+            widgets_vector[73].change_image_in_widget(img_time_colon_char, 0, 0);
+            right_colon_displayed = true;
+        }
+        break;
+    }
+    }
+}
+
+void OvenDisplay::lock_arrows(Side_of_screen screen_side)
+{
+    switch (screen_side)
+    {
+        case LEFT_SIDE:
+        {
+        for (vector<Widget>::size_type i = 0; i != widgets_vector.size(); i++)
+        {
+            if (
+                (i == 5) || \
+                (i == 6) || \
+                (i == 7) || \
+                (i == 8) || \
+                (i == 14) || \
+                (i == 15) || \
+                (i == 16) || \
+                (i == 17)
+                )
+            {
+                widgets_vector[i].lock_button();
+            }
+        }
+            break;
+        }
+        case RIGHT_SIDE:
+        {
+        for (vector<Widget>::size_type i = 0; i != widgets_vector.size(); i++)
+        {
+            if (
+                (i == 42) || \
+                (i == 43) || \
+                (i == 44) || \
+                (i == 45) || \
+                (i == 50) || \
+                (i == 51) || \
+                (i == 52) || \
+                (i == 53)
+                )
+                {
+                    widgets_vector[i].lock_button();
+                }
+            }
+            break;
         }
     }
 }
 
-void OvenDisplay::unlock_arrows_left(void)
+void OvenDisplay::unlock_arrows(Side_of_screen screen_side)
 {
+    switch (screen_side)
+    {
+    case LEFT_SIDE:
+    {
     for (vector<Widget>::size_type i = 0; i != widgets_vector.size(); i++)
     {
         if (
@@ -1156,6 +1368,28 @@ void OvenDisplay::unlock_arrows_left(void)
             widgets_vector[i].unlock_button();
         }
     }
+    }
+    case RIGHT_SIDE:
+    {
+    for (vector<Widget>::size_type i = 0; i != widgets_vector.size(); i++)
+    {
+        if (
+            (i == 42) || \
+            (i == 43) || \
+            (i == 44) || \
+            (i == 45) || \
+            (i == 50) || \
+            (i == 51) || \
+            (i == 52) || \
+            (i == 53)
+            )
+        {
+            widgets_vector[i].unlock_button();
+        }
+    }
+    }
+    }
+
 }
 
 bool OvenDisplay::bounce_filter_passed(Buttons_list pressed_button)

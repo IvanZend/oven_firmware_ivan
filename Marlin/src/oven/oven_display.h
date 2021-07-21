@@ -84,8 +84,7 @@ enum Buttons_list
     LEFT_KEYBOARD_ENTER_BOTTOM,
     HEATING_ON_OFF,
 
-    VACUUM_TIMER_START,
-    VACUUM_TIMER_STOP,
+    VACUUM_TIMER_START_STOP,
     RIGHT_UP_ARROW_1,
     RIGHT_UP_ARROW_2,
     RIGHT_UP_ARROW_3,
@@ -122,6 +121,12 @@ enum Alignment
 {
     ALIGN_LEFT,
     ALIGN_RIGHT
+};
+
+enum Side_of_screen
+{
+    LEFT_SIDE,
+    RIGHT_SIDE
 };
 
 typedef struct 
@@ -180,6 +185,7 @@ typedef struct
 #include "images/img_slide_button_off.h"
 #include "images/img_slide_button_on.h"
 #include "images/img_temperature_display.h"
+#include "images/img_pressure_display.h"
 #include "images/img_temperature_entering_background.h"
 #include "images/img_thermometer_icon_crossed.h"
 #include "images/img_thermometer_icon_enabled.h"
@@ -194,7 +200,8 @@ typedef struct
 #include "images/img_time_up_arrow_pressed.h"
 #include "images/img_time_up_arrow_released.h"
 #include "images/img_time_up_arrow_blocked.h"
-#include "images/img_vacuum_pump_string.h"
+#include "images/img_vacuum_pump_string_1.h"
+#include "images/img_vacuum_pump_string_2.h"
 #include "images/img_keyboard_0_prsd.h"
 #include "images/img_keyboard_0_rlsd.h"
 #include "images/img_keyboard_1_prsd.h"
@@ -286,10 +293,10 @@ class Widget
     uint16_t string_align_right_x(vector<tImage>& img_nmbrs_vect, uint8_t fnt_space, vector<uint8_t>& value_to_align);
     void convert_value_to_int_arr(vector<uint8_t>& value_int_vect,  uint32_t value_to_conv);
     void change_value_in_wgt(Alignment numbers_align, uint8_t font_space, vector<tImage>& img_font, uint32_t value_to_displ);
-    void temper_input_add_number(uint8_t num_to_enter);
-    void temper_input_backspace(void);
-    void temper_input_reset(void);
-    void temper_input_enter(void);
+    void temper_input_add_number(uint8_t num_to_enter, uint16_t &variable_to_change);
+    void temper_input_backspace(uint16_t &variable_to_change);
+    void temper_input_reset(uint16_t &variable_to_change);
+    void temper_input_enter(uint16_t &changed_variable, uint16_t &variable_to_write, uint16_t wgt_to_output_numbr);
 };
 
 class OvenDisplay 
@@ -300,7 +307,8 @@ class OvenDisplay
     Display_mode display_mode;
     uint16_t display_width, display_height;
     bool draw_all_completed;            // Флаг, что весь дисплей был отрисован. Переключаем при запуске и при смене режима (DEFAULT_DISPLAY_MODE)
-    bool colon_displayed;
+    bool left_colon_displayed;
+    bool right_colon_displayed;
     Buttons_list previous_button;
     vector<Widget> widgets_vector;
     vector<tImage> numbers_45_font_vector;
@@ -315,15 +323,16 @@ class OvenDisplay
     void update_all_widgets(void);     // обновляем виджеты, значение которых изменилось, но не отрисовано (напр. цифры)
     void init_widgets_size(void);           // если размер виджета не был задан вручную, он автоматически равен размеру первой картинки - кнопки
     void handle_button_press(Buttons_list pressed_button);      // обрабатываем нажатие кнопки
-    void enter_related_event(void);         // если нажали на одну половину enter, имитируем нажатие на вторую
+    void enter_related_event_left(void);         // если нажали на одну половину enter, имитируем нажатие на вторую
+    void enter_related_event_right(void); 
     uint16_t identify_pressed_btn(uint16_t pressing_coord_x, uint16_t pressing_coord_y);
     void change_time_figure(Decr_Incr chng_type, Widget& figure_widget, uint32_t* digit, vector<tImage>& nmbrs_img_vect, uint8_t digit_max_value);
     void replace_time_figure(Widget& figure_widget, tImage& nmbr_img);
-    void init_numbrs_img_vect(void);
+    void init_fonts_img_vect(void);
     void init_displayed_values(void);
-    void blink_clock_colon(void);
-    void lock_arrows_left(void);
-    void unlock_arrows_left(void);
+    void blink_clock_colon(Side_of_screen screen_side);
+    void lock_arrows(Side_of_screen screen_side);
+    void unlock_arrows(Side_of_screen screen_side);
     bool bounce_filter_passed(Buttons_list pressed_button);
 
 };

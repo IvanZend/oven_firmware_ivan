@@ -5,7 +5,7 @@
 #include "oven_display.h"
 
 #define TOUCH_BOUNCE_TIMER_MS   1
-#define SECONDS_TIMER_MS        1000
+#define SECONDS_TIMER_MS        3
 
 class ExternDevice
 {
@@ -25,21 +25,28 @@ class ProcessTimer
     uint16_t seconds_counter;
     uint16_t miutes_counter;
     ProcessTimer();
-    void start_process_timer(void);
-    void stop_process_timer(void);
-    void seconds_timer_handler(void);
+    void start_process_timer(Side_of_screen screen_side);
+    void stop_process_timer(Side_of_screen screen_side);
+    void seconds_timer_handler(Side_of_screen screen_side);
 };
 
 class MainDevice
 {
     public:
-    bool heating_timer_started;
+
     bool heating_is_enabled;
     uint16_t preset_temperature;
     uint16_t current_temperature;
     uint16_t input_temperature;
+
+    bool vacuum_is_enabled;
+    uint16_t preset_pressure;
+    uint16_t current_pressure;
+    uint16_t input_pressure;
+
     ProcessTimer process_timer_left;
     ProcessTimer process_timer_right;
+
     MainDevice();
 };
 

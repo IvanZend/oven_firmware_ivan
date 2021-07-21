@@ -926,7 +926,8 @@ void MarlinUI::update() {
   
   if (ELAPSED(ms, next_sec_event_ms))
   {
-    main_device.process_timer_left.seconds_timer_handler();
+    main_device.process_timer_left.seconds_timer_handler(LEFT_SIDE);
+    main_device.process_timer_right.seconds_timer_handler(RIGHT_SIDE);
     next_sec_event_ms = ms + SECONDS_TIMER_MS;
   }
 
