@@ -187,3 +187,11 @@ MainDevice::MainDevice(void)
     current_pressure = 0;
     input_pressure = 0;
 }
+
+void MainDevice::update_sensors_data(void)
+{
+    current_temperature = Temperature::OVEN_AIR_TEMPER_SENSOR.celsius; // T600 TRM.K2
+    oven_display.widgets_vector[35].change_value_in_wgt(ALIGN_RIGHT, FONT_30_GAP_PIX, oven_display.numbers_30_font_vector, current_temperature);
+    //current_pressure = Temperature::OVEN_VACUUM_PUMP.celsius; // T600 TRM.K2
+    //oven_display.widgets_vector[71].change_value_in_wgt(ALIGN_RIGHT, FONT_30_GAP_PIX, oven_display.numbers_30_font_vector, current_pressure);
+}

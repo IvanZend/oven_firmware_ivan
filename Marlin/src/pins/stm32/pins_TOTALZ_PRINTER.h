@@ -171,7 +171,7 @@
 // #define MAX6675_SCK_PIN        PA1   // 
 
 #define ADS_CS1_PIN         PA10//PF6  // 
-#define ADS_CS2_PIN         PF7//PF6  // 
+#define ADS_CS2_PIN         PF7//PF6  //
 
 // #define MAX6675_SS_bed_PIN       PA10   // 
 // #define MAX6675_SS2_PIN        PA1   // 
@@ -180,9 +180,13 @@
 // Heaters / Fans
 //
 
+#define OVEN_HEATER_600_PIN     PA15
+#define OVEN_HEATER_800_PIN     PB3
+#define OVEN_VACUUM_PUMP_PIN    PB10
+
 #define HEATER_0_PIN       OVEN_HEATER_600_PIN    // было PC9
 #define HEATER_1_PIN       OVEN_HEATER_800_PIN    // было PB10
-#define HEATER_2_PIN       -1
+#define HEATER_2_PIN       -1 //OVEN_VACUUM_PUMP_PIN
 #define HEATER_3_PIN       -1
 #define HEATER_4_PIN       -1
 #define HEATER_5_PIN       -1

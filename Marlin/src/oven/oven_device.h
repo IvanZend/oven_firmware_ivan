@@ -5,7 +5,7 @@
 #include "oven_display.h"
 
 #define TOUCH_BOUNCE_TIMER_MS   1
-#define SECONDS_TIMER_MS        3
+#define SECONDS_TIMER_MS        1000
 
 class ExternDevice
 {
@@ -48,6 +48,7 @@ class MainDevice
     ProcessTimer process_timer_right;
 
     MainDevice();
+    void update_sensors_data(void);
 };
 
 

@@ -928,6 +928,7 @@ void MarlinUI::update() {
   {
     main_device.process_timer_left.seconds_timer_handler(LEFT_SIDE);
     main_device.process_timer_right.seconds_timer_handler(RIGHT_SIDE);
+    main_device.update_sensors_data();
     next_sec_event_ms = ms + SECONDS_TIMER_MS;
   }
 

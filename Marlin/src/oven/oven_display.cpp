@@ -626,7 +626,7 @@ void OvenDisplay::handle_button_press(Buttons_list pressed_button)
             main_device.heating_is_enabled = false;
             widgets_vector[33].change_image_in_widget(img_slide_button_off, 0, 0);
             widgets_vector[1].change_image_in_widget(img_thermometer_icon_crossed, 0, 0);
-            //Temperature::OVEN_HEATER_800.target = 0;
+            Temperature::OVEN_HEATER_800.target = 0;
 
         }
         else
@@ -634,7 +634,7 @@ void OvenDisplay::handle_button_press(Buttons_list pressed_button)
             main_device.heating_is_enabled = true;
             widgets_vector[33].change_image_in_widget(img_slide_button_on, 0, 0);
             widgets_vector[1].change_image_in_widget(img_thermometer_icon_enabled, 0, 0);
-            //Temperature::OVEN_HEATER_800.target = 50;
+            Temperature::OVEN_HEATER_800.target = 50;
         }
         return;
         break;
@@ -1082,7 +1082,7 @@ void Widget::change_value_in_wgt(Alignment numbers_align, uint8_t font_space, ve
     convert_value_to_int_arr(value_digits_array, value_to_displ);
     uint16_t init_coord_x = 0;
 
-    while (init_coord_x <= (wgt_width - (img_font[IMG_BACKGR_IN_VECT].width/2)))
+    while (init_coord_x <= (wgt_width - (img_font[IMG_BACKGR_IN_VECT].width)))
     {
         change_image_in_widget(img_font[IMG_BACKGR_IN_VECT], init_coord_x, 0);
         init_coord_x += img_font[IMG_BACKGR_IN_VECT].width;
