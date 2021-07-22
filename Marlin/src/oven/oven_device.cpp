@@ -97,7 +97,6 @@ void ProcessTimer::seconds_timer_handler(Side_of_screen screen_side)
                         break;
                     }
                 }
-
             }
             else if (minutes_high_digit > 0)
             {
@@ -118,8 +117,6 @@ void ProcessTimer::seconds_timer_handler(Side_of_screen screen_side)
                         break;
                     }
                 }
-
-
             }
             else if (hours_low_digit > 0)
             {
@@ -143,8 +140,6 @@ void ProcessTimer::seconds_timer_handler(Side_of_screen screen_side)
                         break;
                     }
                 }
-
-
             }
             else if (hours_high_digit > 0)
             {
@@ -171,8 +166,6 @@ void ProcessTimer::seconds_timer_handler(Side_of_screen screen_side)
                         break;
                     }
                 }
-
-
             }
             else
             {

@@ -317,13 +317,13 @@ class OvenDisplay
     uint32_t bounce_sample_counter;
     Buttons_list bounce_btn_buff;
 
-    void test_draw(void);                                                  // тестовая картинка, выводим изображение ракеты
-    void init_widgets(void);                                               // задаём содержимое виджетов
-    void draw_all_widgets(void);         // отрисовываем весь дисплей
-    void update_all_widgets(void);     // обновляем виджеты, значение которых изменилось, но не отрисовано (напр. цифры)
-    void init_widgets_size(void);           // если размер виджета не был задан вручную, он автоматически равен размеру первой картинки - кнопки
-    void handle_button_press(Buttons_list pressed_button);      // обрабатываем нажатие кнопки
-    void enter_related_event_left(void);         // если нажали на одну половину enter, имитируем нажатие на вторую
+    void test_draw(void);                           // тестовая картинка, выводим изображение ракеты
+    void init_widgets(void);                        // задаём содержимое виджетов
+    void draw_all_widgets(void);                    // отрисовываем весь дисплей
+    void update_all_widgets(void);                  // обновляем виджеты, значение которых изменилось, но не отрисовано (напр. цифры)
+    void init_widgets_size(void);                   // если размер виджета не был задан вручную, он автоматически равен размеру первой картинки - кнопки
+    void handle_button_press(Buttons_list pressed_button);                  // обрабатываем нажатие кнопки
+    void enter_related_event_left(void);            // если нажали на одну половину enter, имитируем нажатие на вторую
     void enter_related_event_right(void); 
     uint16_t identify_pressed_btn(uint16_t pressing_coord_x, uint16_t pressing_coord_y);
     void change_time_figure(Decr_Incr chng_type, Widget& figure_widget, uint32_t* digit, vector<tImage>& nmbrs_img_vect, uint8_t digit_max_value);

@@ -384,7 +384,6 @@ void OvenDisplay::init_widgets(void)
         widgets_vector.push_back(pressure_displ_input);                         // 72
         widgets_vector.push_back(right_time_colon_char);                        // 73
 
-
         break;
     }
     case SIMPLIFIED_USER_MODE:
@@ -694,7 +693,7 @@ void OvenDisplay::handle_button_press(Buttons_list pressed_button)
     {
         if (!(main_device.process_timer_right.timer_enabled))
         {
-            change_time_figure(DECREMENT, widgets_vector[46], &main_device.process_timer_left.hours_high_digit, \
+            change_time_figure(DECREMENT, widgets_vector[46], &main_device.process_timer_right.hours_high_digit, \
                                 numbers_45_font_vector, DECIMAL_MAX_NUMBER);
         }
         break;
@@ -703,7 +702,7 @@ void OvenDisplay::handle_button_press(Buttons_list pressed_button)
     {
         if (!(main_device.process_timer_right.timer_enabled))
         {
-            change_time_figure(DECREMENT, widgets_vector[47], &main_device.process_timer_left.hours_low_digit, \
+            change_time_figure(DECREMENT, widgets_vector[47], &main_device.process_timer_right.hours_low_digit, \
                                 numbers_45_font_vector, DECIMAL_MAX_NUMBER);
         }
         break;
@@ -712,7 +711,7 @@ void OvenDisplay::handle_button_press(Buttons_list pressed_button)
     {
         if (!(main_device.process_timer_right.timer_enabled))
         {
-            change_time_figure(DECREMENT, widgets_vector[48], &main_device.process_timer_left.minutes_high_digit, \
+            change_time_figure(DECREMENT, widgets_vector[48], &main_device.process_timer_right.minutes_high_digit, \
                                 numbers_45_font_vector, SIX_DIGIT_MAX_NUMBER);
         }
         break;
@@ -721,7 +720,7 @@ void OvenDisplay::handle_button_press(Buttons_list pressed_button)
     {
         if (!(main_device.process_timer_right.timer_enabled))
         {
-            change_time_figure(DECREMENT, widgets_vector[49], &main_device.process_timer_left.minutes_low_digit, \
+            change_time_figure(DECREMENT, widgets_vector[49], &main_device.process_timer_right.minutes_low_digit, \
                                 numbers_45_font_vector, DECIMAL_MAX_NUMBER);
         }
         break;
@@ -862,27 +861,27 @@ void OvenDisplay::handle_button_press(Buttons_list pressed_button)
 void OvenDisplay::enter_related_event_left(void)
 {
     widgets_vector[36].temper_input_enter(main_device.input_temperature, main_device.preset_temperature, 34);
-     for (vector<Widget>::size_type i = 0; i != widgets_vector.size(); i++)
-     {
-         if ((widgets_vector[i].button_name == LEFT_KEYBOARD_ENTER_TOP) || (widgets_vector[i].button_name == LEFT_KEYBOARD_ENTER_BOTTOM))
-         {
+    for (vector<Widget>::size_type i = 0; i != widgets_vector.size(); i++)
+    {
+        if ((widgets_vector[i].button_name == LEFT_KEYBOARD_ENTER_TOP) || (widgets_vector[i].button_name == LEFT_KEYBOARD_ENTER_BOTTOM))
+        {
             widgets_vector[i].button_is_pressed = true;
             widgets_vector[i].draw_img_vector(widgets_vector[i].pressed_btn_images, widgets_vector[i].wgt_coord_x, widgets_vector[i].wgt_coord_y);
-         }
-     }
+        }
+    }
 }
 
 void OvenDisplay::enter_related_event_right(void)
 {
     widgets_vector[72].temper_input_enter(main_device.input_pressure, main_device.preset_pressure, 70);
-     for (vector<Widget>::size_type i = 0; i != widgets_vector.size(); i++)
-     {
-         if ((widgets_vector[i].button_name == RIGHT_KEYBOARD_ENTER_TOP) || (widgets_vector[i].button_name == RIGHT_KEYBOARD_ENTER_BOTTOM))
-         {
+    for (vector<Widget>::size_type i = 0; i != widgets_vector.size(); i++)
+    {
+        if ((widgets_vector[i].button_name == RIGHT_KEYBOARD_ENTER_TOP) || (widgets_vector[i].button_name == RIGHT_KEYBOARD_ENTER_BOTTOM))
+        {
             widgets_vector[i].button_is_pressed = true;
             widgets_vector[i].draw_img_vector(widgets_vector[i].pressed_btn_images, widgets_vector[i].wgt_coord_x, widgets_vector[i].wgt_coord_y);
-         }
-     }
+        }
+    }
 }
 
 uint16_t OvenDisplay::identify_pressed_btn(uint16_t pressing_coord_x, uint16_t pressing_coord_y)
@@ -986,7 +985,6 @@ void Widget::set_rectangle(void)
     add_img_to_wgt(CONSTANT_IMG, rect_down_left_round, 23 + RIGHT_COLUMN_OFFSET, 561);
     add_img_to_wgt(CONSTANT_IMG, rect_top_left_corner, 23 + RIGHT_COLUMN_OFFSET, 116);
     add_img_to_wgt(CONSTANT_IMG, rect_internal_round, 100 + RIGHT_COLUMN_OFFSET, 109);
-
 }
 
 void Widget::draw_img_vector(vector<ImageObj> img_vector_to_draw, uint16_t parent_wgt_coord_x, uint16_t parent_wgt_coord_y)
@@ -1120,14 +1118,6 @@ void Widget::temper_input_add_number(uint8_t num_to_enter, uint16_t &variable_to
         variable_to_change += num_to_enter;
         change_value_in_wgt(ALIGN_RIGHT, FONT_11_GAP_PIX, oven_display.numbers_11_font_vector, variable_to_change);
     }
-    /*
-    if (main_device.input_temperature <= 99)
-    {
-        main_device.input_temperature *= 10;
-        main_device.input_temperature += num_to_enter;
-        change_value_in_wgt(ALIGN_RIGHT, FONT_11_GAP_PIX, oven_display.numbers_11_font_vector, main_device.input_temperature);
-    }
-    */
 }
 
 void Widget::temper_input_backspace(uint16_t &variable_to_change)
@@ -1152,10 +1142,6 @@ void Widget::temper_input_enter(uint16_t &changed_variable, uint16_t &variable_t
 {
     variable_to_write = changed_variable;
     oven_display.widgets_vector[wgt_to_output_numbr].change_value_in_wgt(ALIGN_RIGHT, FONT_30_GAP_PIX, oven_display.numbers_30_font_vector, variable_to_write);
-    /*
-    main_device.preset_temperature = variable_to_change;
-    oven_display.widgets_vector[34].change_value_in_wgt(ALIGN_RIGHT, FONT_30_GAP_PIX, oven_display.numbers_30_font_vector, main_device.preset_temperature);
-    */
 }
 
 void OvenDisplay::change_time_figure(Decr_Incr chng_type, Widget& figure_widget, uint32_t* digit, vector<tImage>& nmbrs_img_vect, uint8_t digit_max_value)
@@ -1187,7 +1173,6 @@ void OvenDisplay::change_time_figure(Decr_Incr chng_type, Widget& figure_widget,
             break;
         }
     }
-
     replace_time_figure(figure_widget, nmbrs_img_vect[*digit]);
 }
 
@@ -1389,7 +1374,6 @@ void OvenDisplay::unlock_arrows(Side_of_screen screen_side)
     }
     }
     }
-
 }
 
 bool OvenDisplay::bounce_filter_passed(Buttons_list pressed_button)
