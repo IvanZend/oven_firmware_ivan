@@ -187,6 +187,7 @@ typedef struct
 #include "images/img_temperature_display.h"
 #include "images/img_pressure_display.h"
 #include "images/img_temperature_entering_background.h"
+#include "images/img_pressure_entering_background.h"
 #include "images/img_thermometer_icon_crossed.h"
 #include "images/img_thermometer_icon_enabled.h"
 #include "images/img_time_colon_char.h"

@@ -271,7 +271,7 @@ void OvenDisplay::init_widgets(void)
     right_time_down_arrow_4.add_img_to_wgt(BTN_RELEASED_IMG, img_time_down_arrow_released, 0, 0);
     right_time_down_arrow_4.add_img_to_wgt(BTN_PRESSED_IMG, img_time_down_arrow_pressed, 0, 0);
     right_time_down_arrow_4.add_img_to_wgt(BTN_BLOCKED_IMG, img_time_down_arrow_blocked, 0, 0);
-    temperature_right_entering_background.add_img_to_wgt(CONSTANT_IMG, img_temperature_entering_background, 0, 0);
+    temperature_right_entering_background.add_img_to_wgt(CONSTANT_IMG, img_pressure_entering_background, 0, 0);
     temperature_right_keyboard_0.add_img_to_wgt(BTN_PRESSED_IMG, img_keyboard_0_prsd, 0, 0);
     temperature_right_keyboard_0.add_img_to_wgt(BTN_RELEASED_IMG, img_keyboard_0_rlsd, 0, 0);
     temperature_right_keyboard_1.add_img_to_wgt(BTN_PRESSED_IMG, img_keyboard_1_prsd, 0, 0);
@@ -623,18 +623,12 @@ void OvenDisplay::handle_button_press(Buttons_list pressed_button)
     {
         if (main_device.heating_is_enabled)
         {
-            main_device.heating_is_enabled = false;
-            widgets_vector[33].change_image_in_widget(img_slide_button_off, 0, 0);
-            widgets_vector[1].change_image_in_widget(img_thermometer_icon_crossed, 0, 0);
-            Temperature::OVEN_HEATER_800.target = 0;
+            main_device.stop_heating();
 
         }
         else
         {
-            main_device.heating_is_enabled = true;
-            widgets_vector[33].change_image_in_widget(img_slide_button_on, 0, 0);
-            widgets_vector[1].change_image_in_widget(img_thermometer_icon_enabled, 0, 0);
-            Temperature::OVEN_HEATER_800.target = 50;
+            main_device.start_heating();
         }
         return;
         break;
@@ -801,15 +795,11 @@ void OvenDisplay::handle_button_press(Buttons_list pressed_button)
     {
         if (main_device.vacuum_is_enabled)
         {
-            main_device.vacuum_is_enabled = false;
-            widgets_vector[69].change_image_in_widget(img_slide_button_off, 0, 0);
-            widgets_vector[37].change_image_in_widget(img_pressure_sensor_icon_crossed, 0, 0);
+            main_device.stop_vacuum();
         }
         else
         {
-            main_device.vacuum_is_enabled = true;
-            widgets_vector[69].change_image_in_widget(img_slide_button_on, 0, 0);
-            widgets_vector[37].change_image_in_widget(img_pressure_sensor_icon_enabled, 0, 0);
+            main_device.start_vacuum();
         }
         return;
         break;
@@ -861,6 +851,10 @@ void OvenDisplay::handle_button_press(Buttons_list pressed_button)
 void OvenDisplay::enter_related_event_left(void)
 {
     widgets_vector[36].temper_input_enter(main_device.input_temperature, main_device.preset_temperature, 34);
+    if (main_device.heating_is_enabled)
+    {
+        main_device.start_heating();
+    }
     for (vector<Widget>::size_type i = 0; i != widgets_vector.size(); i++)
     {
         if ((widgets_vector[i].button_name == LEFT_KEYBOARD_ENTER_TOP) || (widgets_vector[i].button_name == LEFT_KEYBOARD_ENTER_BOTTOM))
@@ -874,6 +868,10 @@ void OvenDisplay::enter_related_event_left(void)
 void OvenDisplay::enter_related_event_right(void)
 {
     widgets_vector[72].temper_input_enter(main_device.input_pressure, main_device.preset_pressure, 70);
+    if (main_device.vacuum_is_enabled)
+    {
+        main_device.start_vacuum();
+    }
     for (vector<Widget>::size_type i = 0; i != widgets_vector.size(); i++)
     {
         if ((widgets_vector[i].button_name == RIGHT_KEYBOARD_ENTER_TOP) || (widgets_vector[i].button_name == RIGHT_KEYBOARD_ENTER_BOTTOM))
@@ -1080,13 +1078,15 @@ void Widget::change_value_in_wgt(Alignment numbers_align, uint8_t font_space, ve
     vector<uint8_t> value_digits_array;
     value_digits_array.clear();
     convert_value_to_int_arr(value_digits_array, value_to_displ);
-    uint16_t init_coord_x = 0;
+    int16_t init_coord_x = 0;
 
     while (init_coord_x <= (wgt_width - (img_font[IMG_BACKGR_IN_VECT].width)))
     {
         change_image_in_widget(img_font[IMG_BACKGR_IN_VECT], init_coord_x, 0);
         init_coord_x += img_font[IMG_BACKGR_IN_VECT].width;
     }
+    init_coord_x = wgt_width - img_font[IMG_BACKGR_IN_VECT].width + 4;
+    change_image_in_widget(img_font[IMG_BACKGR_IN_VECT], init_coord_x, 0);
 
     switch (numbers_align)
     {

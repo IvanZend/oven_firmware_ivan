@@ -3,6 +3,8 @@
 
 #include <cstdint>
 #include "oven_display.h"
+#include "../gcode/gcode.h"
+#include "../gcode/parser.h"
 
 #define TOUCH_BOUNCE_TIMER_MS   1
 #define SECONDS_TIMER_MS        1000
@@ -49,6 +51,11 @@ class MainDevice
 
     MainDevice();
     void update_sensors_data(void);
+    void start_heating(void);
+    void stop_heating(void);
+    void start_vacuum(void);
+    void stop_vacuum(void);
+    void init_extern_devices(void);
 };
 
 

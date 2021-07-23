@@ -434,6 +434,7 @@
 #define OVEN_HEATER_800 temp_hotend[1]
 //#define OVEN_VACUUM_PUMP temp_hotend[3]
 #define OVEN_AIR_TEMPER_SENSOR temp_bed
+#define OVEN_CONVECTION_FAN fan_speed[0]
 
 // Use temp sensor 1 as a redundant sensor with sensor 0. If the readings
 // from the two sensors differ too much the print will be aborted.

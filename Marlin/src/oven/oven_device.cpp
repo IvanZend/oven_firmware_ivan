@@ -169,6 +169,20 @@ void ProcessTimer::seconds_timer_handler(Side_of_screen screen_side)
             }
             else
             {
+                switch (screen_side)
+                {
+                case (LEFT_SIDE):
+                {
+                    main_device.stop_heating();
+                    break;
+                }
+                case (RIGHT_SIDE):
+                {
+                    main_device.stop_vacuum();
+                    break;
+                }
+                }
+
                 stop_process_timer(screen_side);
             }
         }
@@ -190,8 +204,52 @@ MainDevice::MainDevice(void)
 
 void MainDevice::update_sensors_data(void)
 {
-    current_temperature = Temperature::OVEN_AIR_TEMPER_SENSOR.celsius; // T600 TRM.K2
+    current_temperature = Temperature::OVEN_HEATER_600.celsius; //OVEN_AIR_TEMPER_SENSOR.celsius; // T600 TRM.K2
     oven_display.widgets_vector[35].change_value_in_wgt(ALIGN_RIGHT, FONT_30_GAP_PIX, oven_display.numbers_30_font_vector, current_temperature);
-    //current_pressure = Temperature::OVEN_VACUUM_PUMP.celsius; // T600 TRM.K2
-    //oven_display.widgets_vector[71].change_value_in_wgt(ALIGN_RIGHT, FONT_30_GAP_PIX, oven_display.numbers_30_font_vector, current_pressure);
+    current_pressure = Temperature::OVEN_HEATER_800.celsius;//OVEN_VACUUM_PUMP.celsius; // T600 TRM.K2
+    oven_display.widgets_vector[71].change_value_in_wgt(ALIGN_RIGHT, FONT_30_GAP_PIX, oven_display.numbers_30_font_vector, current_pressure);
+}
+
+void MainDevice::start_heating(void)
+{
+    main_device.heating_is_enabled = true;
+    oven_display.widgets_vector[33].change_image_in_widget(img_slide_button_on, 0, 0);
+    oven_display.widgets_vector[1].change_image_in_widget(img_thermometer_icon_enabled, 0, 0);
+    Temperature::OVEN_HEATER_600.target = preset_temperature;
+    Temperature::OVEN_HEATER_800.target = preset_temperature;
+    Temperature::OVEN_CONVECTION_FAN = 255;
+}
+
+void MainDevice::stop_heating(void)
+{
+    main_device.heating_is_enabled = false;
+    oven_display.widgets_vector[33].change_image_in_widget(img_slide_button_off, 0, 0);
+    oven_display.widgets_vector[1].change_image_in_widget(img_thermometer_icon_crossed, 0, 0);
+    Temperature::OVEN_HEATER_600.target = 0;
+    Temperature::OVEN_HEATER_800.target = 0;
+    Temperature::OVEN_CONVECTION_FAN = 0;
+}
+
+
+void MainDevice::start_vacuum(void)
+{
+    main_device.vacuum_is_enabled = true;
+    oven_display.widgets_vector[69].change_image_in_widget(img_slide_button_on, 0, 0);
+    oven_display.widgets_vector[37].change_image_in_widget(img_pressure_sensor_icon_enabled, 0, 0);
+
+}
+
+void MainDevice::stop_vacuum(void)
+{
+    main_device.vacuum_is_enabled = false;
+    oven_display.widgets_vector[69].change_image_in_widget(img_slide_button_off, 0, 0);
+    oven_display.widgets_vector[37].change_image_in_widget(img_pressure_sensor_icon_crossed, 0, 0);
+
+}
+
+void MainDevice::init_extern_devices(void)
+{
+    Temperature::OVEN_HEATER_600.target = 0;
+    Temperature::OVEN_HEATER_800.target = 0;
+    Temperature::OVEN_CONVECTION_FAN = 0;
 }
