@@ -877,38 +877,6 @@ class Temperature {
         #endif
       );        
       static float ads1118_raw_conv(const int raw);
-    #endif    
-    #define HAS_ADS1115 ANY(HEATER_0_USES_ADS1115, HEATER_1_USES_ADS1115, HEATER_2_USES_ADS1115, HEATER_BED_USES_ADS1115)
-    #if HAS_ADS1115
-      #if HEATER_BED_USES_ADS1115
-        #define COUNT_1115_bed 1
-      #else
-        #define COUNT_1115_bed 0
-      #endif
-      #if ALL(HEATER_0_USES_ADS1115, HEATER_1_USES_ADS1115, HEATER_2_USES_ADS1115)
-        #define COUNT_1115 (3 + COUNT_1115_bed)
-      #elif BOTH(HEATER_0_USES_ADS1115, HEATER_1_USES_ADS1115)
-        #define COUNT_1115 (2 + COUNT_1115_bed)
-      #elif BOTH(HEATER_1_USES_ADS1115, HEATER_2_USES_ADS1115)
-        #define COUNT_1115 (2 + COUNT_1115_bed)
-      #elif BOTH(HEATER_2_USES_ADS1115, HEATER_0_USES_ADS1115)
-        #define COUNT_1115 (2 + COUNT_1115_bed)
-      #else 
-        #define COUNT_1115 (1 + COUNT_1115_bed)
-      #endif
-
-      #if COUNT_1115 > 1
-        #define READ_ADS1115(N) read_ads1115(N)
-      #else
-        #define READ_ADS1115(N) read_ads1115()
-      #endif
-
-      static int read_ads1115(
-        #if COUNT_1115 > 1
-          const uint8_t hindex=0
-        #endif
-      );        
-      static float ads1115_raw_conv(const int raw);
     #endif
     #define HAS_MAX6675 ANY(HEATER_0_USES_MAX6675, HEATER_1_USES_MAX6675, HEATER_2_USES_MAX6675)
     #if HAS_MAX6675

@@ -127,13 +127,11 @@
 #define TEMP_TIMER_NUM 1  // index of timer to use for temperature
 #define HEAT_TIMER_NUM 2  // index of timer to use for heaters
 #define PWM_TIMER_NUM 3  // index of timer to use for heaters
-#define T_REPORT_TIMER_NUM 4  // index of timer to use for heaters
 #define PULSE_TIMER_NUM STEP_TIMER_NUM
 
 #define TEMP_TIMER_FREQUENCY 1000   //hertz, Temperature::isr() is expected to be called at around 1kHz
 #define PWM_TIMER_FREQUENCY 2000   // hertz
 #define HEAT_TIMER_DELAY 10000   // num of microseconds
-#define T_REPORT_TIMER_DELAY 1000000   // num of microseconds
 
 // TODO: get rid of manual rate/prescale/ticks/cycles taken for procedures in stepper.cpp
 #define STEPPER_TIMER_RATE                                                    2000000 // 2 Mhz
@@ -165,9 +163,6 @@
 #define ENABLE_PWM_INTERRUPT()                                                HAL_timer_enable_interrupt(PWM_TIMER_NUM)
 #define DISABLE_PWM_INTERRUPT()                                               HAL_timer_disable_interrupt(PWM_TIMER_NUM)
 
-#define ENABLE_T_REPORT_INTERRUPT()                                           HAL_timer_enable_interrupt(T_REPORT_TIMER_NUM)
-#define DISABLE_T_REPORT_INTERRUPT()                                          HAL_timer_disable_interrupt(T_REPORT_TIMER_NUM)
-
 extern void Step_Handler(HardwareTimer *htim);
 extern void Temp_Handler(HardwareTimer *htim);
 extern void Heat_Handler(HardwareTimer *htim);
@@ -176,7 +171,6 @@ extern void Pwm_Handler(HardwareTimer *htim);
 #define HAL_TEMP_TIMER_ISR() void Temp_Handler(HardwareTimer *htim)
 #define HAL_HEAT_TIMER_ISR() void Heat_Handler(HardwareTimer *htim)
 #define HAL_PWM_TIMER_ISR()  void Pwm_Handler(HardwareTimer *htim)
-#define HAL_T_REPORT_TIMER_ISR()  void Treport_Handler(HardwareTimer *htim)
 
 // ------------------------
 // Public Variables
