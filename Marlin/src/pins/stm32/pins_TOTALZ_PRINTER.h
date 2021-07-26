@@ -186,7 +186,7 @@
 
 #define HEATER_0_PIN       OVEN_HEATER_600_PIN    // было PC9
 #define HEATER_1_PIN       OVEN_HEATER_800_PIN    // было PB10
-#define HEATER_2_PIN       -1 //OVEN_VACUUM_PUMP_PIN
+#define HEATER_2_PIN       OVEN_VACUUM_PUMP_PIN //OVEN_VACUUM_PUMP_PIN
 #define HEATER_3_PIN       -1
 #define HEATER_4_PIN       -1
 #define HEATER_5_PIN       -1

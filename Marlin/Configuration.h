@@ -144,7 +144,7 @@
 
 // This defines the number of extruders
 // :[1, 2, 3, 4, 5, 6, 7, 8]
-#define EXTRUDERS  2
+#define EXTRUDERS  3
 
 // Generally expected filament diameter (1.75, 2.85, 3.0, ...). Used for Volumetric, Filament Width Sensor, etc.
 #define DEFAULT_NOMINAL_FILAMENT_DIA 3.0
@@ -415,7 +415,7 @@
 // #define TEMP_SENSOR_0 -2
 #define TEMP_SENSOR_0 -6//-6//997
 #define TEMP_SENSOR_1 -6//998//996
-#define TEMP_SENSOR_2 0//-6
+#define TEMP_SENSOR_2 -6
 #define TEMP_SENSOR_3 0
 #define TEMP_SENSOR_4 0
 #define TEMP_SENSOR_5 0
@@ -432,7 +432,7 @@
 
 #define OVEN_HEATER_600 temp_hotend[0]
 #define OVEN_HEATER_800 temp_hotend[1]
-//#define OVEN_VACUUM_PUMP temp_hotend[3]
+#define OVEN_VACUUM_PUMP temp_hotend[3]
 #define OVEN_AIR_TEMPER_SENSOR temp_bed
 #define OVEN_CONVECTION_FAN fan_speed[0]
 
