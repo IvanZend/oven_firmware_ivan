@@ -26,7 +26,6 @@
 
 #include "temperature.h"
 #include <SPI.h>
-// #include "ADS1118.h"
 #include "endstops.h"
 
 #include "../MarlinCore.h"
@@ -34,6 +33,8 @@
 #include "planner.h"
 #include "../core/language.h"
 #include "../HAL/shared/Delay.h"
+#include <Wire.h>
+#include <Adafruit_ADS1X15.h>
 #if ENABLED(EXTENSIBLE_UI)
   #include "../lcd/extui/ui_api.h"
 #endif
@@ -114,8 +115,7 @@
 #endif
 
 Temperature thermalManager;
-
-// extern ADS1118 ads1118;
+extern Adafruit_ADS1115 ads15;
 
 const char str_t_thermal_runaway[] PROGMEM = STR_T_THERMAL_RUNAWAY,
            str_t_heating_failed[] PROGMEM = STR_T_HEATING_FAILED;
@@ -1065,18 +1065,33 @@ void Temperature::manage_heater() {
 
 /*ADS1118 MAX-MIN measurment*/
   #if ENABLED(HEATER_0_USES_ADS1118)
-    // if (temp_hotend[0].celsius > _MIN(HEATER_0_MAXTEMP, HEATER_0_MAX6675_TMAX - 0.0)) max_temp_error(H_E0);
-    // if (temp_hotend[0].celsius < _MAX(HEATER_0_MINTEMP, HEATER_0_MAX6675_TMIN + .00)) min_temp_error(H_E0);
+    // if (temp_hotend[0].celsius > _MIN(HEATER_0_MAXTEMP, HEATER_2_ADS1118_TMAX - 0.0)) max_temp_error(H_E0);
+    // if (temp_hotend[0].celsius < _MAX(HEATER_0_MINTEMP, HEATER_2_ADS1118_TMIN + .00)) min_temp_error(H_E0);
   #endif
 
   #if ENABLED(HEATER_1_USES_ADS1118)
-    // if (temp_hotend[1].celsius > _MIN(HEATER_1_MAXTEMP, HEATER_1_MAX6675_TMAX - 0.0)) max_temp_error(H_E1);
-    // if (temp_hotend[1].celsius < _MAX(HEATER_1_MINTEMP, HEATER_1_MAX6675_TMIN + .00)) min_temp_error(H_E1);
+    // if (temp_hotend[1].celsius > _MIN(HEATER_1_MAXTEMP, HEATER_2_ADS1118_TMAX - 0.0)) max_temp_error(H_E1);
+    // if (temp_hotend[1].celsius < _MAX(HEATER_1_MINTEMP, HEATER_2_ADS1118_TMIN + .00)) min_temp_error(H_E1);
   #endif
 
   #if ENABLED(HEATER_2_USES_ADS1118)
     if (temp_hotend[2].celsius > _MIN(HEATER_2_MAXTEMP, HEATER_2_ADS1118_TMAX - 0.0)) max_temp_error(H_E2);
     if (temp_hotend[2].celsius < _MAX(HEATER_2_MINTEMP, HEATER_2_ADS1118_TMIN + .00)) min_temp_error(H_E2);
+  #endif
+
+  #if ENABLED(HEATER_0_USES_ADS1115)
+    // if (temp_hotend[0].celsius > _MIN(HEATER_0_MAXTEMP, HEATER_2_ADS1115_TMAX - 0.0)) max_temp_error(H_E0);
+    // if (temp_hotend[0].celsius < _MAX(HEATER_0_MINTEMP, HEATER_2_ADS1115_TMIN + .00)) min_temp_error(H_E0);
+  #endif
+
+  #if ENABLED(HEATER_1_USES_ADS1115)
+    // if (temp_hotend[1].celsius > _MIN(HEATER_1_MAXTEMP, HEATER_2_ADS1115_TMAX - 0.0)) max_temp_error(H_E1);
+    // if (temp_hotend[1].celsius < _MAX(HEATER_1_MINTEMP, HEATER_2_ADS1115_TMIN + .00)) min_temp_error(H_E1);
+  #endif
+
+  #if ENABLED(HEATER_2_USES_ADS1115)
+    if (temp_hotend[2].celsius > _MIN(HEATER_2_MAXTEMP, HEATER_2_ADS1115_TMAX - 0.0)) max_temp_error(H_E2);
+    if (temp_hotend[2].celsius < _MAX(HEATER_2_MINTEMP, HEATER_2_ADS1115_TMIN + .00)) min_temp_error(H_E2);
   #endif
 
   millis_t ms = millis();
@@ -1493,7 +1508,7 @@ void Temperature::manage_heater() {
             #endif
           );
         #elif ENABLED(HEATER_2_USES_ADS1118)
-          return raw;
+          return ads1118_raw_conv(raw);   
         #elif ENABLED(HEATER_2_USES_AD595)
           return TEMP_AD595(raw);
         #elif ENABLED(HEATER_2_USES_AD8495)
@@ -1570,6 +1585,9 @@ void Temperature::manage_heater() {
   float Temperature::analog_to_celsius_bed(const int raw) {
     #if ENABLED(HEATER_BED_USER_THERMISTOR)
       return user_thermistor_to_deg_c(CTI_BED, raw);
+    #elif ENABLED(HEATER_BED_USES_ADS1115)
+      // return ads1115_raw_conv(raw);   
+      SCAN_THERMISTOR_TABLE(BED_TEMPTABLE, BED_TEMPTABLE_LEN);
     #elif ENABLED(HEATER_BED_USES_THERMISTOR)
       SCAN_THERMISTOR_TABLE(BED_TEMPTABLE, BED_TEMPTABLE_LEN);
     #elif ENABLED(HEATER_BED_USES_AD595)
@@ -1585,6 +1603,18 @@ void Temperature::manage_heater() {
 
 #if HAS_ADS1118
   float Temperature::ads1118_raw_conv(const int raw){
+    uint16_t convRegister = (uint16_t)raw;
+    if(convRegister == 0x7FFF){
+      return (float)(999);
+    }else if(convRegister < 0x7FFF){
+      return (float)(25+convRegister*0.2);
+    }    
+    return (float)(25-((0xFFFF-convRegister)*0.2));
+  }
+#endif
+
+#if HAS_ADS1115
+  float Temperature::ads1115_raw_conv(const int raw){
     uint16_t convRegister = (uint16_t)raw;
     if(convRegister == 0x7FFF){
       return (float)(999);
@@ -1658,6 +1688,15 @@ void Temperature::updateTemperaturesFromRawValues() {
   #if ENABLED(HEATER_2_USES_ADS1118)
     temp_hotend[2].raw = READ_ADS1118(2);
   #endif
+  #if ENABLED(HEATER_0_USES_ADS1115)
+    temp_hotend[0].raw = READ_ADS1115(0);
+  #endif
+  #if ENABLED(HEATER_1_USES_ADS1115)
+    temp_hotend[1].raw = READ_ADS1115(1);
+  #endif
+  #if ENABLED(HEATER_2_USES_ADS1115)
+    temp_hotend[2].raw = READ_ADS1115(2);
+  #endif
   #if HOTENDS
     HOTEND_LOOP() temp_hotend[e].celsius = analog_to_celsius_hotend(temp_hotend[e].raw, e);
     // char txData[100];
@@ -1665,9 +1704,17 @@ void Temperature::updateTemperaturesFromRawValues() {
     // HAL_UART_Transmit(&huart2, (uint8_t *)txData, strlen(txData), 10);
   #endif
   #if HAS_HEATED_BED
+
+    #if HAS_HEATED_BED
+      #if HEATER_BED_USES_ADS1115
+      temp_bed.raw = READ_ADS1115(3);
+      #endif
+    #endif
+    
     char txData[100];
-    // sprintf(txData,"echo: raw temp_hotend[1] = %d  \r\n",temp_hotend[1].raw);
-   
+    //sprintf(txData,"echo: raw temp_hotend[1] = %d,  %d  \r\n",(int)temp_hotend[1].raw,(int)temp_hotend[0].celsius);
+    sprintf(txData,"echo: raw temp_bed.raw = %d,  %d  \r\n",(int)temp_bed.raw,(int)temp_bed.celsius);
+    /*
     temp_hotend[0].raw_100_mid = temp_hotend[0].raw_100_mid+temp_hotend[0].raw;
     if(temp_hotend[0].raw_count1<100){ 
       temp_hotend[0].raw_OLD[temp_hotend[0].raw_count1] = temp_hotend[0].raw;
@@ -1675,7 +1722,6 @@ void Temperature::updateTemperaturesFromRawValues() {
     if(temp_hotend[0].raw_count1>=100){ 
       temp_hotend[0].raw_100_mid = temp_hotend[0].raw_100_mid-temp_hotend[0].raw_OLD[temp_hotend[0].raw_count1-100];
       temp_hotend[0].raw_OLD[temp_hotend[0].raw_count1-100] = temp_hotend[0].raw;
-
       temp_hotend[0].raw_MIN = 65535;
       temp_hotend[0].raw_MAX = 0;
       for(int i=0;i<100;i++){
@@ -1689,9 +1735,12 @@ void Temperature::updateTemperaturesFromRawValues() {
     
     temp_bed.raw_count1++;
     // temp_bed.raw_count2++;
-    sprintf(txData,"echo: raw temp_bed = %d %d %d \r\n",(int)temp_bed.raw,(int)(temp_bed.raw_100_mid/100), (int)(temp_bed.raw_MAX-temp_bed.raw_MIN));
-    // HAL_UART_Transmit(&huart2, (uint8_t *)txData, strlen(txData), 10);
+    // sprintf(txData,"echo: raw temp_bed = %d %d %d \r\n",(int)temp_bed.raw,(int)(temp_bed.raw_100_mid/100), (int)(temp_bed.raw_MAX-temp_bed.raw_MIN));
+    */
 
+
+  //  HAL_UART_Transmit(&huart2, (uint8_t *)txData, strlen(txData), 10);
+    
 
     // temp_bed.celsius = analog_to_celsius_bed(temp_bed.raw_100_mid/100);
     temp_bed.celsius = analog_to_celsius_bed(temp_bed.raw);
@@ -1919,9 +1968,21 @@ void Temperature::init() {
 
   HAL_timer_start(TEMP_TIMER_NUM, TEMP_TIMER_FREQUENCY);
   ENABLE_TEMPERATURE_INTERRUPT();
-  HAL_timer_start(HEAT_TIMER_NUM, HEAT_TIMER_DELAY);
+  //HAL_timer_start(HEAT_TIMER_NUM, HEAT_TIMER_DELAY);
   ENABLE_HEATER_INTERRUPT();
 
+  #if HAS_AUTO_REPORTING
+    // if (!gcode.autoreport_paused) {
+      #if ENABLED(AUTO_REPORT_TEMPERATURES)
+        HAL_timer_start(T_REPORT_TIMER_NUM, T_REPORT_TIMER_DELAY);
+        ENABLE_T_REPORT_INTERRUPT();
+        // thermalManager.auto_report_temperatures();
+      #endif
+      #if ENABLED(AUTO_REPORT_SD_STATUS)
+        card.auto_report_sd_status();
+      #endif
+    // }
+  #endif
 /*
   *
   * дерганье пином на определенной частоте, добавка таймера в инициализацию
@@ -2429,6 +2490,30 @@ void Temperature::disable_all_heaters() {
 
 #endif // HAS_MAX6675
 
+#if HAS_ADS1115  
+  int Temperature::read_ads1115(
+    #if COUNT_1115 > 1
+      const uint8_t hindex
+    #endif
+  ) {
+
+    
+    int16_t adc;
+
+    #if COUNT_1115 > 1
+    adc = ads15.readADC_SingleEnded(hindex);
+    #else
+    adc = ads15.readADC_SingleEnded(0);
+    #endif
+
+    
+
+    return (int)adc;
+  }
+#endif // HAS_ADS1115
+
+
+
 #if HAS_ADS1118
 
   int Temperature::read_ads1118(
@@ -2471,7 +2556,6 @@ void Temperature::disable_all_heaters() {
 
 
     /***************************************
-
     hspi3.Init.CLKPhase = SPI_PHASE_2EDGE;
     HAL_SPI_Init(&hspi3);
     
@@ -2496,6 +2580,19 @@ void Temperature::disable_all_heaters() {
 */
 
     uint8_t dataMSB, dataLSB;
+
+    #if COUNT_1118 == 1
+      dataMSB = SPI.transfer(ADS_CS2_PIN, 0x0C, SPI_CONTINUE);
+      dataLSB = SPI.transfer(ADS_CS2_PIN, 0x62, SPI_CONTINUE);
+      
+      HAL_GPIO_WritePin(ADS_CS2_GPIO_Port, ADS_CS2_Pin,GPIO_PIN_SET);
+
+      uint16_t convRegister;
+      convRegister = ((dataMSB << 8) | (dataLSB));
+
+      ads1118_temp = (int)convRegister;
+    #else
+
     if((hindex == 1) && (check_SPI_enables() == 0)){
       // HAL_GPIO_WritePin(ADS_CS2_GPIO_Port, ADS_CS2_Pin,GPIO_PIN_RESET);
       // delay_us(1);
@@ -2527,10 +2624,7 @@ void Temperature::disable_all_heaters() {
       ads1118_temp = ads1118_temp_previous[hindex];
     }
 
-
-
-    #if COUNT_1118 > 1
-      ads1118_temp_previous[hindex] = ads1118_temp;
+    ads1118_temp_previous[hindex] = ads1118_temp;
     #endif
 
     return int(ads1118_temp);
@@ -2576,7 +2670,9 @@ void Temperature::update_raw_temperatures() {
   #endif
 
   #if HAS_HEATED_BED
+    #if !HEATER_BED_USES_ADS1115
     temp_bed.update();
+    #endif
   #endif
 
   #if HAS_TEMP_CHAMBER
@@ -2751,6 +2847,16 @@ HAL_HEAT_TIMER_ISR() {
   thermalManager.manage_heater();
 
   HAL_timer_isr_epilogue(HEAT_TIMER_NUM);
+}
+
+HAL_T_REPORT_TIMER_ISR() {
+  HAL_timer_isr_prologue(T_REPORT_TIMER_NUM);
+
+  // TestFuncForReference(543212345);
+  
+  thermalManager.auto_report_temperatures();
+
+  HAL_timer_isr_epilogue(T_REPORT_TIMER_NUM);
 }
 
 #if ENABLED(SLOW_PWM_HEATERS) && !defined(MIN_STATE_TIME)
