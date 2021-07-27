@@ -565,7 +565,7 @@ volatile bool Temperature::raw_temps_ready = false;
                 _temp_error(heater, str_t_heating_failed, GET_TEXT(MSG_HEATING_FAILED_LCD));
             }
             else if (current_temp < target - (MAX_OVERSHOOT_PID_AUTOTUNE)) // Heated, then temperature fell too far?
-              _temp_error(heater, str_t_thermal_runaway, GET_TEXT(MSG_THERMAL_RUNAWAY));
+            _temp_error(heater, str_t_thermal_runaway, GET_TEXT(MSG_THERMAL_RUNAWAY));
           }
         #endif
       } // every 2 seconds
@@ -826,7 +826,7 @@ void Temperature::_temp_error(const heater_ind_t heater, PGM_P const serial_msg,
 }
 
 void Temperature::max_temp_error(const heater_ind_t heater) {
-  _temp_error(heater, PSTR(STR_T_MAXTEMP), GET_TEXT(MSG_ERR_MAXTEMP));
+  //_temp_error(heater, PSTR(STR_T_MAXTEMP), GET_TEXT(MSG_ERR_MAXTEMP));
 }
 
 void Temperature::min_temp_error(const heater_ind_t heater) {
@@ -1075,8 +1075,8 @@ void Temperature::manage_heater() {
   #endif
 
   #if ENABLED(HEATER_2_USES_ADS1118)
-    if (temp_hotend[2].celsius > _MIN(HEATER_2_MAXTEMP, HEATER_2_ADS1118_TMAX - 0.0)) max_temp_error(H_E2);
-    if (temp_hotend[2].celsius < _MAX(HEATER_2_MINTEMP, HEATER_2_ADS1118_TMIN + .00)) min_temp_error(H_E2);
+    // if (temp_hotend[2].celsius > _MIN(HEATER_2_MAXTEMP, HEATER_2_ADS1118_TMAX - 0.0)) max_temp_error(H_E2);
+    // if (temp_hotend[2].celsius < _MAX(HEATER_2_MINTEMP, HEATER_2_ADS1118_TMIN + .00)) min_temp_error(H_E2);
   #endif
 
   millis_t ms = millis();
@@ -1086,7 +1086,7 @@ void Temperature::manage_heater() {
     HOTEND_LOOP() {
       #if ENABLED(THERMAL_PROTECTION_HOTENDS)
         if (degHotend(e) > temp_range[e].maxtemp)
-          _temp_error((heater_ind_t)e, str_t_thermal_runaway, GET_TEXT(MSG_THERMAL_RUNAWAY));
+          //_temp_error((heater_ind_t)e, str_t_thermal_runaway, GET_TEXT(MSG_THERMAL_RUNAWAY));
       #endif
 
       #if HEATER_IDLE_HANDLER
@@ -1493,7 +1493,7 @@ void Temperature::manage_heater() {
             #endif
           );
         #elif ENABLED(HEATER_2_USES_ADS1118)
-          return raw;
+          return ads1118_raw_conv(raw);
         #elif ENABLED(HEATER_2_USES_AD595)
           return TEMP_AD595(raw);
         #elif ENABLED(HEATER_2_USES_AD8495)
@@ -2455,6 +2455,7 @@ void Temperature::disable_all_heaters() {
     // Return last-read value between readings
     static millis_t next_ads1118_ms[COUNT_1118] = { 0 };
     millis_t ms = millis();
+    /*
     if (PENDING(ms, next_ads1118_ms[hindex]))
       // return int(860);
       return int(
@@ -2464,11 +2465,8 @@ void Temperature::disable_all_heaters() {
           ads1118_temp_previous[hindex] // Need to return the correct previous value
         #endif
       );
-
     next_ads1118_ms[hindex] = ms + ADS1118_HEAT_INTERVAL;
-
-    ads1118_temp = 0;
-
+    */
 
     /***************************************
 
@@ -2494,39 +2492,122 @@ void Temperature::disable_all_heaters() {
  * 
  * 
 */
+    /*
+    if (PENDING(ms, next_ads1118_ms[hindex]))
+    {
 
-    uint8_t dataMSB, dataLSB;
-    if((hindex == 1) && (check_SPI_enables() == 0)){
-      // HAL_GPIO_WritePin(ADS_CS2_GPIO_Port, ADS_CS2_Pin,GPIO_PIN_RESET);
-      // delay_us(1);
-      dataMSB = SPI.transfer(ADS_CS2_PIN, switch_input?0x0C:0x3C, SPI_CONTINUE);
-      dataLSB = SPI.transfer(ADS_CS2_PIN, 0x62, SPI_CONTINUE);
-      
+    }
+    */
+    /*
+    if (check_SPI_enables() == 0)
+    {
+      uint8_t dataMSB_1, dataLSB_1, dataMSB_2, dataLSB_2;
+
+      dataMSB_1 = SPI.transfer(ADS_CS1_PIN, switch_input?0x0C:0x3C, SPI_CONTINUE);
+      dataLSB_1 = SPI.transfer(ADS_CS1_PIN, 0x62, SPI_CONTINUE);
+      HAL_GPIO_WritePin(ADS_CS1_GPIO_Port, ADS_CS1_Pin,GPIO_PIN_SET);
+      SPI.transfer(ADS_CS1_PIN, switch_input?0x0C:0x3C, SPI_CONTINUE);
+      SPI.transfer(ADS_CS1_PIN, 0x62, SPI_CONTINUE);
+      HAL_GPIO_WritePin(ADS_CS1_GPIO_Port, ADS_CS1_Pin,GPIO_PIN_SET);
+
+      dataMSB_2 = SPI.transfer(ADS_CS2_PIN, switch_input?0x0C:0x3C, SPI_CONTINUE);
+      dataLSB_2 = SPI.transfer(ADS_CS2_PIN, 0x62, SPI_CONTINUE);
       HAL_GPIO_WritePin(ADS_CS2_GPIO_Port, ADS_CS2_Pin,GPIO_PIN_SET);
-
       SPI.transfer(ADS_CS2_PIN, switch_input?0x0C:0x3C, SPI_CONTINUE);
       SPI.transfer(ADS_CS2_PIN, 0x62, SPI_CONTINUE);
-      // dataMSB = 7;
-      // dataLSB = 208;
       HAL_GPIO_WritePin(ADS_CS2_GPIO_Port, ADS_CS2_Pin,GPIO_PIN_SET);
+
+      uint16_t convRegister_1 = ((dataMSB_1 << 8) | (dataLSB_1));
+      uint16_t convRegister_2 = ((dataMSB_2 << 8) | (dataLSB_2));
+          
+          
+      if (switch_input)
+      {
+        ads1118_temp_previous[0] = (int)convRegister_1;
+        //ads1118_temp_previous[2] = (int)convRegister_1;
+      }
+      else
+      {
+        //ads1118_temp_previous[1] = (int)convRegister_2;
+        //ads1118_temp_previous[2] = (int)convRegister_1;
+      }
+      switch_input = !switch_input;
+    }
+    next_ads1118_ms[hindex] = ms + ADS1118_HEAT_INTERVAL;
+    return (int)ads1118_temp_previous[hindex];
+    */
+
+    if (check_SPI_enables() == 0)
+    {
+      uint8_t dataMSB, dataLSB;
+      uint16_t convRegister;
+
+      switch (hindex)
+      {
+      case 0:
+      {
+        dataMSB = SPI.transfer(ADS_CS2_PIN, 0x0C, SPI_CONTINUE);
+        dataLSB = SPI.transfer(ADS_CS2_PIN, 0x62, SPI_CONTINUE);
+        HAL_GPIO_WritePin(ADS_CS2_GPIO_Port, ADS_CS2_Pin,GPIO_PIN_SET);
+        convRegister = ((dataMSB << 8) | (dataLSB));
+        break;
+      }
+      case 1:
+      {
+        dataMSB = SPI.transfer(ADS_CS2_PIN, 0x3C, SPI_CONTINUE);
+        dataLSB = SPI.transfer(ADS_CS2_PIN, 0x62, SPI_CONTINUE);
+        HAL_GPIO_WritePin(ADS_CS2_GPIO_Port, ADS_CS2_Pin,GPIO_PIN_SET);
+        convRegister = ((dataMSB << 8) | (dataLSB));
+        break;
+      }
+      case 2:
+      {
+        dataMSB = SPI.transfer(ADS_CS1_PIN, 0x0C, SPI_CONTINUE);
+        dataLSB = SPI.transfer(ADS_CS1_PIN, 0x62, SPI_CONTINUE);
+        HAL_GPIO_WritePin(ADS_CS1_GPIO_Port, ADS_CS1_Pin,GPIO_PIN_SET);
+        convRegister = ((dataMSB << 8) | (dataLSB));
+        break;
+      }
+      }
+      
+      ads1118_temp_previous[hindex] = (int)convRegister;
+      
+    }
+    return (int)ads1118_temp_previous[hindex];
+    
+    /*
+    uint8_t dataMSB, dataLSB;
+    if((hindex == 1) && (check_SPI_enables() == 0))
+    {
+      
+      dataMSB = SPI.transfer(ADS_CS1_PIN, switch_input?0x0C:0x3C, SPI_CONTINUE);
+      dataLSB = SPI.transfer(ADS_CS1_PIN, 0x62, SPI_CONTINUE);
+      HAL_GPIO_WritePin(ADS_CS1_GPIO_Port, ADS_CS1_Pin,GPIO_PIN_SET);
+
+      SPI.transfer(ADS_CS1_PIN, switch_input?0x0C:0x3C, SPI_CONTINUE);
+      SPI.transfer(ADS_CS1_PIN, 0x62, SPI_CONTINUE);
+      HAL_GPIO_WritePin(ADS_CS1_GPIO_Port, ADS_CS1_Pin,GPIO_PIN_SET);
 
       uint16_t convRegister;
       convRegister = ((dataMSB << 8) | (dataLSB));
 
-      // char txData[50];
-      // sprintf(txData,"echo: raw temp = %d  \r\n",convRegister);
-      // HAL_UART_Transmit(&huart2, (uint8_t *)txData, strlen(txData), 10);
-      if(switch_input){
+      if(switch_input)
+      {
+
         ads1118_temp = (int)convRegister;
-      }else{
+      }
+      else
+      {
         ads1118_temp = ads1118_temp_previous[hindex];
         ads1118_temp_previous[0] = (int)convRegister;
       }      
       switch_input = !switch_input;      
-    }else{
+    }
+    else
+    {
       ads1118_temp = ads1118_temp_previous[hindex];
     }
-
+    
 
 
     #if COUNT_1118 > 1
@@ -2534,6 +2615,9 @@ void Temperature::disable_all_heaters() {
     #endif
 
     return int(ads1118_temp);
+    */
+    
+
     // return int(860);
   }
 

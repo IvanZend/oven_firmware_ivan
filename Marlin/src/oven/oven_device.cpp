@@ -255,5 +255,6 @@ void MainDevice::init_extern_devices(void)
 {
     Temperature::OVEN_HEATER_600.target = 0;
     Temperature::OVEN_HEATER_800.target = 0;
+    Temperature::OVEN_VACUUM_PUMP.target = 0;
     Temperature::OVEN_CONVECTION_FAN = 0;
 }

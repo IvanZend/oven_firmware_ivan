@@ -432,7 +432,7 @@
 
 #define OVEN_HEATER_600 temp_hotend[0]
 #define OVEN_HEATER_800 temp_hotend[1]
-#define OVEN_VACUUM_PUMP temp_hotend[3]
+#define OVEN_VACUUM_PUMP temp_hotend[2]
 #define OVEN_AIR_TEMPER_SENSOR temp_bed
 #define OVEN_CONVECTION_FAN fan_speed[0]
 
@@ -467,11 +467,11 @@
 #define HEATER_0_MAXTEMP 9999//275
 #define HEATER_1_MAXTEMP 9999//275
 #define HEATER_2_MAXTEMP 9999//275
-#define HEATER_3_MAXTEMP 1999//275
-#define HEATER_4_MAXTEMP 1999//275
-#define HEATER_5_MAXTEMP 1999//275
-#define HEATER_6_MAXTEMP 1999//275
-#define HEATER_7_MAXTEMP 1999//275
+#define HEATER_3_MAXTEMP 9999//275
+#define HEATER_4_MAXTEMP 9999//275
+#define HEATER_5_MAXTEMP 9999//275
+#define HEATER_6_MAXTEMP 9999//275
+#define HEATER_7_MAXTEMP 9999//275
 #define BED_MAXTEMP      9999//150
 
 //===========================================================================
