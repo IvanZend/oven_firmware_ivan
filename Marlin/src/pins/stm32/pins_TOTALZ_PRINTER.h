@@ -190,8 +190,8 @@
 #define HEATER_3_PIN       -1
 #define HEATER_4_PIN       -1
 #define HEATER_5_PIN       -1
-#define HEATER_BED_PIN     PA15
-#define HEATER_CHAMBER_PIN     PB3
+#define HEATER_BED_PIN      PC9 //PA15
+#define HEATER_CHAMBER_PIN    -1 //PB3
 
 #ifndef FAN_PIN
   #define FAN_PIN          PC6

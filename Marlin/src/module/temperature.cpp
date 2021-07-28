@@ -2534,50 +2534,8 @@ void Temperature::disable_all_heaters() {
       }
       
     }
-
     return (int)ads1118_temp_previous[hindex];
     
-
-    /*
-    if (check_SPI_enables() == 0)
-    {
-      uint8_t dataMSB, dataLSB;
-      uint16_t convRegister;
-
-      switch (hindex)
-      {
-      case 0:
-      {
-        dataMSB = SPI.transfer(ADS_CS2_PIN, 0x3C, SPI_CONTINUE);
-        dataLSB = SPI.transfer(ADS_CS2_PIN, 0x62, SPI_CONTINUE);
-        HAL_GPIO_WritePin(ADS_CS2_GPIO_Port, ADS_CS2_Pin,GPIO_PIN_SET);
-        convRegister = ((dataMSB << 8) | (dataLSB));
-        break;
-      }
-      case 1:
-      {
-        dataMSB = SPI.transfer(ADS_CS2_PIN, 0x0C, SPI_CONTINUE);
-        dataLSB = SPI.transfer(ADS_CS2_PIN, 0x62, SPI_CONTINUE);
-        HAL_GPIO_WritePin(ADS_CS2_GPIO_Port, ADS_CS2_Pin,GPIO_PIN_SET);
-        convRegister = ((dataMSB << 8) | (dataLSB));
-        break;
-      }
-      case 2:
-      {
-        dataMSB = SPI.transfer(ADS_CS1_PIN, 0x0C, SPI_CONTINUE);
-        dataLSB = SPI.transfer(ADS_CS1_PIN, 0x62, SPI_CONTINUE);
-        HAL_GPIO_WritePin(ADS_CS1_GPIO_Port, ADS_CS1_Pin,GPIO_PIN_SET);
-        convRegister = ((dataMSB << 8) | (dataLSB));
-        break;
-      }
-      }
-      
-      ads1118_temp_previous[hindex] = (int)convRegister;
-      
-    }
-    return (int)ads1118_temp_previous[hindex];
-    */
-
     /*
     uint8_t dataMSB, dataLSB;
     if((hindex == 1) && (check_SPI_enables() == 0))

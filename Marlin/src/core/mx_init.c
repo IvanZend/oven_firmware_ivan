@@ -241,6 +241,40 @@ void MX_GPIO_Init(void)
   __HAL_RCC_GPIOD_CLK_ENABLE();
  
 /*--------------------FOR STEPPERS--------------------*/
+
+// !!! FAN
+  GPIO_InitStruct.Pin = FAN1_PWM_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(FAN1_PWM_GPIO_Port, &GPIO_InitStruct);
+
+// !!! HEATERS
+
+  GPIO_InitStruct.Pin = HR1_PWM_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(HR1_PWM_GPIO_Port, &GPIO_InitStruct);
+
+  GPIO_InitStruct.Pin = HR2_PWM_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(HR2_PWM_GPIO_Port, &GPIO_InitStruct);
+
+  GPIO_InitStruct.Pin = HR3_PWM_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(HR3_PWM_GPIO_Port, &GPIO_InitStruct);
+
+  GPIO_InitStruct.Pin = HR4_PWM_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(HR4_PWM_GPIO_Port, &GPIO_InitStruct);
+
 /*XYZ*/
   GPIO_InitStruct.Pin = X_STEP_Pin_MX;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;

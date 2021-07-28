@@ -8,6 +8,9 @@
 
 #define TOUCH_BOUNCE_TIMER_MS   1
 #define SECONDS_TIMER_MS        1000
+#define FAN_OFF_TEMPERATURE     40
+#define VACUUM_DUMMY_VALUE      100
+#define NO_HEAT_DUMMY_VALUE     15
 
 class ExternDevice
 {

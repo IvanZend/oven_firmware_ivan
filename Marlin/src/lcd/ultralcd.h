@@ -65,6 +65,7 @@
   enum CALeditState : uint8_t {
     EXTR1,
     EXTR2,
+    EXTR3,
     BED,
     CHAMBER,
     FEEDRATE,

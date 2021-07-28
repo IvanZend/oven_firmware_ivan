@@ -1683,6 +1683,8 @@
   #define HEATER_7_INVERTING false
 #endif
 
+#define HEATER_BED_INVERTING false
+
 /**
  * Helper Macros for heaters and extruder fan
  */

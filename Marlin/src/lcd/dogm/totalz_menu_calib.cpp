@@ -66,6 +66,7 @@ void MarlinUI::edic_calib_back(){
     switch(calibstate){
       case EXTR1: edited_settings = Temperature::temp_hotend[0].target;break;
       case EXTR2: edited_settings = Temperature::temp_hotend[1].target;break;
+      case EXTR3: edited_settings = Temperature::temp_hotend[2].target;break;
       case BED:   edited_settings = Temperature::temp_bed.target;break;
       case CHAMBER: 
       #if HAS_TEMP_CHAMBER
