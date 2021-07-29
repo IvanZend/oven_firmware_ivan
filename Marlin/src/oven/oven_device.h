@@ -12,6 +12,7 @@
 #define VACUUM_DUMMY_VALUE      100
 #define NO_HEAT_DUMMY_VALUE     15
 
+
 class ExternDevice
 {
     public:

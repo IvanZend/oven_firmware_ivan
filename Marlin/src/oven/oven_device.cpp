@@ -81,6 +81,24 @@ void ProcessTimer::seconds_timer_handler(Side_of_screen screen_side)
         {
             seconds_counter = SEC_IN_MIN_COUNT;
 
+            if ((hours_low_digit == 0) && (hours_low_digit == 0) && (minutes_high_digit == 0) && (minutes_low_digit == 1))
+            {
+                minutes_low_digit = 0;
+                switch (screen_side)
+                {
+                    case LEFT_SIDE:
+                    {
+                        oven_display.replace_time_figure(oven_display.widgets_vector[12], oven_display.numbers_45_font_vector[minutes_low_digit]);
+                        break;
+                    }
+                    case RIGHT_SIDE:
+                    {
+                        oven_display.replace_time_figure(oven_display.widgets_vector[49], oven_display.numbers_45_font_vector[minutes_low_digit]);
+                        break;
+                    }
+                }
+            }
+
             if (minutes_low_digit > 0)
             {
                 minutes_low_digit--;

@@ -1353,6 +1353,7 @@ void OvenDisplay::unlock_arrows(Side_of_screen screen_side)
             widgets_vector[i].unlock_button();
         }
     }
+    break;
     }
     case RIGHT_SIDE:
     {
@@ -1373,6 +1374,7 @@ void OvenDisplay::unlock_arrows(Side_of_screen screen_side)
         }
     }
     }
+    break;
     }
 }
 
