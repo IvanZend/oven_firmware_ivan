@@ -165,8 +165,8 @@
 // #define TEMP_7_PIN         PA1   // Analog Input
 
 
-#define TEMP_BED_PIN       PC0
-// #define TEMP_CHAMBER_PIN       PA0
+#define TEMP_BED_PIN           PC0
+#define TEMP_CHAMBER_PIN       PA0
 // #define MAX6675_DO_PIN         PA1   // 
 // #define MAX6675_SCK_PIN        PA1   // 
 
@@ -186,12 +186,12 @@
 
 #define HEATER_0_PIN       OVEN_HEATER_600_PIN    // было PC9
 #define HEATER_1_PIN       OVEN_HEATER_800_PIN    // было PB10
-#define HEATER_2_PIN       OVEN_VACUUM_PUMP_PIN //OVEN_VACUUM_PUMP_PIN
+#define HEATER_2_PIN       -1 
 #define HEATER_3_PIN       -1
 #define HEATER_4_PIN       -1
 #define HEATER_5_PIN       -1
 #define HEATER_BED_PIN      PC9 //PA15
-#define HEATER_CHAMBER_PIN    -1 //PB3
+#define HEATER_CHAMBER_PIN    OVEN_VACUUM_PUMP_PIN //PB3
 
 #ifndef FAN_PIN
   #define FAN_PIN          PC6
