@@ -14,7 +14,7 @@ ProcessTimer::ProcessTimer(void)
     minutes_high_digit = 0;
     hours_low_digit = 0;
     hours_high_digit = 0;
-    seconds_counter = 0;
+    seconds_counter = SEC_IN_MIN_COUNT;
     miutes_counter = 0;
 }
 
@@ -222,14 +222,20 @@ MainDevice::MainDevice(void)
 
 void MainDevice::update_sensors_data(void)
 {
-    current_temperature = Temperature::OVEN_HEATER_600.celsius; //OVEN_AIR_TEMPER_SENSOR.celsius; // T600 TRM.K2
+    current_temperature = Temperature::OVEN_AIR_TEMPER_SENSOR.celsius; //OVEN_AIR_TEMPER_SENSOR.celsius; // T600 TRM.K2
     oven_display.widgets_vector[35].change_value_in_wgt(ALIGN_RIGHT, FONT_30_GAP_PIX, oven_display.numbers_30_font_vector, current_temperature);
+
+    if (SHOW_ALL_SENSORS)
+    {
+        current_temperature = Temperature::OVEN_HEATER_600.celsius; //OVEN_AIR_TEMPER_SENSOR.celsius; // T600 TRM.K2
+        oven_display.widgets_vector[70].change_value_in_wgt(ALIGN_RIGHT, FONT_30_GAP_PIX, oven_display.numbers_30_font_vector, current_temperature);
     
-    current_pressure = Temperature::OVEN_HEATER_800.celsius;
-    oven_display.widgets_vector[71].change_value_in_wgt(ALIGN_RIGHT, FONT_30_GAP_PIX, oven_display.numbers_30_font_vector, current_pressure);
-    
-    current_pressure = Temperature::OVEN_VACUUM_PUMP.celsius;//OVEN_VACUUM_PUMP.celsius; // T600 TRM.K2
-    oven_display.widgets_vector[72].change_value_in_wgt(ALIGN_RIGHT, FONT_11_GAP_PIX, oven_display.numbers_11_font_vector, current_pressure);
+        current_temperature = Temperature::OVEN_HEATER_800.celsius;
+        oven_display.widgets_vector[71].change_value_in_wgt(ALIGN_RIGHT, FONT_30_GAP_PIX, oven_display.numbers_30_font_vector, current_temperature);
+        
+        current_pressure = Temperature::OVEN_VACUUM_PUMP.celsius;//OVEN_VACUUM_PUMP.celsius; // T600 TRM.K2
+        oven_display.widgets_vector[72].change_value_in_wgt(ALIGN_RIGHT, FONT_11_GAP_PIX, oven_display.numbers_11_font_vector, current_pressure);
+    }
 
     if ((preset_temperature < FAN_OFF_TEMPERATURE)||(main_device.heating_is_enabled == false))
     {
@@ -248,6 +254,29 @@ void MainDevice::update_sensors_data(void)
             }
         }
     }
+
+    if (main_device.heating_is_enabled)
+    {
+        if (Temperature::OVEN_AIR_TEMPER_SENSOR.celsius > preset_temperature)
+        {
+            if ((preset_temperature + HEATING_MAINTAIN) > TEMPERATURE_CRITICAL)
+            {
+                if ((Temperature::OVEN_HEATER_600.target != TEMPERATURE_CRITICAL) || (Temperature::OVEN_HEATER_800.target != TEMPERATURE_CRITICAL))
+                {
+                    Temperature::OVEN_HEATER_600.target = TEMPERATURE_CRITICAL;
+                    Temperature::OVEN_HEATER_800.target = TEMPERATURE_CRITICAL;
+                }
+            }
+            else
+            {
+                if ((Temperature::OVEN_HEATER_600.target != preset_temperature + HEATING_MAINTAIN) || (Temperature::OVEN_HEATER_800.target != preset_temperature + HEATING_MAINTAIN))
+                {
+                    Temperature::OVEN_HEATER_600.target = preset_temperature + HEATING_MAINTAIN;
+                    Temperature::OVEN_HEATER_800.target = preset_temperature + HEATING_MAINTAIN;
+                }
+            }
+        }
+    }
 }
 
 void MainDevice::start_heating(void)
@@ -255,8 +284,16 @@ void MainDevice::start_heating(void)
     main_device.heating_is_enabled = true;
     oven_display.widgets_vector[33].change_image_in_widget(img_slide_button_on, 0, 0);
     oven_display.widgets_vector[1].change_image_in_widget(img_thermometer_icon_enabled, 0, 0);
-    Temperature::OVEN_HEATER_600.target = preset_temperature;
-    Temperature::OVEN_HEATER_800.target = preset_temperature;
+    if ((preset_temperature + HEATING_INCREASE) > TEMPERATURE_CRITICAL)
+    {
+        Temperature::OVEN_HEATER_600.target = TEMPERATURE_CRITICAL;
+        Temperature::OVEN_HEATER_800.target = TEMPERATURE_CRITICAL;
+    }
+    else
+    {
+        Temperature::OVEN_HEATER_600.target = preset_temperature + HEATING_INCREASE;
+        Temperature::OVEN_HEATER_800.target = preset_temperature + HEATING_INCREASE;
+    }
     Temperature::OVEN_CONVECTION_FAN = 255;
 }
 

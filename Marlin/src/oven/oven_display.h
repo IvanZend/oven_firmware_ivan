@@ -40,6 +40,7 @@ using namespace std;
 #define FONT_30_GAP_PIX         4
 #define FONT_11_GAP_PIX         3
 #define IMG_BACKGR_IN_VECT      10
+#define SHOW_ALL_SENSORS        1
 
 enum Decr_Incr
 {
@@ -297,7 +298,7 @@ class Widget
     void temper_input_add_number(uint8_t num_to_enter, uint16_t &variable_to_change);
     void temper_input_backspace(uint16_t &variable_to_change);
     void temper_input_reset(uint16_t &variable_to_change);
-    void temper_input_enter(uint16_t &changed_variable, uint16_t &variable_to_write, uint16_t wgt_to_output_numbr);
+    void temper_input_enter(uint16_t changed_variable, uint16_t &variable_to_write, uint16_t wgt_to_output_numbr);
 };
 
 class OvenDisplay 

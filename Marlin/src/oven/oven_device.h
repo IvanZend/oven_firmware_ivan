@@ -11,7 +11,9 @@
 #define FAN_OFF_TEMPERATURE     40
 #define VACUUM_DUMMY_VALUE      100
 #define NO_HEAT_DUMMY_VALUE     15
-
+#define HEATING_INCREASE        20
+#define HEATING_MAINTAIN        20
+#define TEMPERATURE_CRITICAL    150
 
 class ExternDevice
 {
