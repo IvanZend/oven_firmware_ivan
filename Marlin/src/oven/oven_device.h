@@ -14,6 +14,7 @@
 #define HEATING_INCREASE        20
 #define HEATING_MAINTAIN        20
 #define TEMPERATURE_CRITICAL    150
+#define MILLIBAR_MIN_VALUE      5
 
 class ExternDevice
 {

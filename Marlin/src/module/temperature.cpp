@@ -1633,6 +1633,68 @@ void Temperature::manage_heater() {
   }
 #endif // HAS_TEMP_PROBE
 
+#define BAR_RAW_0       59950
+#define BAR_RAW_033     58610
+#define BAR_VALUE_033   33
+
+/*
+#define SAMPLES_TO_AVERAGE  10
+uint16_t bar_off_raw_arr[SAMPLES_TO_AVERAGE];
+uint16_t bar_on_raw_arr[SAMPLES_TO_AVERAGE];
+
+void add_value_to_average(uint16_t* array, uint8_t size, uint16_t value)
+{
+  for (int i = 0; i < (size - 1); i++)
+  {
+    array[i] = array[i + 1];
+  }
+  array[size - 1] = value;
+}
+
+uint32_t get_average_from_array(uint16_t* array, uint8_t size)
+{
+  uint32_t sum = 0;
+  for (int i = 0; i < size; i++)
+  {
+    sum += array[i];
+  }
+  sum /= size;
+
+  return sum;
+}
+*/
+
+static float analog_to_milli_bar_pressure_sensor(float raw)
+{
+  /*
+  if (!main_device.vacuum_is_enabled)
+  {
+    add_value_to_average(bar_off_raw_arr, SAMPLES_TO_AVERAGE, (uint16_t) raw);
+  }
+  else
+  {
+    add_value_to_average(bar_on_raw_arr, SAMPLES_TO_AVERAGE, (uint16_t) raw);
+  }
+  */
+
+  float current_raw_ratio = (BAR_RAW_0 - raw)/(BAR_RAW_0 - BAR_RAW_033);
+  float current_bar = current_raw_ratio * BAR_VALUE_033;
+
+  /*
+  static uint32_t min_raw = 0xFFFFFFFF;
+  static uint32_t max_raw = 0;
+  if (raw > max_raw)
+  {
+    max_raw = raw;
+  }
+  if (raw < min_raw)
+  {
+    min_raw = raw;
+  }
+  */
+  return abs(current_bar);
+}
+
 /**
  * Get the raw values into the actual temperatures.
  * The raw values are created in interrupt context,
@@ -1697,7 +1759,7 @@ void Temperature::updateTemperaturesFromRawValues() {
     temp_bed.celsius = analog_to_celsius_bed(temp_bed.raw);
   #endif
   #if HAS_TEMP_CHAMBER
-    temp_chamber.celsius = analog_to_celsius_chamber(temp_chamber.raw);
+    temp_chamber.celsius = (int)analog_to_milli_bar_pressure_sensor((float)temp_chamber.raw);
   #endif
   #if HAS_TEMP_PROBE
     temp_probe.celsius = analog_to_celsius_probe(temp_probe.raw);
@@ -1752,7 +1814,6 @@ void Temperature::updateTemperaturesFromRawValues() {
  * The manager is implemented by periodic calls to manage_heater()
  */
 void Temperature::init() {
-
   #if ENABLED(MAX6675_IS_MAX31865)
     max31865.begin(MAX31865_2WIRE); // MAX31865_2WIRE, MAX31865_3WIRE, MAX31865_4WIRE
   #endif
