@@ -1638,10 +1638,14 @@ void Temperature::manage_heater() {
 #define BAR_VALUE_033   33
 
 /*
-#define SAMPLES_TO_AVERAGE  10
-uint16_t bar_off_raw_arr[SAMPLES_TO_AVERAGE];
-uint16_t bar_on_raw_arr[SAMPLES_TO_AVERAGE];
 
+// фильтр скользящего среднего. Был нужен для экспериментального определения значений АЦП при вакууме и без него
+
+#define SAMPLES_TO_AVERAGE  10
+uint16_t bar_off_raw_arr[SAMPLES_TO_AVERAGE];     // буфер для значений без вакуума
+uint16_t bar_on_raw_arr[SAMPLES_TO_AVERAGE];      // буфер для значений с вакуумом
+
+// отбрасываем нулевой элемент, сдвигаем все элементы на 1 и добавляем новое значение в конец массива
 void add_value_to_average(uint16_t* array, uint8_t size, uint16_t value)
 {
   for (int i = 0; i < (size - 1); i++)
@@ -1651,6 +1655,7 @@ void add_value_to_average(uint16_t* array, uint8_t size, uint16_t value)
   array[size - 1] = value;
 }
 
+// получаем среднее арифметичское массива
 uint32_t get_average_from_array(uint16_t* array, uint8_t size)
 {
   uint32_t sum = 0;
@@ -1664,10 +1669,12 @@ uint32_t get_average_from_array(uint16_t* array, uint8_t size)
 }
 */
 
+// конвертация разрядов АЦП в милли бар
 static float analog_to_milli_bar_pressure_sensor(float raw)
 {
+  // закидываем значение в скользящее среднее
   /*
-  if (!main_device.vacuum_is_enabled)
+  if (!main_device.vacuum_is_enabled)       // если вакуум вкл
   {
     add_value_to_average(bar_off_raw_arr, SAMPLES_TO_AVERAGE, (uint16_t) raw);
   }
@@ -1677,21 +1684,9 @@ static float analog_to_milli_bar_pressure_sensor(float raw)
   }
   */
 
-  float current_raw_ratio = (BAR_RAW_0 - raw)/(BAR_RAW_0 - BAR_RAW_033);
-  float current_bar = current_raw_ratio * BAR_VALUE_033;
+  float current_raw_ratio = (BAR_RAW_0 - raw)/(BAR_RAW_0 - BAR_RAW_033);    // узнаём отношение текущего значения АЦП к максимальному диапазону значений
+  float current_bar = current_raw_ratio * BAR_VALUE_033;                    // домножаем это на физическую величину (максимальный диапазон в бар)
 
-  /*
-  static uint32_t min_raw = 0xFFFFFFFF;
-  static uint32_t max_raw = 0;
-  if (raw > max_raw)
-  {
-    max_raw = raw;
-  }
-  if (raw < min_raw)
-  {
-    min_raw = raw;
-  }
-  */
   return abs(current_bar);
 }
 
@@ -2564,6 +2559,7 @@ void Temperature::disable_all_heaters() {
     {
       uint8_t dataMSB_1, dataLSB_1, dataMSB_2, dataLSB_2;
       switch_input = !switch_input;
+      // закомменченная часть понадобится, если задействованы оба внешних ADS
       /*
       dataMSB_1 = SPI.transfer(ADS_CS1_PIN, switch_input?0x0C:0x3C, SPI_CONTINUE);
       dataLSB_1 = SPI.transfer(ADS_CS1_PIN, 0x62, SPI_CONTINUE);

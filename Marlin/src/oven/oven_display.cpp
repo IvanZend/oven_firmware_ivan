@@ -3,8 +3,9 @@
 #include "../core/macros.h"
 #include "oven_core.h"
 
-OvenDisplay oven_display;
+OvenDisplay oven_display;             // глобальный объект дисплея
 
+// конструктор виджета (без габаритов)
 Widget::Widget(Buttons_list btn_name, uint16_t wgt_x, uint16_t wgt_y)
 {
     button_name = btn_name;
@@ -13,10 +14,10 @@ Widget::Widget(Buttons_list btn_name, uint16_t wgt_x, uint16_t wgt_y)
     wgt_width = 0;
     wgt_height = 0;
     button_is_pressed = false;
-    wgt_img_changed = false;
     btn_locked = false;
 }
 
+// конструктор виджета (с габаритами)
 Widget::Widget(Buttons_list btn_name, uint16_t wgt_x, uint16_t wgt_y, uint16_t wgt_wdth, uint16_t wgt_hght)
 {
     button_name = btn_name;
@@ -25,10 +26,10 @@ Widget::Widget(Buttons_list btn_name, uint16_t wgt_x, uint16_t wgt_y, uint16_t w
     wgt_width = wgt_wdth;
     wgt_height = wgt_hght;
     button_is_pressed = false;
-    wgt_img_changed = false;
     btn_locked = false;
 }
 
+// добавить изображение в вектор внутри виджета
 void Widget::add_img_to_wgt(Img_vect_list vect_to_add_type, tImage add_image_generated, uint16_t add_img_coord_x, uint16_t add_img_coord_y)
 {
     ImageObj tmp_img_obj_1;
@@ -38,54 +39,57 @@ void Widget::add_img_to_wgt(Img_vect_list vect_to_add_type, tImage add_image_gen
     
     switch (vect_to_add_type)
     {
-    case CONSTANT_IMG:
+    case CONSTANT_IMG:                                      // изображение не меняется на протяжении всей программы
     {
         constant_images.push_back(tmp_img_obj_1);
         break;
     }
-    case CHANGEABLE_IMG:
+    case CHANGEABLE_IMG:                                    // изображение меняется при вызове специальной функции
     {
         changeable_images.push_back(tmp_img_obj_1);
         break;
     }
-    case BTN_PRESSED_IMG:
+    case BTN_PRESSED_IMG:                                   // изображение при нажатии кнопки
     {
         pressed_btn_images.push_back(tmp_img_obj_1);
         break;
     }
-    case BTN_RELEASED_IMG:
+    case BTN_RELEASED_IMG:                                  // изображение при отпущенной кнопке
     {
         released_btn_images.push_back(tmp_img_obj_1);
         break;
     }
-    case BTN_BLOCKED_IMG:
+    case BTN_BLOCKED_IMG:                                   // изображение при заблокированной кнопке
         blocked_btn_images.push_back(tmp_img_obj_1);
         break;
     }
 }
 
-OvenDisplay::OvenDisplay(void)
+OvenDisplay::OvenDisplay(void)          // конструктор экземпляря дисплея
 {
-    display_mode = DEFAULT_DISPLAY_MODE;
+    display_mode = DEFAULT_DISPLAY_MODE;    // режим дисплея (пока есть только один)
     display_width = DISPLAY_WIDTH;
     display_height = DISPLAY_HEIGHT;
-    draw_all_completed = false;
-    left_colon_displayed = true;
+    draw_all_completed = false;             // флаг начальной отрисовки всего экрана
+    left_colon_displayed = true;            // флаг отображения двоеточия в таймере (левом и правом)
     right_colon_displayed = true;
-    previous_button = NO_BUTTON;
-    bounce_sample_counter = 0;
-    bounce_btn_buff = NO_BUTTON;
-    init_fonts_img_vect();
-    init_widgets();
+    previous_button = NO_BUTTON;            // предыдущая нажатая кнопка
+    bounce_sample_counter = 0;              // счётчик касаний для фильтра дребезга тачскрина
+    bounce_btn_buff = NO_BUTTON;            // кнопка, для которой работает фильтр дребезга
+    init_fonts_img_vect();                  // инициализируем шрифты (цифры)
+    init_widgets();                         // создаём все виджеты и кладём в общий вектор
 }
 
+// первое тестовое изображение. сейчас ненужно
 void OvenDisplay::test_draw(void)
 {
     TFT_DrawBitmap_d(100, 100, rocket.data, rocket.width, rocket.height, MAIN_LAYER);
 }
 
+// создаём виджеты и складываем в общий вектор
 void OvenDisplay::init_widgets(void)
 {
+    // создаём все виджеты
     Widget background_frame = {NO_BUTTON, 0, 0};
     Widget thermometer_icon = {NO_BUTTON, 29, 32};
     Widget heating_string = {NO_BUTTON, 120, 42};
@@ -162,10 +166,11 @@ void OvenDisplay::init_widgets(void)
     Widget pressure_displ_current = {NO_BUTTON, 630, 129, TEMPER_DISPL_SIZE_X, TEMPER_DISPL_SIZE_Y};
     Widget pressure_displ_input = {NO_BUTTON, 714, 362, TEMPER_INPUT_SIZE_X, TEMPER_INPUT_SIZE_Y};
     Widget right_time_colon_char = {NO_BUTTON, 594, 269};
-
-    background_frame.tile_area(backgr_tile, display_width, display_height);
-    background_frame.set_rectangle();
-    thermometer_icon.add_img_to_wgt(CONSTANT_IMG, img_thermometer_icon_crossed, 0, 0);
+    
+    // добавляем начальные изображения в виджеты
+    background_frame.tile_area(backgr_tile, display_width, display_height);             // заливаем фон одним цветом (повторяющаяся картинка)
+    background_frame.set_rectangle();                                                   // отрисовываем рамки (повторяющиеся элементы)
+    thermometer_icon.add_img_to_wgt(CONSTANT_IMG, img_thermometer_icon_crossed, 0, 0);  // добавляем изображение во внутренний вектор виджета
     heating_string.add_img_to_wgt(CONSTANT_IMG, img_heating_string, 0, 0);
     heating_timer_start_stop_btn.add_img_to_wgt(BTN_RELEASED_IMG, img_heating_timer_start_button, 0, 0);
     temperature_display.add_img_to_wgt(CONSTANT_IMG, img_temperature_display, 0, 0);
@@ -303,12 +308,12 @@ void OvenDisplay::init_widgets(void)
     vacuum_on_off_button.add_img_to_wgt(BTN_RELEASED_IMG, img_slide_button_off, 0, 0);
     right_time_colon_char.add_img_to_wgt(CONSTANT_IMG, img_time_colon_char, 0, 0);
 
-    widgets_vector.clear();
-    switch (display_mode)
+    widgets_vector.clear();     // инициализруем нулём вектор виджетов
+    switch (display_mode)       // тут будет переключение между сервисным и пользовательским режимом (сейчас неактуально)
     {
     case STANDARD_USER_MODE:
     {
-        widgets_vector.push_back(background_frame);                             // 0
+        widgets_vector.push_back(background_frame);                             // 0    номер виджета в общем векторе
         widgets_vector.push_back(thermometer_icon);                             // 1
         widgets_vector.push_back(heating_string);                               // 2
         widgets_vector.push_back(heating_timer_start_stop_btn);                 // 3
@@ -401,12 +406,13 @@ void OvenDisplay::init_widgets(void)
     init_widgets_size();
 }
 
+// начальная отрисовка всех виджетов
 void OvenDisplay::draw_all_widgets(void)
 {
-    for(vector<Widget>::size_type i = 0; i != widgets_vector.size(); i++)
+    for(vector<Widget>::size_type i = 0; i != widgets_vector.size(); i++)       // проходимся по вектору виджетов
     {
+        // отрисовываем константные изображения
         widgets_vector[i].draw_img_vector(widgets_vector[i].constant_images, widgets_vector[i].wgt_coord_x, widgets_vector[i].wgt_coord_y);
-        widgets_vector[i].draw_img_vector(widgets_vector[i].released_btn_images, widgets_vector[i].wgt_coord_x, widgets_vector[i].wgt_coord_y);
         if(widgets_vector[i].button_name != NO_BUTTON)          // отрисовывам кнопки в ненажатом состоянии
         {
             widgets_vector[i].draw_img_vector(widgets_vector[i].released_btn_images, widgets_vector[i].wgt_coord_x, widgets_vector[i].wgt_coord_y);
@@ -414,43 +420,33 @@ void OvenDisplay::draw_all_widgets(void)
     }
 }
 
-void OvenDisplay::update_all_widgets(void)
-{
-    for (vector<Widget>::size_type i = 0; i != widgets_vector.size(); i++)
-    {
-        if (widgets_vector[i].wgt_img_changed)
-        {
-            widgets_vector[i].wgt_img_changed = false;
-            //widgets_vector[i].draw_img_vector(widgets_vector[i].changeable_images, widgets_vector[i].wgt_coord_x, widgets_vector[i].wgt_coord_y);
-        }
-    }
-}
-
+// если размер виджета не задан вручную, автоматически берём размер первого изображения в виджете 
 void OvenDisplay::init_widgets_size(void)
 {
-    for (vector<Widget>::size_type i = 0; i != widgets_vector.size(); i++)
+    for (vector<Widget>::size_type i = 0; i != widgets_vector.size(); i++)                  // проходимся по вектору виджетов
     {
-        if ((widgets_vector[i].wgt_width == 0) && (widgets_vector[i].wgt_height == 0))
+        if ((widgets_vector[i].wgt_width == 0) && (widgets_vector[i].wgt_height == 0))      // если размер виджета равен нулю
         {
-            if (widgets_vector[i].released_btn_images.size() != 0)
+            if (widgets_vector[i].released_btn_images.size() != 0)                          // если виджет является кнопкой
             {
-                widgets_vector[i].wgt_width = widgets_vector[i].released_btn_images[0].image_struct.width;
+                widgets_vector[i].wgt_width = widgets_vector[i].released_btn_images[0].image_struct.width;      // берём размеры изображения кнопки
                 widgets_vector[i].wgt_height = widgets_vector[i].released_btn_images[0].image_struct.height;
             }
-            else if (widgets_vector[i].constant_images.size() != 0)
+            else if (widgets_vector[i].constant_images.size() != 0)                         // если виджет не является кнопкой
             {
-                widgets_vector[i].wgt_width = widgets_vector[i].constant_images[0].image_struct.width;
+                widgets_vector[i].wgt_width = widgets_vector[i].constant_images[0].image_struct.width;      // берём размеры первого константного изображения
                 widgets_vector[i].wgt_height = widgets_vector[i].constant_images[0].image_struct.height;
             }
         }
     }
 }
 
+// обработчик нажатия кнопки
 void OvenDisplay::handle_button_press(Buttons_list pressed_button)
 {
-    for (vector<Widget>::size_type i = 0; i != widgets_vector.size(); i++)
+    for (vector<Widget>::size_type i = 0; i != widgets_vector.size(); i++)                          // проходимся по вектору виджетов
     {
-        if ((pressed_button == widgets_vector[i].button_name) && (widgets_vector[i].btn_locked))
+        if ((pressed_button == widgets_vector[i].button_name) && (widgets_vector[i].btn_locked))    // если данная кнопка заблокирована - выходим из функции
         {
             return;
         }
@@ -458,30 +454,30 @@ void OvenDisplay::handle_button_press(Buttons_list pressed_button)
 
     switch (pressed_button)         // вызываем функции, не связанные с отрисовкой кнопки
     {
-    case NO_BUTTON:
+    case NO_BUTTON:                 // проверяем, какая кнопка нажата
     {
 
         break;
     }
     case HEATING_TIMER_START_STOP:
     {
-        if (main_device.process_timer_left.timer_enabled)
+        if (main_device.process_timer_left.timer_enabled)                   // если левый таймер включён
         {
-            main_device.process_timer_left.stop_process_timer(LEFT_SIDE);
+            main_device.process_timer_left.stop_process_timer(LEFT_SIDE);   // выключаем таймер
         }
         else
         {
-            main_device.process_timer_left.start_process_timer(LEFT_SIDE);
+            main_device.process_timer_left.start_process_timer(LEFT_SIDE);  // иначе включаем таймер
         }
         return;
         break;
     }
     case LEFT_UP_ARROW_1:
     {
-        if (!(main_device.process_timer_left.timer_enabled))
+        if (!(main_device.process_timer_left.timer_enabled))                    // если левый таймер не включён
         {
             change_time_figure(INCREMENT, widgets_vector[9], &main_device.process_timer_left.hours_high_digit, \
-                                numbers_45_font_vector, DECIMAL_MAX_NUMBER);
+                                numbers_45_font_vector, DECIMAL_MAX_NUMBER);    // меняем цифру в таймере
         }
         break;
     }
@@ -550,7 +546,7 @@ void OvenDisplay::handle_button_press(Buttons_list pressed_button)
     }
     case LEFT_KEYBOARD_1:
     {
-        widgets_vector[36].temper_input_add_number(1, main_device.input_temperature);
+        widgets_vector[36].temper_input_add_number(1, main_device.input_temperature);       // добавляем введённую цифру к отображаемому значению
         break;
     }
     case LEFT_KEYBOARD_2:
@@ -600,17 +596,17 @@ void OvenDisplay::handle_button_press(Buttons_list pressed_button)
     }
     case LEFT_KEYBOARD_BACKSPACE:
     {
-        widgets_vector[36].temper_input_backspace(main_device.input_temperature);
+        widgets_vector[36].temper_input_backspace(main_device.input_temperature);           // стираем цифру из отображаемого значения
         break;
     }
     case LEFT_KEYBOARD_RECET:
     {
-        widgets_vector[36].temper_input_reset(main_device.input_temperature);
+        widgets_vector[36].temper_input_reset(main_device.input_temperature);               // сбрасываем в ноль отображаемое значение
         break;
     }
     case LEFT_KEYBOARD_ENTER_TOP:
     {
-        enter_related_event_left();
+        enter_related_event_left();                                      // общее событие для двух половин кнопки enter
         return;
         break;
     }
@@ -622,7 +618,7 @@ void OvenDisplay::handle_button_press(Buttons_list pressed_button)
     }
     case HEATING_ON_OFF:
     {
-        if (main_device.heating_is_enabled)
+        if (main_device.heating_is_enabled)                             // включаем / выключаем нагрев
         {
             main_device.stop_heating();
 
@@ -634,7 +630,7 @@ void OvenDisplay::handle_button_press(Buttons_list pressed_button)
         return;
         break;
     }
-
+    // всё то же самое для правой части дисплея (вауумный насос)
     case VACUUM_TIMER_START_STOP:
     {
         if (main_device.process_timer_right.timer_enabled)
@@ -812,7 +808,7 @@ void OvenDisplay::handle_button_press(Buttons_list pressed_button)
         break;
     }
     }
-
+    // отрисовываем кнопки
     for (vector<Widget>::size_type i = 0; i != widgets_vector.size(); i++)      // проходимся по всем виджетам
     {
         if (widgets_vector[i].button_name != NO_BUTTON)                         // если виджет является кнопкой
@@ -822,50 +818,52 @@ void OvenDisplay::handle_button_press(Buttons_list pressed_button)
                 if (pressed_button == widgets_vector[i].button_name)        // если нажата данная кнопка
                 {
                         
-                    widgets_vector[i].button_is_pressed = true;
+                    widgets_vector[i].button_is_pressed = true;             // выставляем флаг нажатия
                     widgets_vector[i].draw_img_vector(widgets_vector[i].pressed_btn_images, \
-                                                        widgets_vector[i].wgt_coord_x, widgets_vector[i].wgt_coord_y);
+                                                        widgets_vector[i].wgt_coord_x, widgets_vector[i].wgt_coord_y);  // отрисовываем нажатую кнопку
                 }
                 else        // если не нажата данная кнопка
                 {
-                    if (widgets_vector[i].button_is_pressed)        // если данная кнопка была нажата ранее
+                    if (widgets_vector[i].button_is_pressed)                // если данная кнопка была нажата ранее
                     {
-                        widgets_vector[i].button_is_pressed = false;
+                        widgets_vector[i].button_is_pressed = false;        // выставляем флаг, что кнопка не нажата
                         widgets_vector[i].draw_img_vector(widgets_vector[i].released_btn_images, \
-                                                            widgets_vector[i].wgt_coord_x, widgets_vector[i].wgt_coord_y);
+                                                            widgets_vector[i].wgt_coord_x, widgets_vector[i].wgt_coord_y);      // отрисовываем отпущенную кнопку
                     }
                 }
             }
             else            // если не нажата никакая кнопка
             {
-                if (widgets_vector[i].button_is_pressed)            // если данная кнопка была нажата ранее
+                if (widgets_vector[i].button_is_pressed)                    // если данная кнопка была нажата ранее
                 {
-                    widgets_vector[i].button_is_pressed = false;
+                    widgets_vector[i].button_is_pressed = false;            // выставляем флаг, что кнопка не нажата
                     widgets_vector[i].draw_img_vector(widgets_vector[i].released_btn_images, \
-                                                        widgets_vector[i].wgt_coord_x, widgets_vector[i].wgt_coord_y);
+                                                        widgets_vector[i].wgt_coord_x, widgets_vector[i].wgt_coord_y);          // отрисовываем отпущенную кнопку
                 }
             }
         }
     }
 }
 
+// общее событие для двух половинок кнопки enter (левая часто экрана)
 void OvenDisplay::enter_related_event_left(void)
 {
-    if (main_device.input_temperature < TEMPERATURE_CRITICAL)
+    if (main_device.input_temperature < TEMPERATURE_CRITICAL)       // если не превышена критическая температура нагревателя
     {
-        widgets_vector[36].temper_input_enter(main_device.input_temperature, main_device.preset_temperature, 34);
+        widgets_vector[36].temper_input_enter(main_device.input_temperature, main_device.preset_temperature, 34);   // вводим температуру с клавиатуры
     }
     else
     {
-        widgets_vector[36].temper_input_enter(TEMPERATURE_CRITICAL, main_device.preset_temperature, 34);
+        widgets_vector[36].temper_input_enter(TEMPERATURE_CRITICAL, main_device.preset_temperature, 34);            // иначе вводим критическую температуру
     }
 
-    if (main_device.heating_is_enabled)
+    if (main_device.heating_is_enabled)                             // если идёт нагрев
     {
-        main_device.start_heating();
+        main_device.start_heating();                                // подаём команду "начать нагрев" (чтобы продолжать греть при вводе новой температуры)
     }
-    for (vector<Widget>::size_type i = 0; i != widgets_vector.size(); i++)
+    for (vector<Widget>::size_type i = 0; i != widgets_vector.size(); i++)      // проходимся по всем виджетам
     {
+        // если нажата одна из половинок кнопки enter, отрисовываем нажатие обеих
         if ((widgets_vector[i].button_name == LEFT_KEYBOARD_ENTER_TOP) || (widgets_vector[i].button_name == LEFT_KEYBOARD_ENTER_BOTTOM))
         {
             widgets_vector[i].button_is_pressed = true;
@@ -874,6 +872,7 @@ void OvenDisplay::enter_related_event_left(void)
     }
 }
 
+// общее событие для двух половинок кнопки enter (правая часть экрана)
 void OvenDisplay::enter_related_event_right(void)
 {
     widgets_vector[72].temper_input_enter(main_device.input_pressure, main_device.preset_pressure, 70);
@@ -891,40 +890,43 @@ void OvenDisplay::enter_related_event_right(void)
     }
 }
 
+// определяем нажатую кнопку
 uint16_t OvenDisplay::identify_pressed_btn(uint16_t pressing_coord_x, uint16_t pressing_coord_y)
 {
-    pressing_coord_x += CALIBRATION_OFFSET_X;
+    pressing_coord_x += CALIBRATION_OFFSET_X;       // добавляем калибровочное смещение, ибо тачскрин и дисплей могут не совпадать
     pressing_coord_y += CALIBRATION_OFFSET_Y;
 
-    for (vector<Widget>::size_type i = 0; i != widgets_vector.size(); i++)
+    for (vector<Widget>::size_type i = 0; i != widgets_vector.size(); i++)          // проходимся по вектору виджетов
     {
-        if (widgets_vector[i].button_name != NO_BUTTON)
+        if (widgets_vector[i].button_name != NO_BUTTON)                             // если данный вектор являетс кнопкой
         {
         if ((WITHIN(pressing_coord_x, widgets_vector[i].wgt_coord_x, \
         (widgets_vector[i].wgt_coord_x + widgets_vector[i].wgt_width))) && \
              (WITHIN(pressing_coord_y, widgets_vector[i].wgt_coord_y, \
-             (widgets_vector[i].wgt_coord_y + widgets_vector[i].wgt_height))))
+             (widgets_vector[i].wgt_coord_y + widgets_vector[i].wgt_height))))      // если текущие координаты нажатия находятся внутри кнопки
         {
-        return (uint16_t)widgets_vector[i].button_name;
+        return (uint16_t)widgets_vector[i].button_name;                             // возвращаем номер кнопки (определён через enum)
         }
         }
     }
     return 0;
 }
 
+// заполняем определённую область повторяющимся изображением
 void Widget::tile_area(tImage image_to_tile, uint16_t area_width, uint16_t area_hight)
 {
-    uint16_t repetitions_x = area_width/image_to_tile.width;
+    uint16_t repetitions_x = area_width/image_to_tile.width;            // вычисляем количество повторений по X и Y
     uint16_t repetitions_y = area_width/image_to_tile.height;
-    for (int i = 0; i <= repetitions_y; i++)
+    for (int i = 0; i <= repetitions_y; i++)                            // проходимся по горизонтали
     {
-        for (int ii = 0; ii <= repetitions_x; ii++)
+        for (int ii = 0; ii <= repetitions_x; ii++)                     // проходимся по вертикали
         {
-            add_img_to_wgt(CONSTANT_IMG, image_to_tile, (image_to_tile.width * ii), (image_to_tile.height * i));
+            add_img_to_wgt(CONSTANT_IMG, image_to_tile, (image_to_tile.width * ii), (image_to_tile.height * i));    // отрисовываем фоновое изображение
         }
     }
 }
 
+// отрисовываем рамки
 void Widget::set_rectangle(void)
 {
     for (int i = 0; i < 26; i++)                                    // верхняя большая горизонтальная линия (левая часть экрана)
@@ -979,14 +981,14 @@ void Widget::set_rectangle(void)
         add_img_to_wgt(CONSTANT_IMG, rect_vertic_line, 107 + RIGHT_COLUMN_OFFSET, (i*10) + 38);
     }
 
-    add_img_to_wgt(CONSTANT_IMG, rect_top_left_corner, 107, 29);
+    add_img_to_wgt(CONSTANT_IMG, rect_top_left_corner, 107, 29);        // скруглённые углы слева
     add_img_to_wgt(CONSTANT_IMG, rect_top_right_round, 377, 29);
     add_img_to_wgt(CONSTANT_IMG, rect_down_right_round, 377, 561);
     add_img_to_wgt(CONSTANT_IMG, rect_down_left_round, 23,561);
     add_img_to_wgt(CONSTANT_IMG, rect_top_left_corner, 23, 116);
     add_img_to_wgt(CONSTANT_IMG, rect_internal_round, 100, 109);
 
-    add_img_to_wgt(CONSTANT_IMG, rect_top_left_corner, 107 + RIGHT_COLUMN_OFFSET, 29);
+    add_img_to_wgt(CONSTANT_IMG, rect_top_left_corner, 107 + RIGHT_COLUMN_OFFSET, 29);      // скруглённые углы справа
     add_img_to_wgt(CONSTANT_IMG, rect_top_right_round, 377 + RIGHT_COLUMN_OFFSET, 29);
     add_img_to_wgt(CONSTANT_IMG, rect_down_right_round, 377 + RIGHT_COLUMN_OFFSET, 561);
     add_img_to_wgt(CONSTANT_IMG, rect_down_left_round, 23 + RIGHT_COLUMN_OFFSET, 561);
@@ -994,182 +996,193 @@ void Widget::set_rectangle(void)
     add_img_to_wgt(CONSTANT_IMG, rect_internal_round, 100 + RIGHT_COLUMN_OFFSET, 109);
 }
 
+// отрисовываем изображения, перечисленные в векторе
 void Widget::draw_img_vector(vector<ImageObj> img_vector_to_draw, uint16_t parent_wgt_coord_x, uint16_t parent_wgt_coord_y)
 {
-    for(vector<ImageObj>::size_type ii = 0; ii != img_vector_to_draw.size(); ii++)
+    for(vector<ImageObj>::size_type ii = 0; ii != img_vector_to_draw.size(); ii++)  // проходимся по вектору изображений
     {
     TFT_DrawBitmap_d(img_vector_to_draw[ii].img_coord_x + parent_wgt_coord_x, \
                     img_vector_to_draw[ii].img_coord_y + parent_wgt_coord_y, \
                     img_vector_to_draw[ii].image_struct.data, \
                     img_vector_to_draw[ii].image_struct.width, \
                     img_vector_to_draw[ii].image_struct.height, \
-                    MAIN_LAYER);
+                    MAIN_LAYER);                                                    // вызываем встроенную команду marlin
     }
 }
 
+// заменяем изображение в виджете
 void Widget::change_image_in_widget(tImage image_to_output, uint16_t img_out_coord_x, uint16_t img_out_coord_y)
 {
-    changeable_images.clear();
-    add_img_to_wgt(CHANGEABLE_IMG, image_to_output, img_out_coord_x, img_out_coord_y);
-    draw_img_vector(changeable_images, wgt_coord_x, wgt_coord_y);
+    changeable_images.clear();      // очищаем вектор изменяемых изображений в виджете
+    add_img_to_wgt(CHANGEABLE_IMG, image_to_output, img_out_coord_x, img_out_coord_y);  // добавляем изображение в вектор изменяемых изображений
+    draw_img_vector(changeable_images, wgt_coord_x, wgt_coord_y);                       // отрисовываем изменяемые изображения
 }
 
+// определяем координаты изображения в центре виджета
 uint16_t Widget::img_center_x(tImage img_to_center)
 {
     uint16_t centered_coord_x = (wgt_width/2) - img_to_center.width/2;
     return centered_coord_x;
 }
 
+// блокируем кнопку
 void Widget::lock_button(void)
 {
-    button_is_pressed = false;
-    draw_img_vector(blocked_btn_images, wgt_coord_x, wgt_coord_y);
-    btn_locked = true;
+    button_is_pressed = false;                                          // убираем флаг нажатия
+    draw_img_vector(blocked_btn_images, wgt_coord_x, wgt_coord_y);      // меняем изображение кнопки
+    btn_locked = true;                                                  // включаем флаг блокировки
 }
 
+// разблокируем кнопку
 void Widget::unlock_button(void)
 {
-    button_is_pressed = false;
-    draw_img_vector(released_btn_images, wgt_coord_x, wgt_coord_y);
-    btn_locked = false;
+    button_is_pressed = false;                                          // убираем флаг нажатия
+    draw_img_vector(released_btn_images, wgt_coord_x, wgt_coord_y);     // меняем изображение кнопки
+    btn_locked = false;                                                 // выключаем флаг блокировки
 }
 
+// выравниваем строку символов по правой стороне
 uint16_t Widget::string_align_right_x(vector<tImage>& img_nmbrs_vect, uint8_t fnt_space, vector<uint8_t>& value_to_align)
 {
-    uint16_t string_summ_size = 0;
-    for (int i = 0; i < value_to_align.size(); i++)
+    uint16_t string_summ_size = 0;                              // суммарная ширина строки
+    for (int i = 0; i < value_to_align.size(); i++)             // проходимся по всем символам строки
     {
-        string_summ_size += (img_nmbrs_vect[value_to_align[i]].width + fnt_space);
+        string_summ_size += (img_nmbrs_vect[value_to_align[i]].width + fnt_space);      // прибавляем к суммарной ширине ширину символа и пробел между символами
     }
-    if (string_summ_size <= wgt_width)
+    if (string_summ_size <= wgt_width)                                                  // если не превышена ширина виджета
     {
-        string_summ_size = wgt_width - string_summ_size;
+        string_summ_size = wgt_width - string_summ_size;                                // получаем координату начала строки в виджете
     }
     else
     {
-        string_summ_size = 0;
+        string_summ_size = 0;                                                           // иначе обнуляем ширину строки
     }
-    return string_summ_size;
+    return string_summ_size;                                                            // возвращаем ширину строки
 }
 
+// конвертируем числовое значение в массив цифр (по разрядам)
 void Widget::convert_value_to_int_arr(vector<uint8_t>& value_int_vect,  uint32_t value_to_conv)
 {
-    uint16_t number_of_decimal_digits = 0;
-    uint32_t dec_divider_buf_1 = 1;
-    uint32_t prev_digits_buf = 0;
+    uint16_t number_of_decimal_digits = 0;              // количество десячиных разрядов
+    uint32_t dec_divider_buf_1 = 1;                     // десятка в степени, на неё делим
+    uint32_t prev_digits_buf = 0;                       // буфер старших разрядов, его вычитаем
 
-    if (value_to_conv > 0)
+    if (value_to_conv > 0)                              // если наше значение больше нуля
     {
-        while (dec_divider_buf_1 <= value_to_conv)
+        while (dec_divider_buf_1 <= value_to_conv)      // проходимся по всем разрядам
         {
-            number_of_decimal_digits++; 
-            dec_divider_buf_1 *= 10;
+            number_of_decimal_digits++;                 // инкрементируем количество разрядов
+            dec_divider_buf_1 *= 10;                    // умножаем на 10 десятку в степени
         }
-        dec_divider_buf_1 /= 10;
+        dec_divider_buf_1 /= 10;                        // делим на 10 десятку в степени (чтобы был первый разряд)
     }
     else
     {
-        number_of_decimal_digits = 1;
+        number_of_decimal_digits = 1;                   // если значение равно нулю, количество разрядов равно 1
     }
 
-    value_int_vect.resize(number_of_decimal_digits);
-    for (uint16_t i = number_of_decimal_digits; i > 0; i--)
+    value_int_vect.resize(number_of_decimal_digits);    // меняем размер вектора для нужного количества разрядов 
+    for (uint16_t i = number_of_decimal_digits; i > 0; i--)     // проходимся по каждому десятичному разряду 
     {
-        value_int_vect[i - 1] = value_to_conv/(dec_divider_buf_1) - prev_digits_buf;
-        dec_divider_buf_1 /= 10;
-        prev_digits_buf += (value_int_vect[i - 1]);
-        prev_digits_buf *= 10;
+        value_int_vect[i - 1] = value_to_conv/(dec_divider_buf_1) - prev_digits_buf;    // делим текущий разряд на десятку в степени, затем вычитаем более старшие разряды
+        dec_divider_buf_1 /= 10;                        // уменьшаем на разряд десятку в степени
+        prev_digits_buf += (value_int_vect[i - 1]);     // прибавляем текущий разряд к буферу старших разрядов
+        prev_digits_buf *= 10;                          // домножаем старшие разряды на 10
     }
 }
 
+// изменить числовое значение в виджете (оно является строкой)
 void Widget::change_value_in_wgt(Alignment numbers_align, uint8_t font_space, vector<tImage>& img_font, uint32_t value_to_displ)
 {
-    vector<uint8_t> value_digits_array;
-    value_digits_array.clear();
-    convert_value_to_int_arr(value_digits_array, value_to_displ);
-    int16_t init_coord_x = 0;
+    vector<uint8_t> value_digits_array;                                 // создаём массив разрядов
+    convert_value_to_int_arr(value_digits_array, value_to_displ);       // конвертируем число в массив разрядов
+    int16_t init_coord_x = 0;                                           // начальная координата строки в виджете
 
-    while (init_coord_x <= (wgt_width - (img_font[IMG_BACKGR_IN_VECT].width)))
+    while (init_coord_x <= (wgt_width - (img_font[IMG_BACKGR_IN_VECT].width)))  // пока координата строки меньше ширины виджета за вычетом ширины одного символа
     {
-        change_image_in_widget(img_font[IMG_BACKGR_IN_VECT], init_coord_x, 0);
-        init_coord_x += img_font[IMG_BACKGR_IN_VECT].width;
+        change_image_in_widget(img_font[IMG_BACKGR_IN_VECT], init_coord_x, 0);  // отрисовываем фон символа
+        init_coord_x += img_font[IMG_BACKGR_IN_VECT].width;                     // прибавляем к начальной координате ширину фона символа
     }
-    init_coord_x = wgt_width - img_font[IMG_BACKGR_IN_VECT].width + 4;
-    change_image_in_widget(img_font[IMG_BACKGR_IN_VECT], init_coord_x, 0);
+    init_coord_x = wgt_width - img_font[IMG_BACKGR_IN_VECT].width + 4;          // начальная координата равна ширине виджета за вычетом ширины одного символа + 4 пикселя (вправо)
+    change_image_in_widget(img_font[IMG_BACKGR_IN_VECT], init_coord_x, 0);      // отрисовываем крайний правый фон символа
 
     switch (numbers_align)
     {
-    case ALIGN_LEFT:
+    case ALIGN_LEFT:                // если выравнивание по левой стороне
     {
-        init_coord_x = 0;
+        init_coord_x = 0;           // начинаем с начала виджета
         break;
     }
-    case ALIGN_RIGHT:
+    case ALIGN_RIGHT:               // если выравнивание по правой стороне
     {
-        init_coord_x = string_align_right_x(img_font, font_space, value_digits_array);
+        init_coord_x = string_align_right_x(img_font, font_space, value_digits_array);      // определяем координату строки в виджете
         break;
     }
     }
-    uint16_t img_string_size_buf = 0;
-    for (vector<uint8_t>::size_type i = value_digits_array.size(); i > 0; i--)
+    uint16_t img_string_size_buf = 0;                                                       // буфер размера строки
+    for (vector<uint8_t>::size_type i = value_digits_array.size(); i > 0; i--)              // проходимся по массиву разрядов
     {
-        change_image_in_widget(img_font[value_digits_array[i - 1]], (init_coord_x + img_string_size_buf), 0);
-        img_string_size_buf += (img_font[value_digits_array[i - 1]].width + font_space);
+        change_image_in_widget(img_font[value_digits_array[i - 1]], (init_coord_x + img_string_size_buf), 0);   // отрисовываем разряд
+        img_string_size_buf += (img_font[value_digits_array[i - 1]].width + font_space);                        // прибавляем к размеру строки ширину символа + ширину пробела
     }
-    value_digits_array.clear();
 }
 
+// добавляем разряд к вводимому числу
 void Widget::temper_input_add_number(uint8_t num_to_enter, uint16_t &variable_to_change)
 {
-    if (variable_to_change <= 99)
+    if (variable_to_change <= 99)                               // можем ввести не более трёх разрядов
     {
-        variable_to_change *= 10;
-        variable_to_change += num_to_enter;
-        change_value_in_wgt(ALIGN_RIGHT, FONT_11_GAP_PIX, oven_display.numbers_11_font_vector, variable_to_change);
+        variable_to_change *= 10;                               // домножаем на 10 имеющееся число
+        variable_to_change += num_to_enter;                     // прибавляем новый разряд
+        change_value_in_wgt(ALIGN_RIGHT, FONT_11_GAP_PIX, oven_display.numbers_11_font_vector, variable_to_change);     // меняем число в виджете
     }
 }
 
+// удаляем младший разряд из вводимого числа
 void Widget::temper_input_backspace(uint16_t &variable_to_change)
 {
-    if (variable_to_change > 0)
+    if (variable_to_change > 0)         // если число больше нуля
     {
-        variable_to_change /= 10;
-        change_value_in_wgt(ALIGN_RIGHT, FONT_11_GAP_PIX, oven_display.numbers_11_font_vector, variable_to_change);
+        variable_to_change /= 10;       // делим число на десять
+        change_value_in_wgt(ALIGN_RIGHT, FONT_11_GAP_PIX, oven_display.numbers_11_font_vector, variable_to_change);     // меняем число в виджете
     }
 }
 
+// сбрасываем вводимое число
 void Widget::temper_input_reset(uint16_t &variable_to_change)
 {
-    if (variable_to_change != 0)
+    if (variable_to_change != 0)        // если число не равно нулю
     {
-        variable_to_change = 0;
-        change_value_in_wgt(ALIGN_RIGHT, FONT_11_GAP_PIX, oven_display.numbers_11_font_vector, variable_to_change);
+        variable_to_change = 0;         // приравниваем к нулю
+        change_value_in_wgt(ALIGN_RIGHT, FONT_11_GAP_PIX, oven_display.numbers_11_font_vector, variable_to_change);     // меняем число в виджете
     }
 }
 
+// вводимое значение становится заданным
 void Widget::temper_input_enter(uint16_t changed_variable, uint16_t &variable_to_write, uint16_t wgt_to_output_numbr)
 {
-    variable_to_write = changed_variable;
-    oven_display.widgets_vector[wgt_to_output_numbr].change_value_in_wgt(ALIGN_RIGHT, FONT_30_GAP_PIX, oven_display.numbers_30_font_vector, variable_to_write);
+    variable_to_write = changed_variable;       // отправляем изменённую переменную в целевую переменную
+    oven_display.widgets_vector[wgt_to_output_numbr].change_value_in_wgt(ALIGN_RIGHT, FONT_30_GAP_PIX, oven_display.numbers_30_font_vector, variable_to_write); // отрисовываем
 }
 
+// меняем цифру в таймере
 void OvenDisplay::change_time_figure(Decr_Incr chng_type, Widget& figure_widget, uint32_t* digit, vector<tImage>& nmbrs_img_vect, uint8_t digit_max_value)
 {
     switch (chng_type)
     {
-        case DECREMENT:
+        case DECREMENT:                     // если декрементируем
         {
-            if (*digit > 0)
+            if (*digit > 0)                 // если текущий разряд больше 0
             {
-                *digit = *digit - 1;
+                *digit = *digit - 1;        // декрементируем
             }
             else
             {
-                *digit = digit_max_value;
+                *digit = digit_max_value;   // иначе присваиваем максимальное значение
             }
             break;
         }
-        case INCREMENT:
+        case INCREMENT:                     // с инкрементном наоборот
         {
             if (*digit < digit_max_value)
             {
@@ -1182,18 +1195,21 @@ void OvenDisplay::change_time_figure(Decr_Incr chng_type, Widget& figure_widget,
             break;
         }
     }
-    replace_time_figure(figure_widget, nmbrs_img_vect[*digit]);
+    replace_time_figure(figure_widget, nmbrs_img_vect[*digit]);     // отрисовываем введённую цифру
 }
 
+// отрисовываем цифру в таймере
 void OvenDisplay::replace_time_figure(Widget& figure_widget, tImage& nmbr_img)
 {
     figure_widget.change_image_in_widget(numbers_45_font_vector[IMG_BACKGR_IN_VECT], \
-                                        figure_widget.img_center_x(numbers_45_font_vector[IMG_BACKGR_IN_VECT]), TIME_FIGURE_Y_OFFSET);
-    figure_widget.change_image_in_widget(nmbr_img, figure_widget.img_center_x(nmbr_img), TIME_FIGURE_Y_OFFSET);
+                                        figure_widget.img_center_x(numbers_45_font_vector[IMG_BACKGR_IN_VECT]), TIME_FIGURE_Y_OFFSET);  // отрисовываем фон символа
+    figure_widget.change_image_in_widget(nmbr_img, figure_widget.img_center_x(nmbr_img), TIME_FIGURE_Y_OFFSET);                         // отрисовываем символ
 }
 
+// инициализируем массивы изображений цифр (номер в массиве соответствует самой цифре)
 void OvenDisplay::init_fonts_img_vect(void)
 {
+    // шрифт 45 пикселей, тёмный фон
     numbers_45_font_vector.push_back(numbers_45_0);
     numbers_45_font_vector.push_back(numbers_45_1);
     numbers_45_font_vector.push_back(numbers_45_2);
@@ -1206,6 +1222,7 @@ void OvenDisplay::init_fonts_img_vect(void)
     numbers_45_font_vector.push_back(numbers_45_9);
     numbers_45_font_vector.push_back(numbers_45_background);
 
+    // шрифт 30 пикселей, тёмный фон
     numbers_30_font_vector.push_back(numbers_30_0);
     numbers_30_font_vector.push_back(numbers_30_1);
     numbers_30_font_vector.push_back(numbers_30_2);
@@ -1218,6 +1235,7 @@ void OvenDisplay::init_fonts_img_vect(void)
     numbers_30_font_vector.push_back(numbers_30_9);
     numbers_30_font_vector.push_back(numbers_30_background);
 
+    // шрифт 11 пикселей, оранжевый фон
     numbers_11_font_vector.push_back(numbers_11_0);
     numbers_11_font_vector.push_back(numbers_11_1);
     numbers_11_font_vector.push_back(numbers_11_2);
@@ -1231,9 +1249,10 @@ void OvenDisplay::init_fonts_img_vect(void)
     numbers_11_font_vector.push_back(numbers_11_background);
 }
 
+// начальная отрисовка отображаемых значений
 void OvenDisplay::init_displayed_values(void)
 {
-    for (vector<Widget>::size_type i = 0; i != widgets_vector.size(); i++)
+    for (vector<Widget>::size_type i = 0; i != widgets_vector.size(); i++)      // отрисовываем цифры в таймерах
     {
         if (
             (i == 9)  || \
@@ -1249,33 +1268,34 @@ void OvenDisplay::init_displayed_values(void)
             widgets_vector[i].change_image_in_widget(numbers_45_0, widgets_vector[i].img_center_x(numbers_45_0), TIME_FIGURE_Y_OFFSET);
         }
     }
-    widgets_vector[34].change_value_in_wgt(ALIGN_RIGHT, FONT_30_GAP_PIX, numbers_30_font_vector, main_device.preset_temperature);
-    widgets_vector[35].change_value_in_wgt(ALIGN_RIGHT, FONT_30_GAP_PIX, numbers_30_font_vector, main_device.current_temperature);
-    widgets_vector[36].change_value_in_wgt(ALIGN_RIGHT, FONT_11_GAP_PIX, numbers_11_font_vector, main_device.input_temperature);
+    widgets_vector[34].change_value_in_wgt(ALIGN_RIGHT, FONT_30_GAP_PIX, numbers_30_font_vector, main_device.preset_temperature);   // заданная температура
+    widgets_vector[35].change_value_in_wgt(ALIGN_RIGHT, FONT_30_GAP_PIX, numbers_30_font_vector, main_device.current_temperature);  // текущая температура
+    widgets_vector[36].change_value_in_wgt(ALIGN_RIGHT, FONT_11_GAP_PIX, numbers_11_font_vector, main_device.input_temperature);    // вводимая температура (над клавиатурой)
 
     if (SHOW_ALL_SENSORS)
     {
-        widgets_vector[70].change_value_in_wgt(ALIGN_RIGHT, FONT_30_GAP_PIX, numbers_30_font_vector, main_device.preset_pressure);
+        widgets_vector[70].change_value_in_wgt(ALIGN_RIGHT, FONT_30_GAP_PIX, numbers_30_font_vector, main_device.preset_pressure);  // то же самое для правого значения
         widgets_vector[71].change_value_in_wgt(ALIGN_RIGHT, FONT_30_GAP_PIX, numbers_30_font_vector, main_device.current_pressure);
         widgets_vector[72].change_value_in_wgt(ALIGN_RIGHT, FONT_11_GAP_PIX, numbers_11_font_vector, main_device.input_pressure);
     }
 }
 
+// переключить двоеточие в таймере
 void OvenDisplay::blink_clock_colon(Side_of_screen screen_side)
 {
-    switch (screen_side)
+    switch (screen_side)    // в какой половине дисплея работает таймер
     {
     case (LEFT_SIDE):
     {
-        if (left_colon_displayed)
+        if (left_colon_displayed)   // если двоеточие отображается
         {
-            widgets_vector[13].change_image_in_widget(img_time_colon_backgr, 0, 0);
-            left_colon_displayed = false;
+            widgets_vector[13].change_image_in_widget(img_time_colon_backgr, 0, 0);    // отрисовываем фон
+            left_colon_displayed = false;                                              // переключаем флаг
         }
         else
         {
-            widgets_vector[13].change_image_in_widget(img_time_colon_char, 0, 0);
-            left_colon_displayed = true;
+            widgets_vector[13].change_image_in_widget(img_time_colon_char, 0, 0);       // отрисовываем двоеточие
+            left_colon_displayed = true;                                                // переключаем флаг
         }
         break;
     }
@@ -1296,13 +1316,14 @@ void OvenDisplay::blink_clock_colon(Side_of_screen screen_side)
     }
 }
 
+// заблокировать стрелки таймера
 void OvenDisplay::lock_arrows(Side_of_screen screen_side)
 {
-    switch (screen_side)
+    switch (screen_side)        // в какой половине дисплея
     {
         case LEFT_SIDE:
         {
-        for (vector<Widget>::size_type i = 0; i != widgets_vector.size(); i++)
+        for (vector<Widget>::size_type i = 0; i != widgets_vector.size(); i++)  // проходимся по всем виджетам стрелок
         {
             if (
                 (i == 5) || \
@@ -1315,7 +1336,7 @@ void OvenDisplay::lock_arrows(Side_of_screen screen_side)
                 (i == 17)
                 )
             {
-                widgets_vector[i].lock_button();
+                widgets_vector[i].lock_button();                                // блокируем
             }
         }
             break;
@@ -1337,12 +1358,13 @@ void OvenDisplay::lock_arrows(Side_of_screen screen_side)
                 {
                     widgets_vector[i].lock_button();
                 }
-            }
-            break;
+        }
+        break;
         }
     }
 }
 
+// разблокировать стрелки таймера
 void OvenDisplay::unlock_arrows(Side_of_screen screen_side)
 {
     switch (screen_side)
@@ -1390,145 +1412,21 @@ void OvenDisplay::unlock_arrows(Side_of_screen screen_side)
     }
 }
 
+// проверка, что отсчитали нужное количество семплов для данной кнопки
 bool OvenDisplay::bounce_filter_passed(Buttons_list pressed_button)
 {
-    if (pressed_button != bounce_btn_buff)
+    if (pressed_button != bounce_btn_buff)              // если текущая кнопка не равна кнопке, для которой считали дребезг
     {
-        bounce_btn_buff = pressed_button;
-        bounce_sample_counter = 0;
+        bounce_btn_buff = pressed_button;               // начинаем считать дребезг для текущей кнопки
+        bounce_sample_counter = 0;                      // обнуляем счетчик семплов
     }
-    if (bounce_sample_counter >= BOUNCE_MAX_SAMPLES)
+    if (bounce_sample_counter >= BOUNCE_MAX_SAMPLES)    // если досчитали до порогового количесвта семплов
     {
-        bounce_sample_counter = BOUNCE_MAX_SAMPLES;
-        return true;
+        bounce_sample_counter = BOUNCE_MAX_SAMPLES;     // заглушка, чтобы не считать бесконечно
+        return true;                                    // нажатие кнопки произошло
     }
     else
     {
-        return false;
+        return false;                                   // нажатие кнопки не произошло
     }
 }
-
-void system_menu_layout_draw(void)
-{
-    TFT_FillScreen(LCD_COLOR_WHITE, MAIN_LAYER);
-    //TFT_SetFont(&Font24);
-    TFT_SetTextColor(LCD_COLOR_BLACK);
-    TFT_DrawText(TFT_FONT24, OFFSET_FROM_EDGE, SPACE_BETWEEN_LINES, {"заданная температура воздуха: "}, 0, MAIN_LAYER, MAIN_LAYER, 0x0);
-    TFT_DrawText(TFT_FONT24, OFFSET_FROM_EDGE + 500, SPACE_BETWEEN_LINES, {"C"}, 0, MAIN_LAYER, MAIN_LAYER, 0x0);
-    TFT_DrawRectangle(OFFSET_FROM_EDGE + 650 - RECTANGLE_OFFSET, SPACE_BETWEEN_LINES -  RECTANGLE_OFFSET, \
-                        100, RECTANGLE_HEIGHT, ROUND_CORNER, LCD_COLOR_BLUE, LCD_COLOR_WHITE, MAIN_LAYER, \
-                        RECTANGLE_THICKNESS, RECTANGLE_FILL, RECTANGLE_PUNCTIR);
-    TFT_SetTextColor(LCD_COLOR_BLUE);
-    TFT_DrawText(TFT_FONT24, OFFSET_FROM_EDGE + 650, SPACE_BETWEEN_LINES, {"старт"}, 0, MAIN_LAYER, MAIN_LAYER, 0x0);
-
-    TFT_DrawRectangle(OFFSET_FROM_EDGE + 100 - RECTANGLE_OFFSET, 2*SPACE_BETWEEN_LINES -  RECTANGLE_OFFSET, \
-                        46, RECTANGLE_HEIGHT, ROUND_CORNER, LCD_COLOR_BLUE, LCD_COLOR_WHITE, MAIN_LAYER, \
-                        RECTANGLE_THICKNESS, RECTANGLE_FILL, RECTANGLE_PUNCTIR);
-    TFT_DrawRectangle(OFFSET_FROM_EDGE + 150 - RECTANGLE_OFFSET, 2*SPACE_BETWEEN_LINES -  RECTANGLE_OFFSET, \
-                        46, RECTANGLE_HEIGHT, ROUND_CORNER, LCD_COLOR_BLUE, LCD_COLOR_WHITE, MAIN_LAYER, \
-                        RECTANGLE_THICKNESS, RECTANGLE_FILL, RECTANGLE_PUNCTIR);
-    TFT_DrawRectangle(OFFSET_FROM_EDGE + 200 - RECTANGLE_OFFSET, 2*SPACE_BETWEEN_LINES -  RECTANGLE_OFFSET, \
-                        46, RECTANGLE_HEIGHT, ROUND_CORNER, LCD_COLOR_BLUE, LCD_COLOR_WHITE, MAIN_LAYER, \
-                        RECTANGLE_THICKNESS, RECTANGLE_FILL, RECTANGLE_PUNCTIR);
-    TFT_DrawRectangle(OFFSET_FROM_EDGE + 250 - RECTANGLE_OFFSET, 2*SPACE_BETWEEN_LINES -  RECTANGLE_OFFSET, \
-                        64, RECTANGLE_HEIGHT, ROUND_CORNER, LCD_COLOR_BLUE, LCD_COLOR_WHITE, MAIN_LAYER, \
-                        RECTANGLE_THICKNESS, RECTANGLE_FILL, RECTANGLE_PUNCTIR);
-    TFT_DrawRectangle(OFFSET_FROM_EDGE + 318 - RECTANGLE_OFFSET, 2*SPACE_BETWEEN_LINES -  RECTANGLE_OFFSET, \
-                        64, RECTANGLE_HEIGHT, ROUND_CORNER, LCD_COLOR_BLUE, LCD_COLOR_WHITE, MAIN_LAYER, \
-                        RECTANGLE_THICKNESS, RECTANGLE_FILL, RECTANGLE_PUNCTIR);
-    TFT_DrawRectangle(OFFSET_FROM_EDGE + 386 - RECTANGLE_OFFSET, 2*SPACE_BETWEEN_LINES -  RECTANGLE_OFFSET, \
-                        64, RECTANGLE_HEIGHT, ROUND_CORNER, LCD_COLOR_BLUE, LCD_COLOR_WHITE, MAIN_LAYER, \
-                        RECTANGLE_THICKNESS, RECTANGLE_FILL, RECTANGLE_PUNCTIR);
-    TFT_DrawText(TFT_FONT24, OFFSET_FROM_EDGE + 100, 2*SPACE_BETWEEN_LINES, {"70 80 90 100 110 120"}, 0, MAIN_LAYER, MAIN_LAYER, 0x0);
-    TFT_DrawRectangle(OFFSET_FROM_EDGE + 650 - RECTANGLE_OFFSET, 2*SPACE_BETWEEN_LINES -  RECTANGLE_OFFSET, \
-                        100, RECTANGLE_HEIGHT, ROUND_CORNER, LCD_COLOR_BLUE, LCD_COLOR_WHITE, MAIN_LAYER, \
-                        RECTANGLE_THICKNESS, RECTANGLE_FILL, RECTANGLE_PUNCTIR);
-    TFT_DrawText(TFT_FONT24, OFFSET_FROM_EDGE + 650, 2*SPACE_BETWEEN_LINES, {"стоп"}, 0, MAIN_LAYER, MAIN_LAYER, 0x0);
-    
-    TFT_SetTextColor(LCD_COLOR_BLACK);
-    TFT_DrawText(TFT_FONT24, OFFSET_FROM_EDGE, 3*SPACE_BETWEEN_LINES, {"заданное время нагрева: "}, 0, MAIN_LAYER, MAIN_LAYER, 0x0);
-    TFT_DrawText(TFT_FONT24, OFFSET_FROM_EDGE + 400, 3*SPACE_BETWEEN_LINES, {"ч"}, 0, MAIN_LAYER, MAIN_LAYER, 0x0);
-    TFT_DrawText(TFT_FONT24, OFFSET_FROM_EDGE + 450, 3*SPACE_BETWEEN_LINES, {"мин"}, 0, MAIN_LAYER, MAIN_LAYER, 0x0);
-
-    TFT_DrawRectangle(OFFSET_FROM_EDGE + 100 - RECTANGLE_OFFSET, 4*SPACE_BETWEEN_LINES -  RECTANGLE_OFFSET, \
-                        24, RECTANGLE_HEIGHT, ROUND_CORNER, LCD_COLOR_BLUE, LCD_COLOR_WHITE, MAIN_LAYER, \
-                        RECTANGLE_THICKNESS, RECTANGLE_FILL, RECTANGLE_PUNCTIR);
-    TFT_DrawRectangle(OFFSET_FROM_EDGE + 254 - RECTANGLE_OFFSET, 4*SPACE_BETWEEN_LINES -  RECTANGLE_OFFSET, \
-                        24, RECTANGLE_HEIGHT, ROUND_CORNER, LCD_COLOR_BLUE, LCD_COLOR_WHITE, MAIN_LAYER, \
-                        RECTANGLE_THICKNESS, RECTANGLE_FILL, RECTANGLE_PUNCTIR);
-    TFT_SetTextColor(LCD_COLOR_BLUE);
-    TFT_DrawText(TFT_FONT24, OFFSET_FROM_EDGE + 100, 4*SPACE_BETWEEN_LINES, {"+ 30 мин -"}, 0, MAIN_LAYER, MAIN_LAYER, 0x0);
-
-    TFT_SetTextColor(LCD_COLOR_BLACK);
-    TFT_DrawText(TFT_FONT24, OFFSET_FROM_EDGE, 5*SPACE_BETWEEN_LINES, {"статус: "}, 0, MAIN_LAYER, MAIN_LAYER, 0x0);
-
-    TFT_DrawText(TFT_FONT24, OFFSET_FROM_EDGE, 6*SPACE_BETWEEN_LINES, {"осталось времени: "}, 0, MAIN_LAYER, MAIN_LAYER, 0x0);
-
-    TFT_DrawText(TFT_FONT24, OFFSET_FROM_EDGE, 7*SPACE_BETWEEN_LINES, {"текущая температура воздуха: "}, 0, MAIN_LAYER, MAIN_LAYER, 0x0);
-    TFT_DrawText(TFT_FONT24, OFFSET_FROM_EDGE + 500, 7*SPACE_BETWEEN_LINES, {"C"}, 0, MAIN_LAYER, MAIN_LAYER, 0x0);
-
-    TFT_DrawText(TFT_FONT24, OFFSET_FROM_EDGE, 8*SPACE_BETWEEN_LINES, {"текущая температура нагревателя 1: "}, 0, MAIN_LAYER, MAIN_LAYER, 0x0);
-    TFT_DrawText(TFT_FONT24, OFFSET_FROM_EDGE + 600, 8*SPACE_BETWEEN_LINES, {"C"}, 0, MAIN_LAYER, MAIN_LAYER, 0x0);
-
-    TFT_DrawRectangle(OFFSET_FROM_EDGE + 100 - RECTANGLE_OFFSET, 9*SPACE_BETWEEN_LINES -  RECTANGLE_OFFSET, \
-                        24, RECTANGLE_HEIGHT, ROUND_CORNER, LCD_COLOR_BLUE, LCD_COLOR_WHITE, MAIN_LAYER, \
-                        RECTANGLE_THICKNESS, RECTANGLE_FILL, RECTANGLE_PUNCTIR);
-    TFT_DrawRectangle(OFFSET_FROM_EDGE + 220 - RECTANGLE_OFFSET, 9*SPACE_BETWEEN_LINES -  RECTANGLE_OFFSET, \
-                        24, RECTANGLE_HEIGHT, ROUND_CORNER, LCD_COLOR_BLUE, LCD_COLOR_WHITE, MAIN_LAYER, \
-                        RECTANGLE_THICKNESS, RECTANGLE_FILL, RECTANGLE_PUNCTIR);
-    TFT_DrawRectangle(OFFSET_FROM_EDGE + 400 - RECTANGLE_OFFSET, 9*SPACE_BETWEEN_LINES -  RECTANGLE_OFFSET, \
-                        120, RECTANGLE_HEIGHT, ROUND_CORNER, LCD_COLOR_BLUE, LCD_COLOR_WHITE, MAIN_LAYER, \
-                        RECTANGLE_THICKNESS, RECTANGLE_FILL, RECTANGLE_PUNCTIR);
-    TFT_DrawRectangle(OFFSET_FROM_EDGE + 534 - RECTANGLE_OFFSET, 9*SPACE_BETWEEN_LINES -  RECTANGLE_OFFSET, \
-                        100, RECTANGLE_HEIGHT, ROUND_CORNER, LCD_COLOR_BLUE, LCD_COLOR_WHITE, MAIN_LAYER, \
-                        RECTANGLE_THICKNESS, RECTANGLE_FILL, RECTANGLE_PUNCTIR);
-    TFT_SetTextColor(LCD_COLOR_BLUE);
-    TFT_DrawText(TFT_FONT24, OFFSET_FROM_EDGE + 100, 9*SPACE_BETWEEN_LINES, {"+ 10 C -"}, 0, MAIN_LAYER, MAIN_LAYER, 0x0);
-    TFT_DrawText(TFT_FONT24, OFFSET_FROM_EDGE + 400, 9*SPACE_BETWEEN_LINES, {"нагрев  сброс"}, 0, MAIN_LAYER, MAIN_LAYER, 0x0);
-
-    TFT_SetTextColor(LCD_COLOR_BLACK);
-    TFT_DrawText(TFT_FONT24, OFFSET_FROM_EDGE, 10*SPACE_BETWEEN_LINES, {"текущая температура нагревателя 2: "}, 0, MAIN_LAYER, MAIN_LAYER, 0x0);
-    TFT_DrawText(TFT_FONT24, OFFSET_FROM_EDGE + 600, 10*SPACE_BETWEEN_LINES, {"C"}, 0, MAIN_LAYER, MAIN_LAYER, 0x0);
-
-    TFT_DrawRectangle(OFFSET_FROM_EDGE + 100 - RECTANGLE_OFFSET, 11*SPACE_BETWEEN_LINES -  RECTANGLE_OFFSET, \
-                        24, RECTANGLE_HEIGHT, ROUND_CORNER, LCD_COLOR_BLUE, LCD_COLOR_WHITE, MAIN_LAYER, \
-                        RECTANGLE_THICKNESS, RECTANGLE_FILL, RECTANGLE_PUNCTIR);
-    TFT_DrawRectangle(OFFSET_FROM_EDGE + 220 - RECTANGLE_OFFSET, 11*SPACE_BETWEEN_LINES -  RECTANGLE_OFFSET, \
-                        24, RECTANGLE_HEIGHT, ROUND_CORNER, LCD_COLOR_BLUE, LCD_COLOR_WHITE, MAIN_LAYER, \
-                        RECTANGLE_THICKNESS, RECTANGLE_FILL, RECTANGLE_PUNCTIR);
-    TFT_DrawRectangle(OFFSET_FROM_EDGE + 400 - RECTANGLE_OFFSET, 11*SPACE_BETWEEN_LINES -  RECTANGLE_OFFSET, \
-                        120, RECTANGLE_HEIGHT, ROUND_CORNER, LCD_COLOR_BLUE, LCD_COLOR_WHITE, MAIN_LAYER, \
-                        RECTANGLE_THICKNESS, RECTANGLE_FILL, RECTANGLE_PUNCTIR);
-    TFT_DrawRectangle(OFFSET_FROM_EDGE + 534 - RECTANGLE_OFFSET, 11*SPACE_BETWEEN_LINES -  RECTANGLE_OFFSET, \
-                        100, RECTANGLE_HEIGHT, ROUND_CORNER, LCD_COLOR_BLUE, LCD_COLOR_WHITE, MAIN_LAYER, \
-                        RECTANGLE_THICKNESS, RECTANGLE_FILL, RECTANGLE_PUNCTIR);
-    TFT_SetTextColor(LCD_COLOR_BLUE);
-    TFT_DrawText(TFT_FONT24, OFFSET_FROM_EDGE + 100, 11*SPACE_BETWEEN_LINES, {"+ 10 C - "}, 0, MAIN_LAYER, MAIN_LAYER, 0x0);
-    TFT_DrawText(TFT_FONT24, OFFSET_FROM_EDGE + 400, 11*SPACE_BETWEEN_LINES, {"нагрев  сброс"}, 0, MAIN_LAYER, MAIN_LAYER, 0x0); 
-    
-    TFT_SetTextColor(LCD_COLOR_BLACK);
-    TFT_DrawText(TFT_FONT24, OFFSET_FROM_EDGE, 12*SPACE_BETWEEN_LINES, {"текущее давление: "}, 0, MAIN_LAYER, MAIN_LAYER, 0x0);
-    TFT_DrawText(TFT_FONT24, OFFSET_FROM_EDGE + 400, 12*SPACE_BETWEEN_LINES, {"атм"}, 0, MAIN_LAYER, MAIN_LAYER, 0x0);
-
-    TFT_DrawRectangle(OFFSET_FROM_EDGE + 400 - RECTANGLE_OFFSET, 13*SPACE_BETWEEN_LINES -  RECTANGLE_OFFSET, \
-                        60, RECTANGLE_HEIGHT, ROUND_CORNER, LCD_COLOR_BLUE, LCD_COLOR_WHITE, MAIN_LAYER, \
-                        RECTANGLE_THICKNESS, RECTANGLE_FILL, RECTANGLE_PUNCTIR);
-    TFT_DrawRectangle(OFFSET_FROM_EDGE + 480 - RECTANGLE_OFFSET, 13*SPACE_BETWEEN_LINES -  RECTANGLE_OFFSET, \
-                        80, RECTANGLE_HEIGHT, ROUND_CORNER, LCD_COLOR_BLUE, LCD_COLOR_WHITE, MAIN_LAYER, \
-                        RECTANGLE_THICKNESS, RECTANGLE_FILL, RECTANGLE_PUNCTIR);
-    TFT_DrawText(TFT_FONT24, OFFSET_FROM_EDGE, 13*SPACE_BETWEEN_LINES, {"насос: "}, 0, MAIN_LAYER, MAIN_LAYER, 0x0);
-    TFT_SetTextColor(LCD_COLOR_BLUE);
-    TFT_DrawText(TFT_FONT24, OFFSET_FROM_EDGE + 400, 13*SPACE_BETWEEN_LINES, {"вкл  выкл"}, 0, MAIN_LAYER, MAIN_LAYER, 0x0);
-
-    TFT_DrawRectangle(OFFSET_FROM_EDGE + 400 - RECTANGLE_OFFSET, 14*SPACE_BETWEEN_LINES -  RECTANGLE_OFFSET, \
-                        60, RECTANGLE_HEIGHT, ROUND_CORNER, LCD_COLOR_BLUE, LCD_COLOR_WHITE, MAIN_LAYER, \
-                        RECTANGLE_THICKNESS, RECTANGLE_FILL, RECTANGLE_PUNCTIR);
-    TFT_DrawRectangle(OFFSET_FROM_EDGE + 480 - RECTANGLE_OFFSET, 14*SPACE_BETWEEN_LINES -  RECTANGLE_OFFSET, \
-                        80, RECTANGLE_HEIGHT, ROUND_CORNER, LCD_COLOR_BLUE, LCD_COLOR_WHITE, MAIN_LAYER, \
-                        RECTANGLE_THICKNESS, RECTANGLE_FILL, RECTANGLE_PUNCTIR);
-    TFT_SetTextColor(LCD_COLOR_BLACK);
-    TFT_DrawText(TFT_FONT24, OFFSET_FROM_EDGE, 14*SPACE_BETWEEN_LINES, {"вентиляторы: "}, 0, MAIN_LAYER, MAIN_LAYER, 0x0);
-    TFT_SetTextColor(LCD_COLOR_BLUE);
-    TFT_DrawText(TFT_FONT24, OFFSET_FROM_EDGE + 400, 14*SPACE_BETWEEN_LINES, {"вкл  выкл"}, 0, MAIN_LAYER, MAIN_LAYER, 0x0);
-}
-

@@ -413,28 +413,28 @@
  */
 // #define TEMP_SENSOR_0 998
 // #define TEMP_SENSOR_0 -2
-#define TEMP_SENSOR_0 -6//-6//997
-#define TEMP_SENSOR_1 -6//998//996
+#define TEMP_SENSOR_0 -6//-6//997         // термопара нагревателя 600 Вт
+#define TEMP_SENSOR_1 -6//998//996        // термопара нагревателя 800 Вт
 #define TEMP_SENSOR_2 0
 #define TEMP_SENSOR_3 0
 #define TEMP_SENSOR_4 0
 #define TEMP_SENSOR_5 0
 #define TEMP_SENSOR_6 0
 #define TEMP_SENSOR_7 0
-#define TEMP_SENSOR_BED 1//997
+#define TEMP_SENSOR_BED 1//997            // термистор воздуха в камере
 // #define TEMP_SENSOR_BED 1000
 #define TEMP_SENSOR_PROBE 0
-#define TEMP_SENSOR_CHAMBER 1
+#define TEMP_SENSOR_CHAMBER 1             // датчик вакуума
 
 // Dummy thermistor constant temperature readings, for use with 998 and 999
 #define DUMMY_THERMISTOR_998_VALUE 300
 #define DUMMY_THERMISTOR_999_VALUE 150
 
-#define OVEN_HEATER_600 temp_hotend[0]
-#define OVEN_HEATER_800 temp_hotend[1]
-#define OVEN_VACUUM_PUMP temp_chamber
-#define OVEN_AIR_TEMPER_SENSOR temp_bed
-#define OVEN_CONVECTION_FAN fan_speed[0]
+#define OVEN_HEATER_600 temp_hotend[0]    // нагреватель 600 Вт
+#define OVEN_HEATER_800 temp_hotend[1]    // нагреватель 800 Вт
+#define OVEN_VACUUM_PUMP temp_chamber     // вакуумный насос
+#define OVEN_AIR_TEMPER_SENSOR temp_bed   // воздух в камере (только датчик)
+#define OVEN_CONVECTION_FAN fan_speed[0]  // вентиляторы обдува
 
 // Use temp sensor 1 as a redundant sensor with sensor 0. If the readings
 // from the two sensors differ too much the print will be aborted.

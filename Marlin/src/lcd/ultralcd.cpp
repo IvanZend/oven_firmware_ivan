@@ -648,13 +648,13 @@ void MarlinUI::status_screen() {
 
   #endif // ULTIPANEL_FEEDMULTIPLY
    //draw_status_screen();
-  if (!oven_display.draw_all_completed)
+  if (!oven_display.draw_all_completed)       // если ранее не отрисовывали весь дисплей
   {
     HAL_LTDC_SetAddress(&hltdc,LCD_FRAME_BUFFER(LAYER_HOME), 0);
-    oven_display.draw_all_widgets();
-    oven_display.init_displayed_values();
+    oven_display.draw_all_widgets();          // отрисовываем фон и виджеты
+    oven_display.init_displayed_values();     // отрисовываем отображаемые значения
     //oven_display.test_draw();
-    oven_display.draw_all_completed = true;
+    oven_display.draw_all_completed = true;   // выставляем флаг, что всё отрисовали
   }
 }
 
@@ -909,30 +909,30 @@ void MarlinUI::update() {
 
   #endif // INIT_SDCARD_ON_BOOT
 
-  if (oven_display.bounce_filter_passed((Buttons_list)touch_buttons))
+  if (oven_display.bounce_filter_passed((Buttons_list)touch_buttons))     // если пройден фильтр дребезга 
   {
-    if (touch_buttons != oven_display.previous_button)
+    if (touch_buttons != oven_display.previous_button)                    // если текущая кнопка не равна предыдущей кнопке
     {
-      oven_display.handle_button_press((Buttons_list)touch_buttons);
-      oven_display.previous_button = (Buttons_list)touch_buttons;
+      oven_display.handle_button_press((Buttons_list)touch_buttons);      // вызываем обработчик нажатия кнпоки
+      oven_display.previous_button = (Buttons_list)touch_buttons;         // перезаписываем предыдущую кнопку
     }
   }
   
-  if (ELAPSED(ms, next_bounce_filter_ms))
+  if (ELAPSED(ms, next_bounce_filter_ms))   // если истёк таймер до следующего семпла дребезга
   {
-    oven_display.bounce_sample_counter++;
-    next_bounce_filter_ms = ms + TOUCH_BOUNCE_TIMER_MS;
+    oven_display.bounce_sample_counter++;   // увеличиваем счётчик семплов дребезга
+    next_bounce_filter_ms = ms + TOUCH_BOUNCE_TIMER_MS;   // задаём время до следующего события
   }
   
-  if (ELAPSED(ms, next_sec_event_ms))
+  if (ELAPSED(ms, next_sec_event_ms))       // если истекла секунда
   {
-    main_device.process_timer_left.seconds_timer_handler(LEFT_SIDE);
-    main_device.process_timer_right.seconds_timer_handler(RIGHT_SIDE);
-    if (oven_display.draw_all_completed)
+    main_device.process_timer_left.seconds_timer_handler(LEFT_SIDE);      // вызываем обработчик события для левого таймера
+    main_device.process_timer_right.seconds_timer_handler(RIGHT_SIDE);    // вызываем обработчик события для правого таймера
+    if (oven_display.draw_all_completed)                                  // если весь дисплей отрисован
     {
-      main_device.update_sensors_data();
+      main_device.update_sensors_data();                                  // обновляем показания датчиков
     }
-    next_sec_event_ms = ms + SECONDS_TIMER_MS;
+    next_sec_event_ms = ms + SECONDS_TIMER_MS;                            // задаём время до следующего события
   }
 
   touch_buttons = touch.read_buttons(currentScreen);

@@ -165,9 +165,10 @@ typedef struct
 */
 /*
  * Виджет - визуальный объект, выводимый на экран. Может быть или не быть кнопкой.
- * Может содержать изображения, рамки, текст (символы или строки). 
+ * Может содержать изображения. 
 */
 
+// подключаем файлы bmp - изображений
 #include "images/rocket.h"
 #include "images/backgr_tile.h"
 #include "images/rect_down_left_round.h"
@@ -266,80 +267,75 @@ typedef struct
 #include "images/numbers_11_9.h"
 #include "images/numbers_11_background.h"
 
-
+// класс виджета
 class Widget
 {
     public:
+    Buttons_list button_name;       // имя кнопки виджета (может быть NO_BUTTON)
+    uint16_t wgt_coord_x, wgt_coord_y, wgt_width, wgt_height;   // координаты и габариты виджета
+    vector<ImageObj> constant_images;       // постоянные изображения
+    vector<ImageObj> changeable_images;     // изменяемые изображения
+    vector<ImageObj> pressed_btn_images;    // изображения при нажатой кнопке
+    vector<ImageObj> released_btn_images;   // изображения при отпущенной кнопке
+    vector<ImageObj> blocked_btn_images;    // изображения при заблокированной кнопке
+    bool button_is_pressed;                 // флаг нажатия кнопки
+    bool btn_locked;                        // флаг блокировки кнопки
 
-    Buttons_list button_name;
-    uint16_t wgt_coord_x, wgt_coord_y, wgt_width, wgt_height;
-    vector<ImageObj> constant_images;
-    vector<ImageObj> changeable_images;
-    vector<ImageObj> pressed_btn_images;
-    vector<ImageObj> released_btn_images;
-    vector<ImageObj> blocked_btn_images;
-    bool button_is_pressed;
-    bool wgt_img_changed;                           // флаг, что выводимое значение изменилось, но еще не было физически отрисовано
-    bool btn_locked;
-
-    Widget(Buttons_list btn_name, uint16_t wgt_x, uint16_t wgt_y);
-    Widget(Buttons_list btn_name, uint16_t wgt_x, uint16_t wgt_y, uint16_t wgt_wdth, uint16_t wgt_hght);
-    void add_img_to_wgt(Img_vect_list vect_to_add_type, tImage add_image_generated, uint16_t add_img_coord_x, uint16_t add_img_coord_y);
+    Widget(Buttons_list btn_name, uint16_t wgt_x, uint16_t wgt_y);  // конструктор без габаритов
+    Widget(Buttons_list btn_name, uint16_t wgt_x, uint16_t wgt_y, uint16_t wgt_wdth, uint16_t wgt_hght);    // конструктор с габаритами
+    void add_img_to_wgt(Img_vect_list vect_to_add_type, tImage add_image_generated, uint16_t add_img_coord_x, uint16_t add_img_coord_y);    // добавляем изображение в виджет
     void tile_area(tImage image_to_tile, uint16_t area_width, uint16_t area_hight); // замостить область повторяющейся картинкой
     void set_rectangle(void);                       // отрисовываем фоновые рамки
-    void draw_img_vector(vector<ImageObj> img_vector_to_draw, uint16_t parent_wgt_coord_x, uint16_t parent_wgt_coord_y);
-    void change_image_in_widget(tImage image_to_output, uint16_t img_out_coord_x, uint16_t img_out_coord_y);
-    uint16_t img_center_x(tImage img_to_center);
-    void lock_button(void);
-    void unlock_button(void);
-    uint16_t string_align_right_x(vector<tImage>& img_nmbrs_vect, uint8_t fnt_space, vector<uint8_t>& value_to_align);
-    void convert_value_to_int_arr(vector<uint8_t>& value_int_vect,  uint32_t value_to_conv);
-    void change_value_in_wgt(Alignment numbers_align, uint8_t font_space, vector<tImage>& img_font, uint32_t value_to_displ);
-    void temper_input_add_number(uint8_t num_to_enter, uint16_t &variable_to_change);
-    void temper_input_backspace(uint16_t &variable_to_change);
-    void temper_input_reset(uint16_t &variable_to_change);
-    void temper_input_enter(uint16_t changed_variable, uint16_t &variable_to_write, uint16_t wgt_to_output_numbr);
+    void draw_img_vector(vector<ImageObj> img_vector_to_draw, uint16_t parent_wgt_coord_x, uint16_t parent_wgt_coord_y);    // отрисовываем вектор изображений
+    void change_image_in_widget(tImage image_to_output, uint16_t img_out_coord_x, uint16_t img_out_coord_y);            // изменить изображение изменить изображение в виджете
+    uint16_t img_center_x(tImage img_to_center);                                // получить координату для размещения изображения в центре виджета
+    void lock_button(void);                 // заблокировать кнопку
+    void unlock_button(void);               // разблокировать кнопку
+    uint16_t string_align_right_x(vector<tImage>& img_nmbrs_vect, uint8_t fnt_space, vector<uint8_t>& value_to_align);  // выровнять строку по правой границе виджета
+    void convert_value_to_int_arr(vector<uint8_t>& value_int_vect,  uint32_t value_to_conv);            // конвертировать числовое значение в массив цифр
+    void change_value_in_wgt(Alignment numbers_align, uint8_t font_space, vector<tImage>& img_font, uint32_t value_to_displ);   // изменить числовое значение в виджете
+    void temper_input_add_number(uint8_t num_to_enter, uint16_t &variable_to_change);       // добавить разряд к вводимому значению
+    void temper_input_backspace(uint16_t &variable_to_change);          // удалить младший разряд из вводимого значения
+    void temper_input_reset(uint16_t &variable_to_change);              // сбросить вводимое значение
+    void temper_input_enter(uint16_t changed_variable, uint16_t &variable_to_write, uint16_t wgt_to_output_numbr);  // ввод из редактируемого значения в заданное значение
 };
 
+// класс дисплея (единственный)
 class OvenDisplay 
 {
     public:
-
     OvenDisplay(void);                  // конструктор
-    Display_mode display_mode;
-    uint16_t display_width, display_height;
+    Display_mode display_mode;          // режим дисплея (пользовательский стандартный, пользовательский упрощённый, сервисный)
+    uint16_t display_width, display_height;     // габариты дисплея в пикселях
     bool draw_all_completed;            // Флаг, что весь дисплей был отрисован. Переключаем при запуске и при смене режима (DEFAULT_DISPLAY_MODE)
-    bool left_colon_displayed;
-    bool right_colon_displayed;
-    Buttons_list previous_button;
-    vector<Widget> widgets_vector;
-    vector<tImage> numbers_45_font_vector;
-    vector<tImage> numbers_30_font_vector;
-    vector<tImage> numbers_11_font_vector;
-    uint32_t bounce_sample_counter;
-    Buttons_list bounce_btn_buff;
+    bool left_colon_displayed;          // флаг отображения двоеточия в левом таймере
+    bool right_colon_displayed;         // флаг обображения двоеточия в правом таймере
+    Buttons_list previous_button;       // буфер предыдущей нажатой кнопки
+    vector<Widget> widgets_vector;      // вектор виджетов
+    vector<tImage> numbers_45_font_vector;  // вектор изображений шрифта 45 пикселей
+    vector<tImage> numbers_30_font_vector;  // вектор изображений шрифта 30 пикселей
+    vector<tImage> numbers_11_font_vector;  // вектор изображений шрифта 11 пикселей
+    uint32_t bounce_sample_counter;     // счётчик дребезга
+    Buttons_list bounce_btn_buff;       // буфер кнопки, для которой считаем дребезг
 
     void test_draw(void);                           // тестовая картинка, выводим изображение ракеты
     void init_widgets(void);                        // задаём содержимое виджетов
     void draw_all_widgets(void);                    // отрисовываем весь дисплей
-    void update_all_widgets(void);                  // обновляем виджеты, значение которых изменилось, но не отрисовано (напр. цифры)
     void init_widgets_size(void);                   // если размер виджета не был задан вручную, он автоматически равен размеру первой картинки - кнопки
     void handle_button_press(Buttons_list pressed_button);                  // обрабатываем нажатие кнопки
     void enter_related_event_left(void);            // если нажали на одну половину enter, имитируем нажатие на вторую
-    void enter_related_event_right(void); 
-    uint16_t identify_pressed_btn(uint16_t pressing_coord_x, uint16_t pressing_coord_y);
-    void change_time_figure(Decr_Incr chng_type, Widget& figure_widget, uint32_t* digit, vector<tImage>& nmbrs_img_vect, uint8_t digit_max_value);
-    void replace_time_figure(Widget& figure_widget, tImage& nmbr_img);
-    void init_fonts_img_vect(void);
-    void init_displayed_values(void);
-    void blink_clock_colon(Side_of_screen screen_side);
-    void lock_arrows(Side_of_screen screen_side);
-    void unlock_arrows(Side_of_screen screen_side);
-    bool bounce_filter_passed(Buttons_list pressed_button);
+    void enter_related_event_right(void);           // то же для правой клавитуры
+    uint16_t identify_pressed_btn(uint16_t pressing_coord_x, uint16_t pressing_coord_y);    // определяем, в какой кнопке лежат координаты нажатия
+    void change_time_figure(Decr_Incr chng_type, Widget& figure_widget, uint32_t* digit, vector<tImage>& nmbrs_img_vect, uint8_t digit_max_value);  // изменить цифру в таймере
+    void replace_time_figure(Widget& figure_widget, tImage& nmbr_img);   // отрисовать введённую цифру в таймере
+    void init_fonts_img_vect(void);     // иницииализировать вектора изображений шрифтов
+    void init_displayed_values(void);   // инициализировать отображаемые числовые значения
+    void blink_clock_colon(Side_of_screen screen_side);     // вкл / выкл двоеточие в таймере
+    void lock_arrows(Side_of_screen screen_side);           // заблокировать кнопки стрелок в таймере
+    void unlock_arrows(Side_of_screen screen_side);         // разблокировать кнопки стрелок в таймере
+    bool bounce_filter_passed(Buttons_list pressed_button); // проверка прохождения фильтра дребезга
 
 };
-
-void system_menu_layout_draw(void);
 
 extern OvenDisplay oven_display;       // глобальный объект дисплея
 

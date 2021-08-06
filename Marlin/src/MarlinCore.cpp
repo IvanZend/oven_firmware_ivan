@@ -1488,7 +1488,7 @@ void setup() {
 
   marlin_state = MF_RUNNING;
 
-  main_device.init_extern_devices();
+  main_device.init_extern_devices();        // инициализируем внешние устройства печи
 
   SETUP_LOG("setup() completed.");
 }

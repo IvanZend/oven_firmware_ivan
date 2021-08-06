@@ -6,64 +6,56 @@
 #include "../gcode/gcode.h"
 #include "../gcode/parser.h"
 
-#define TOUCH_BOUNCE_TIMER_MS   1
-#define SECONDS_TIMER_MS        1000
-#define FAN_OFF_TEMPERATURE     40
-#define VACUUM_DUMMY_VALUE      100
-#define NO_HEAT_DUMMY_VALUE     15
-#define HEATING_INCREASE        20
-#define HEATING_MAINTAIN        20
-#define TEMPERATURE_CRITICAL    150
-#define MILLIBAR_MIN_VALUE      5
+#define TOUCH_BOUNCE_TIMER_MS   1           // время одного семпла для фильтра дребезга
+#define SECONDS_TIMER_MS        1000        // количество миллисекунд в секунде
+#define FAN_OFF_TEMPERATURE     40          // пороговая температура выключения обдува
+#define VACUUM_DUMMY_VALUE      10000       // значение-заглушка для вакуума (ПИД-регулятор всегда в максимуме)
+#define NO_HEAT_DUMMY_VALUE     15          // значение температуры без нагрева
+#define HEATING_INCREASE        20          // дополнительная температура нагревателей при нагреве
+#define HEATING_MAINTAIN        20          // дополнительная температура нагревателей при удержании тепла
+#define TEMPERATURE_CRITICAL    150         // критическая температура, которую нельзя превышать        
 
-class ExternDevice
-{
-    public:
-    bool device_enabled;
-    ExternDevice();
-};
-
+// класс таймера
 class ProcessTimer
 {
     public:
-    bool timer_enabled;
-    uint32_t minutes_low_digit;
-    uint32_t minutes_high_digit;
-    uint32_t hours_low_digit;
-    uint32_t hours_high_digit;
-    uint16_t seconds_counter;
-    uint16_t miutes_counter;
-    ProcessTimer();
-    void start_process_timer(Side_of_screen screen_side);
-    void stop_process_timer(Side_of_screen screen_side);
-    void seconds_timer_handler(Side_of_screen screen_side);
+    bool timer_enabled;                 // флаг включённого таймера
+    uint32_t minutes_low_digit;         // младший разряд минут
+    uint32_t minutes_high_digit;        // старший разряд минут
+    uint32_t hours_low_digit;           // младший разряд часов
+    uint32_t hours_high_digit;          // старший разряд часов
+    uint16_t seconds_counter;           // счётчик секунд в минуте
+    ProcessTimer();                     // конструктор
+    void start_process_timer(Side_of_screen screen_side);       // запустить таймер
+    void stop_process_timer(Side_of_screen screen_side);        // остановить таймер
+    void seconds_timer_handler(Side_of_screen screen_side);     // обработчик события с внешнего таймера
 };
 
+// класс основного устройства
 class MainDevice
 {
     public:
 
-    bool heating_is_enabled;
-    uint16_t preset_temperature;
-    uint16_t current_temperature;
-    uint16_t input_temperature;
+    bool heating_is_enabled;            // флаг включённого нагрева
+    uint16_t preset_temperature;        // заданная температура
+    uint16_t current_temperature;       // текущая температура
+    uint16_t input_temperature;         // вводимая температура
 
-    bool vacuum_is_enabled;
-    uint16_t preset_pressure;
-    uint16_t current_pressure;
-    uint16_t input_pressure;
+    bool vacuum_is_enabled;             // флаг включённого вакуума
+    uint16_t preset_pressure;           // заданное давление
+    uint16_t current_pressure;          // текущее давление
+    uint16_t input_pressure;            // вводимое давление
 
-    ProcessTimer process_timer_left;
-    ProcessTimer process_timer_right;
+    ProcessTimer process_timer_left;    // экземпляр таймера слева (температура)
+    ProcessTimer process_timer_right;   // экземпляр таймера справа (вакуум)
 
-    MainDevice();
-    void update_sensors_data(void);
-    void start_heating(void);
-    void stop_heating(void);
-    void start_vacuum(void);
-    void stop_vacuum(void);
-    void init_extern_devices(void);
+    MainDevice();                       // конструктор
+    void update_sensors_data(void);     // обновить отображаемые значения датчиков
+    void start_heating(void);           // запуск нагрева
+    void stop_heating(void);            // остановка нагрева
+    void start_vacuum(void);            // запуск вакуума
+    void stop_vacuum(void);             // остановка вакуума
+    void init_extern_devices(void);     // инициализировать внешние устройства
 };
-
 
 #endif

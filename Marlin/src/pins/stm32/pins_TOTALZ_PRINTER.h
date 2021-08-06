@@ -165,13 +165,13 @@
 // #define TEMP_7_PIN         PA1   // Analog Input
 
 
-#define TEMP_BED_PIN           PC0
-#define TEMP_CHAMBER_PIN       PA0
+#define TEMP_BED_PIN           PC0        // термистор температуры воздуха
+#define TEMP_CHAMBER_PIN       PA0        // датчик вакуума
 // #define MAX6675_DO_PIN         PA1   // 
 // #define MAX6675_SCK_PIN        PA1   // 
 
-#define ADS_CS1_PIN         PA10//PF6  // 
-#define ADS_CS2_PIN         PF7//PF6  //
+#define ADS_CS1_PIN         PA10//PF6
+#define ADS_CS2_PIN         PF7//PF6      // термопары нагревателей (двухканальный внешний АЦП)
 
 // #define MAX6675_SS_bed_PIN       PA10   // 
 // #define MAX6675_SS2_PIN        PA1   // 
@@ -184,14 +184,14 @@
 #define OVEN_HEATER_800_PIN     PB3
 #define OVEN_VACUUM_PUMP_PIN    PB10
 
-#define HEATER_0_PIN       OVEN_HEATER_600_PIN    // было PC9
-#define HEATER_1_PIN       OVEN_HEATER_800_PIN    // было PB10
+#define HEATER_0_PIN       OVEN_HEATER_600_PIN    // было PC9     // нагреватель 600 Вт
+#define HEATER_1_PIN       OVEN_HEATER_800_PIN    // было PB10    // нагреватель 800 Вт
 #define HEATER_2_PIN       -1 
 #define HEATER_3_PIN       -1
 #define HEATER_4_PIN       -1
 #define HEATER_5_PIN       -1
-#define HEATER_BED_PIN      PC9 //PA15
-#define HEATER_CHAMBER_PIN    OVEN_VACUUM_PUMP_PIN //PB3
+#define HEATER_BED_PIN      PC9 //PA15                            // заглушка (без нагревателя) для термистора температуры воздуха
+#define HEATER_CHAMBER_PIN    OVEN_VACUUM_PUMP_PIN //PB3          // вакуумный насос
 
 #ifndef FAN_PIN
   #define FAN_PIN          PC6
