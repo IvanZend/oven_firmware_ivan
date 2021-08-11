@@ -221,9 +221,6 @@ MainDevice::MainDevice(void)
 // обновито показания датчиков температуры и давления
 void MainDevice::update_sensors_data(void)
 {
-    current_temperature = Temperature::OVEN_AIR_TEMPER_SENSOR.celsius;      // считываем текущую температуру воздуха
-    oven_display.widgets_vector[35].change_value_in_wgt(ALIGN_RIGHT, FONT_30_GAP_PIX, oven_display.numbers_30_font_vector, current_temperature);    // отрисовываем
-
     if (SHOW_ALL_SENSORS)       // если отображаем все сенсоры (для сервиса)
     {
         current_temperature = Temperature::OVEN_HEATER_600.celsius;         // считываем текущюу температуру нагревателя на 600 Вт
@@ -234,7 +231,16 @@ void MainDevice::update_sensors_data(void)
         
         current_pressure = Temperature::OVEN_VACUUM_PUMP.celsius;           // считываем текущее давление
         oven_display.widgets_vector[72].change_value_in_wgt(ALIGN_RIGHT, FONT_11_GAP_PIX, oven_display.numbers_11_font_vector, current_pressure);       // отрисовываем
+        
+        current_temperature = Temperature::OVEN_AIR_TEMPER_SENSOR.celsius;      // считываем текущую температуру воздуха
+        oven_display.widgets_vector[35].change_value_in_wgt(ALIGN_RIGHT, FONT_30_GAP_PIX, oven_display.numbers_30_font_vector, current_temperature);    // отрисовываем
     }
+    else
+    {
+        current_temperature = Temperature::OVEN_HEATER_800.celsius;      // считываем текущую температуру воздуха
+        oven_display.widgets_vector[35].change_value_in_wgt(ALIGN_RIGHT, FONT_30_GAP_PIX, oven_display.numbers_30_font_vector, current_temperature);    // отрисовываем
+    }
+
 
     if ((preset_temperature < FAN_OFF_TEMPERATURE)||(main_device.heating_is_enabled == false))   // если заданная температура ниже порога включения обдува, или нагрев не включён
     {
