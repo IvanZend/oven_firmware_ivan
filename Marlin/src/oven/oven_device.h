@@ -14,6 +14,7 @@
 #define HEATING_INCREASE        0           // дополнительная температура нагревателей при нагреве
 #define HEATING_MAINTAIN        0           // дополнительная температура нагревателей при удержании тепла
 #define TEMPERATURE_CRITICAL    150         // критическая температура, которую нельзя превышать        
+#define PERCENT_TO_VACUUM       30          // процент времени нагрева, после которого включаем вакуум
 
 // класс таймера
 class ProcessTimer
@@ -25,10 +26,14 @@ class ProcessTimer
     uint32_t hours_low_digit;           // младший разряд часов
     uint32_t hours_high_digit;          // старший разряд часов
     uint16_t seconds_counter;           // счётчик секунд в минуте
+    uint32_t total_sec_counter;         // общее количество секунд (измеряется при запуске таймера)
+    uint32_t remain_sec_counter;        // количество секунд до конца работы таймера
     ProcessTimer();                     // конструктор
     void start_process_timer(Side_of_screen screen_side);       // запустить таймер
     void stop_process_timer(Side_of_screen screen_side);        // остановить таймер
     void seconds_timer_handler(Side_of_screen screen_side);     // обработчик события с внешнего таймера
+    uint32_t return_remain_sec(uint32_t min_low_dgt, uint32_t min_high_dgt, uint32_t hour_low_dgt, uint32_t hour_high_dgt, uint32_t sec_count);   // секунды до конца таймера
+    bool time_not_zero(void);           // если хотя бы один разряд не равен нулю
 };
 
 // класс основного устройства

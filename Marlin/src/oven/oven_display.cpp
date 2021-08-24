@@ -93,7 +93,7 @@ void OvenDisplay::init_widgets(void)
     Widget background_frame = {NO_BUTTON, 0, 0};
     Widget thermometer_icon = {NO_BUTTON, 29, 32};
     Widget heating_string = {NO_BUTTON, 120, 42};
-    Widget heating_timer_start_stop_btn = {HEATING_TIMER_START_STOP, 88, 127, 0, 0};
+    Widget heating_timer_start_stop_btn = {NO_BUTTON, 88, 127, 0, 0};
     Widget temperature_display = {NO_BUTTON, 200, 50};
     Widget left_time_up_arrow_1 = {LEFT_UP_ARROW_1, 49, 200, 0, 0};
     Widget left_time_up_arrow_2 = {LEFT_UP_ARROW_2, 124, 200, 0, 0};
@@ -132,20 +132,20 @@ void OvenDisplay::init_widgets(void)
     Widget vacuum_pump_string_1 = {NO_BUTTON, 512, 39};
     Widget vacuum_pump_string_2 = {NO_BUTTON, 512, 65};
     Widget atm_string = {NO_BUTTON, 415, 100};
-    Widget vacuum_timer_start_stop_btn = {VACUUM_TIMER_START_STOP, 481, 127, 0, 0};
+    Widget vacuum_timer_start_stop_btn = {NO_BUTTON, 481, 127, 0, 0};
     Widget pressure_display = {NO_BUTTON, 592, 50};
-    Widget right_time_up_arrow_1 = {RIGHT_UP_ARROW_1, 442, 200, 0, 0};
-    Widget right_time_up_arrow_2 = {RIGHT_UP_ARROW_2, 517, 200, 0, 0};
-    Widget right_time_up_arrow_3 = {RIGHT_UP_ARROW_3, 611, 200, 0, 0};
-    Widget right_time_up_arrow_4 = {RIGHT_UP_ARROW_4, 686, 200, 0, 0};
+    Widget right_time_up_arrow_1 = {NO_BUTTON, 442, 200, 0, 0};
+    Widget right_time_up_arrow_2 = {NO_BUTTON, 517, 200, 0, 0};
+    Widget right_time_up_arrow_3 = {NO_BUTTON, 611, 200, 0, 0};
+    Widget right_time_up_arrow_4 = {NO_BUTTON, 686, 200, 0, 0};
     Widget right_time_figure_1 = {NO_BUTTON, 442, 230, 0, 0};
     Widget right_time_figure_2 = {NO_BUTTON, 517, 230, 0, 0};
     Widget right_time_figure_3 = {NO_BUTTON, 611, 230, 0, 0};
     Widget right_time_figure_4 = {NO_BUTTON, 686, 230, 0, 0};
-    Widget right_time_down_arrow_1 = {RIGHT_DOWN_ARROW_1, 442, 320, 0, 0};
-    Widget right_time_down_arrow_2 = {RIGHT_DOWN_ARROW_2, 517, 320, 0, 0};
-    Widget right_time_down_arrow_3 = {RIGHT_DOWN_ARROW_3, 611, 320, 0, 0};
-    Widget right_time_down_arrow_4 = {RIGHT_DOWN_ARROW_4, 686, 320, 0, 0};
+    Widget right_time_down_arrow_1 = {NO_BUTTON, 442, 320, 0, 0};
+    Widget right_time_down_arrow_2 = {NO_BUTTON, 517, 320, 0, 0};
+    Widget right_time_down_arrow_3 = {NO_BUTTON, 611, 320, 0, 0};
+    Widget right_time_down_arrow_4 = {NO_BUTTON, 686, 320, 0, 0};
     Widget temperature_right_entering_background = {NO_BUTTON, 443, 357};
     Widget temperature_right_keyboard_1 = {NO_BUTTON, 448, 382, 0, 0};
     Widget temperature_right_keyboard_2 = {NO_BUTTON, 498, 382, 0, 0};
@@ -161,7 +161,7 @@ void OvenDisplay::init_widgets(void)
     Widget temperature_right_keyboard_recet = {NO_BUTTON, 549, 450, 0, 0};
     Widget temperature_right_keyboard_enter_top = {NO_BUTTON, 700, 382, 0, 0};
     Widget temperature_right_keyboard_enter_bottom = {NO_BUTTON, 650, 450, 0, 0};
-    Widget vacuum_on_off_button = {VACUUM_ON_OFF, 527, 495, 0, 0};
+    Widget vacuum_on_off_button = {NO_BUTTON, 527, 495, 0, 0};
     Widget pressure_displ_preset = {NO_BUTTON, 630, 81, TEMPER_DISPL_SIZE_X, TEMPER_DISPL_SIZE_Y};
     Widget pressure_displ_current = {NO_BUTTON, 630, 129, TEMPER_DISPL_SIZE_X, TEMPER_DISPL_SIZE_Y};
     Widget pressure_displ_input = {NO_BUTTON, 714, 362, TEMPER_INPUT_SIZE_X, TEMPER_INPUT_SIZE_Y};
@@ -237,8 +237,11 @@ void OvenDisplay::init_widgets(void)
     temperature_left_keyboard_enter_bottom.add_img_to_wgt(BTN_PRESSED_IMG, img_keyboard_enter_bottom_prsd, 0, 0);
     temperature_left_keyboard_enter_bottom.add_img_to_wgt(BTN_RELEASED_IMG, img_keyboard_enter_bottom_rlsd, 0, 0);
     heating_on_off_button.add_img_to_wgt(BTN_RELEASED_IMG, img_slide_button_off, 0, 0);
+    heating_on_off_button.add_img_to_wgt(BTN_BLOCKED_IMG, img_slide_button_blocked, 0, 0);
+    
     
     pressure_sensor_icon.add_img_to_wgt(CONSTANT_IMG, img_pressure_sensor_icon_crossed, 0, 0);
+    /*
     vacuum_pump_string_1.add_img_to_wgt(CONSTANT_IMG, img_vacuum_pump_string_1, 0, 0);
     vacuum_pump_string_2.add_img_to_wgt(CONSTANT_IMG, img_vacuum_pump_string_2, 0, 0);
     atm_string.add_img_to_wgt(CONSTANT_IMG, img_atm_string, 0, 0);
@@ -307,6 +310,7 @@ void OvenDisplay::init_widgets(void)
     //temperature_right_keyboard_enter_bottom.add_img_to_wgt(BTN_RELEASED_IMG, img_keyboard_enter_bottom_rlsd, 0, 0);
     vacuum_on_off_button.add_img_to_wgt(BTN_RELEASED_IMG, img_slide_button_off, 0, 0);
     right_time_colon_char.add_img_to_wgt(CONSTANT_IMG, img_time_colon_char, 0, 0);
+    */
 
     widgets_vector.clear();     // инициализруем нулём вектор виджетов
     switch (display_mode)       // тут будет переключение между сервисным и пользовательским режимом (сейчас неактуально)
@@ -461,15 +465,6 @@ void OvenDisplay::handle_button_press(Buttons_list pressed_button)
     }
     case HEATING_TIMER_START_STOP:
     {
-        if (main_device.process_timer_left.timer_enabled)                   // если левый таймер включён
-        {
-            main_device.process_timer_left.stop_process_timer(LEFT_SIDE);   // выключаем таймер
-        }
-        else
-        {
-            main_device.process_timer_left.start_process_timer(LEFT_SIDE);  // иначе включаем таймер
-        }
-        return;
         break;
     }
     case LEFT_UP_ARROW_1:
@@ -618,15 +613,29 @@ void OvenDisplay::handle_button_press(Buttons_list pressed_button)
     }
     case HEATING_ON_OFF:
     {
+        if (main_device.process_timer_left.timer_enabled)                   // если левый таймер включён
+        {
+            main_device.process_timer_left.stop_process_timer(LEFT_SIDE);   // выключаем таймер
+        }
+        else
+        {
+            main_device.process_timer_left.start_process_timer(LEFT_SIDE);  // иначе включаем таймер
+        }
+
         if (main_device.heating_is_enabled)                             // включаем / выключаем нагрев
         {
             main_device.stop_heating();
-
         }
         else
         {
             main_device.start_heating();
         }
+
+        if (main_device.vacuum_is_enabled)
+        {
+            main_device.stop_vacuum();
+        }
+
         return;
         break;
     }
@@ -790,15 +799,6 @@ void OvenDisplay::handle_button_press(Buttons_list pressed_button)
     }
     case VACUUM_ON_OFF:
     {
-        if (main_device.vacuum_is_enabled)
-        {
-            main_device.stop_vacuum();
-        }
-        else
-        {
-            main_device.start_vacuum();
-        }
-        return;
         break;
     }
     
@@ -1165,6 +1165,24 @@ void Widget::temper_input_enter(uint16_t changed_variable, uint16_t &variable_to
     oven_display.widgets_vector[wgt_to_output_numbr].change_value_in_wgt(ALIGN_RIGHT, FONT_30_GAP_PIX, oven_display.numbers_30_font_vector, variable_to_write); // отрисовываем
 }
 
+void Widget::check_slider_lock(void)
+{
+    if (main_device.process_timer_left.time_not_zero())             // если введённое время не равно нулю
+    {
+        if (btn_locked)                          // если кнопка-слайдер заблокирована
+        {
+            unlock_button();                     // разблокируем кнопку
+        }
+    }
+    else                                                            // если введённое время равно нулю
+    {
+        if (!(btn_locked))                       // если кнопка-слайдер не заблокирована
+        {
+            lock_button();                       // блокируем кнопку
+        }
+    }
+}
+
 // меняем цифру в таймере
 void OvenDisplay::change_time_figure(Decr_Incr chng_type, Widget& figure_widget, uint32_t* digit, vector<tImage>& nmbrs_img_vect, uint8_t digit_max_value)
 {
@@ -1196,6 +1214,8 @@ void OvenDisplay::change_time_figure(Decr_Incr chng_type, Widget& figure_widget,
         }
     }
     replace_time_figure(figure_widget, nmbrs_img_vect[*digit]);     // отрисовываем введённую цифру
+
+    widgets_vector[33].check_slider_lock();
 }
 
 // отрисовываем цифру в таймере
@@ -1258,11 +1278,13 @@ void OvenDisplay::init_displayed_values(void)
             (i == 9)  || \
             (i == 10) || \
             (i == 11) || \
-            (i == 12) || \
+            (i == 12) 
+            /* || \
             (i == 46) || \
             (i == 47) || \
             (i == 48) || \
             (i == 49)
+            */
             )
         {
             widgets_vector[i].change_image_in_widget(numbers_45_0, widgets_vector[i].img_center_x(numbers_45_0), TIME_FIGURE_Y_OFFSET);
