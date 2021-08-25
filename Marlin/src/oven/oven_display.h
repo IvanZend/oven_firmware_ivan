@@ -40,7 +40,7 @@ using namespace std;
 #define FONT_30_GAP_PIX         4
 #define FONT_11_GAP_PIX         3
 #define IMG_BACKGR_IN_VECT      10
-#define SHOW_ALL_SENSORS        0
+#define SHOW_ALL_SENSORS        1
 
 enum Decr_Incr
 {
@@ -186,7 +186,6 @@ typedef struct
 #include "images/img_pressure_sensor_icon_enabled.h"
 #include "images/img_slide_button_off.h"
 #include "images/img_slide_button_on.h"
-#include "images/img_slide_button_blocked.h"
 #include "images/img_temperature_display.h"
 #include "images/img_pressure_display.h"
 #include "images/img_temperature_entering_background.h"
@@ -299,7 +298,6 @@ class Widget
     void temper_input_backspace(uint16_t &variable_to_change);          // удалить младший разряд из вводимого значения
     void temper_input_reset(uint16_t &variable_to_change);              // сбросить вводимое значение
     void temper_input_enter(uint16_t changed_variable, uint16_t &variable_to_write, uint16_t wgt_to_output_numbr);  // ввод из редактируемого значения в заданное значение
-    void check_slider_lock(void);   // проверяем, надо ли блокировать кнопку-слайдер
 };
 
 // класс дисплея (единственный)
@@ -336,6 +334,7 @@ class OvenDisplay
     void lock_arrows(Side_of_screen screen_side);           // заблокировать кнопки стрелок в таймере
     void unlock_arrows(Side_of_screen screen_side);         // разблокировать кнопки стрелок в таймере
     bool bounce_filter_passed(Buttons_list pressed_button); // проверка прохождения фильтра дребезга
+
 };
 
 extern OvenDisplay oven_display;       // глобальный объект дисплея

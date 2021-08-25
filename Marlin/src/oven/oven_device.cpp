@@ -10,8 +10,6 @@ ProcessTimer::ProcessTimer(void)    // конструктор таймера
     hours_low_digit = 0;            // младший разряд часов
     hours_high_digit = 0;           // старший разряд часов
     seconds_counter = SEC_IN_MIN_COUNT;     // счётчик секунд в минуте
-    total_sec_counter = 0;
-    remain_sec_counter = 0;         // секунды таймера
 }
 
 // запустить таймер
@@ -24,11 +22,7 @@ void ProcessTimer::start_process_timer(Side_of_screen screen_side)
             case LEFT_SIDE:
             {
                 oven_display.lock_arrows(screen_side);      // блокируем стрелки таймера
-                //oven_display.widgets_vector[3].change_image_in_widget(img_heating_timer_stop_button, 0, 0); // переключаем кнопку вкл/выкл таймера
-                if (total_sec_counter == 0)
-                {
-                    total_sec_counter = return_remain_sec(minutes_low_digit, minutes_high_digit, hours_low_digit, hours_high_digit, seconds_counter);   // всего секунд
-                }
+                oven_display.widgets_vector[3].change_image_in_widget(img_heating_timer_stop_button, 0, 0); // переключаем кнопку вкл/выкл таймера
                 timer_enabled = true;                       // выставляем флаг включенного таймера
                 break;
             }
@@ -52,7 +46,7 @@ void ProcessTimer::stop_process_timer(Side_of_screen screen_side)
         {
             timer_enabled = false;  // выставляем флаг выключенного таймера
             oven_display.widgets_vector[13].change_image_in_widget(img_time_colon_char, 0, 0);              // отрисовываем двоеточие таймера
-            //oven_display.widgets_vector[3].change_image_in_widget(img_heating_timer_start_button, 0, 0);    // переключаем кнопку вкл/выкл таймера
+            oven_display.widgets_vector[3].change_image_in_widget(img_heating_timer_start_button, 0, 0);    // переключаем кнопку вкл/выкл таймера
             oven_display.left_colon_displayed = true;       // выставляем флаг отображения двоеточия
             oven_display.unlock_arrows(screen_side);        // разблокируем стрелки таймера
             break;
@@ -104,7 +98,7 @@ void ProcessTimer::seconds_timer_handler(Side_of_screen screen_side)
 
             if (minutes_low_digit > 0)                  // если младший разряд минут больше нуля
             {
-                minutes_low_digit--;                    // вычитаем минуту
+                minutes_low_digit--;                    // вычетаем минуту
                 switch (screen_side)
                 {
                     case LEFT_SIDE:                     // выбираем сторону и отрисовываем цифру в разряде
@@ -195,10 +189,6 @@ void ProcessTimer::seconds_timer_handler(Side_of_screen screen_side)
                 case (LEFT_SIDE):
                 {
                     main_device.stop_heating();     // останавливаем нагрев
-                    main_device.stop_vacuum();
-                    oven_display.widgets_vector[33].lock_button();    // блокируем кнопку вкл/выкл нагрев
-                    total_sec_counter = 0;
-                    seconds_counter = SEC_IN_MIN_COUNT;
                     break;
                 }
                 case (RIGHT_SIDE):
@@ -210,12 +200,6 @@ void ProcessTimer::seconds_timer_handler(Side_of_screen screen_side)
 
                 stop_process_timer(screen_side);    // останавливаем таймер
             }
-        }
-
-        remain_sec_counter = return_remain_sec(minutes_low_digit, minutes_high_digit, hours_low_digit, hours_high_digit, seconds_counter);
-        if (remain_sec_counter < ((total_sec_counter/100)*(100 - PERCENT_TO_VACUUM)))
-        {
-            main_device.start_vacuum();
         }
     }
 }
@@ -336,7 +320,7 @@ void MainDevice::stop_heating(void)
 void MainDevice::start_vacuum(void)
 {
     main_device.vacuum_is_enabled = true;           // выставляем флаг вакуума
-    //oven_display.widgets_vector[69].change_image_in_widget(img_slide_button_on, 0, 0);              // переключаем кнопку вкл/выкл вакуум
+    oven_display.widgets_vector[69].change_image_in_widget(img_slide_button_on, 0, 0);              // переключаем кнопку вкл/выкл вакуум
     oven_display.widgets_vector[37].change_image_in_widget(img_pressure_sensor_icon_enabled, 0, 0); // переключаем иконку зачеркнутого давления
     Temperature::OVEN_VACUUM_PUMP.target = VACUUM_DUMMY_VALUE;                                      // требуем давление-заглушку для ПИД-регулятора
 }
@@ -345,7 +329,7 @@ void MainDevice::start_vacuum(void)
 void MainDevice::stop_vacuum(void)
 {
     main_device.vacuum_is_enabled = false;          // убираем флаг вакуума
-    //oven_display.widgets_vector[69].change_image_in_widget(img_slide_button_off, 0, 0);             // переключаем кнопку вкл/выкл вакуум
+    oven_display.widgets_vector[69].change_image_in_widget(img_slide_button_off, 0, 0);             // переключаем кнопку вкл/выкл вакуум
     oven_display.widgets_vector[37].change_image_in_widget(img_pressure_sensor_icon_crossed, 0, 0); // переключаем иконку зачёркнутого давления
     Temperature::OVEN_VACUUM_PUMP.target = 0;                                                       // требуем минимальое давление
 }
@@ -357,28 +341,4 @@ void MainDevice::init_extern_devices(void)
     Temperature::OVEN_HEATER_800.target = NO_HEAT_DUMMY_VALUE;
     Temperature::OVEN_VACUUM_PUMP.target = 0;                       // вакуум на минимум
     Temperature::OVEN_CONVECTION_FAN = 0;                           // обдув выключен
-}
-
-// узнаём, сколько секунд осталось до конца работы таймера
-uint32_t ProcessTimer::return_remain_sec(uint32_t min_low_dgt, uint32_t min_high_dgt, uint32_t hour_low_dgt, uint32_t hour_high_dgt, uint32_t sec_count)
-{
-    uint32_t remain_value = 0;
-    remain_value += (min_low_dgt - 1)*60 + sec_count;
-    remain_value += min_high_dgt*10*60;
-    remain_value += hour_low_dgt*60*60;
-    remain_value += hour_high_dgt*10*60*60;
-    return remain_value;
-}
-
-// проверяем, что введённое время не равно нулю
-bool ProcessTimer::time_not_zero(void)
-{
-    if ((minutes_low_digit != 0)||(minutes_high_digit != 0)||(hours_low_digit != 0)||(hours_high_digit != 0))   // если хотя бы один разряд не равен нулю
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
 }
