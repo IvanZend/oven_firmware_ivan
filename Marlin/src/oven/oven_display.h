@@ -40,7 +40,7 @@ using namespace std;
 #define FONT_30_GAP_PIX         4
 #define FONT_11_GAP_PIX         3
 #define IMG_BACKGR_IN_VECT      10
-#define SHOW_ALL_SENSORS        1
+#define SHOW_ALL_SENSORS        0
 
 enum Decr_Incr
 {

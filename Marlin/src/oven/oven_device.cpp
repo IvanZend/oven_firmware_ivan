@@ -237,7 +237,7 @@ void MainDevice::update_sensors_data(void)
     }
     else
     {
-        current_temperature = Temperature::OVEN_HEATER_800.celsius;      // считываем текущую температуру воздуха
+        current_temperature = Temperature::OVEN_HEATER_800.celsius;      // считываем текущую температуру нагревателя на 800 Вт
         oven_display.widgets_vector[35].change_value_in_wgt(ALIGN_RIGHT, FONT_30_GAP_PIX, oven_display.numbers_30_font_vector, current_temperature);    // отрисовываем
     }
 
